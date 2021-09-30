@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@null"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/card_image"
+        android:layout_width="0dp"
+        android:layout_height="390dp"
+        android:layout_weight="2"
+        android:alpha="1"
+        android:scaleType="fitXY"
+        android:src="@drawable/id0" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/gold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="gold"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/attack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="attack"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/heart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="heart"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/banishClassroom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="banish classroom"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/banishHand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="banish hand"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/banishDiscardPile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="banish discard pile"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/return_to_library"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Return to library"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/drawCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="draw card"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/drawExtraCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="draw card"
+            android:visibility="gone" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/drawCardDiscardOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="draw card &amp; discard one"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/drawTwoCardDiscardOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="draw 2 card &amp; discard one"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/opponentHexToDiscardPile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Opponent put Hex in discard pile"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/opponentHexToHand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Opponent put Hex in hand"
+            android:visibility="gone"/>
+    </LinearLayout>
+</LinearLayout>

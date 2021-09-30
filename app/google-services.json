@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "329585453851",
+    "project_id": "hogwartsbattle-cc11e",
+    "storage_bucket": "hogwartsbattle-cc11e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329585453851:android:7203e6f8bb3611f974c1be",
+        "android_client_info": {
+          "package_name": "com.example.hogwartsbattle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329585453851-e8dg3c61uhkbitge0m87tuta1k3iqb7j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2W5h7e7HVBrroIt-EBNGMOTW7fbckzYU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329585453851-e8dg3c61uhkbitge0m87tuta1k3iqb7j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
