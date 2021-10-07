@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hogwartsbattle.Adapters.ClassroomAdapter;
+import com.example.hogwartsbattle.Adapters.OpponentAllyAdapter;
 import com.example.hogwartsbattle.Adapters.OpponentHandAdapter;
 import com.example.hogwartsbattle.Adapters.OwnAllyAdapter;
 import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
@@ -31,6 +32,7 @@ import com.example.hogwartsbattle.Interface.IChooseHouseDialog;
 import com.example.hogwartsbattle.Interface.IOnClassroomShow;
 import com.example.hogwartsbattle.Interface.IOnOpponentHandShow;
 import com.example.hogwartsbattle.Interface.IOnOwnHandShow;
+import com.example.hogwartsbattle.Interface.IOpponentAllysListener;
 import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IRockPaperScissorsDialog;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
@@ -49,11 +51,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import dmax.dialog.SpotsDialog;
 
 
-public class GameActivity extends AppCompatActivity implements IChooseAllyDialog, IChooseHouseDialog, IRockPaperScissorsDialog, IOnOwnHandShow, IOnClassroomShow, IOnOpponentHandShow, IUpdateAttackGoldHeart, IOwnAllyListener {
+public class GameActivity extends AppCompatActivity implements IChooseAllyDialog, IChooseHouseDialog, IRockPaperScissorsDialog, IOnOwnHandShow, IOnClassroomShow, IOnOpponentHandShow, IUpdateAttackGoldHeart, IOwnAllyListener, IOpponentAllysListener {
 
     Player thisPlayer;
     Player opponent;
@@ -61,6 +64,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
 
     ArrayList<Card> allCards = new ArrayList<>();
     ArrayList<Card> generalDeck = new ArrayList<>();
+    ArrayList<Card> classRoom = new ArrayList<>();
     ArrayList<Card> hexDeck = new ArrayList<>();
     ArrayList<Card> ownDeck = new ArrayList<>();
     ArrayList<Card> hand = new ArrayList<>();
@@ -78,12 +82,15 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     IOnClassroomShow iOnClassroomShow;
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
     IOwnAllyListener iOwnAllyListener;
+    IOpponentAllysListener iOpponentAllysListener;
 
     FirebaseDatabase database;
 
-    ValueEventListener valueEventListenerOpponentFirstHand, valueEventListenerPlaying, valueEventListenerOpponentHandCards, valueEventListenerClassroom, valueEventListenerOpponentHouse;
+    ValueEventListener valueEventListenerOpponentFirstHand, valueEventListenerPlaying,
+            valueEventListenerOpponentHandCards, valueEventListenerClassroom, valueEventListenerOpponentHouse,
+            valueEventListenerOpponentAlly, valueEventListenerOwnAlly;
 
-    RecyclerView ownHand, opponentHand, recyclerViewClassroom, recyclerOwnAllys;
+    RecyclerView ownHand, opponentHand, recyclerViewClassroom, recyclerOwnAllys, recyclerOpponentAlly;
     TextView playersGold, playersAttack, playersHeart;
 
     OwnAllyAdapter ownAllyAdapter;
@@ -107,6 +114,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         iOnOpponentHandShow = this;
         iUpdateAttackGoldHeart = this;
         iOwnAllyListener = this;
+        iOpponentAllysListener = this;
         buildDecks();
 
         ChooseHouseDialog.getInstance().showChooseHouseDialog(this, iChooseHouseDialog);
@@ -161,7 +169,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         dialog.dismiss();
         thisPlayer.setHouse(Common.Houses.get(id));
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/house").setValue(Common.Houses.get(id));
-        
+
 
         ChooseAllyDialog.getInstance().showChooseAllyDialog(this, iChooseAllyDialog);
     }
@@ -244,17 +252,35 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             database.getReference("rooms/" + Common.currentRoomName + "/playing").setValue(winner);
             setClassroom();
         }
-        valueEventListenerPlaying = listenerHelpers.startListenerForPlaying(this);
+        // Need to be deleted in onDestroy!
+        // All listeners for game will be here
+        valueEventListenerPlaying = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue().equals(thisPlayer.getPlayerName())) {
+                    playTurn();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        database.getReference("rooms/" + Common.currentRoomName + "/playing").addValueEventListener(valueEventListenerPlaying);
         valueEventListenerOpponentHandCards = listenerHelpers.setListenerForOpponentHandCards(iOnOpponentHandShow);
+        valueEventListenerOpponentAlly = listenerHelpers.setListenerForOpponentAllys(iOpponentAllysListener);
+        valueEventListenerOwnAlly = listenerHelpers.setListenerForOwnAllys(iOwnAllyListener);
         valueEventListenerClassroom = listenerHelpers.setListenerForClassroom(generalDeck, iOnClassroomShow);
     }
 
     private void setUIView() {
-
         ownHand = findViewById(R.id.recycler_own_hand);
         opponentHand = findViewById(R.id.recycler_opponent_hand);
         recyclerViewClassroom = findViewById(R.id.classroom);
         recyclerOwnAllys = findViewById(R.id.recycler_own_allys);
+        recyclerOpponentAlly = findViewById(R.id.opponent_allys);
 
         playersAttack = findViewById(R.id.playersAttack);
         playersGold = findViewById(R.id.playersGold);
@@ -277,20 +303,37 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         ownHand.setLayoutManager(horizontalLayoutManagerOwnHand);
         ownHand.setHasFixedSize(true);
         ownHand.addItemDecoration(new SpacesItemDecoration(8));
+
         opponentHand.setLayoutManager(horizontalLayoutManagerOpponentHand);
         opponentHand.setHasFixedSize(true);
         opponentHand.addItemDecoration(new SpacesItemDecoration(8));
+
+        recyclerOpponentAlly.setLayoutManager(new GridLayoutManager(this, 1));
+        recyclerOpponentAlly.setHasFixedSize(true);
+        recyclerOpponentAlly.addItemDecoration(new SpacesItemDecoration(8));
 
         finishMove = findViewById(R.id.finishMove);
         finishMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                thisPlayer.setCoins(0);
-                thisPlayer.setAttacks(0);
+                if (thisPlayer.getHeart() > 0) {
+                    if (thisPlayer.getLives() < 7)
+                        if (thisPlayer.getLives() + thisPlayer.getHeart() > 7) {
+                            thisPlayer.setLives(7);
+                        } else {
+                            thisPlayer.setLives(thisPlayer.getLives() + thisPlayer.getHeart());
+                        }
+                    thisPlayer.setLives(thisPlayer.getLives() + thisPlayer.getHeart());
+                }
+                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getNotHandNotDiscarded());
+                thisPlayer.setNotHandNotDiscarded("");
                 opponent.setLives(opponent.getLives() - thisPlayer.getAttacks());
                 if (opponent.getLives() < 1) {
 
                 }
+                thisPlayer.setCoins(0);
+                thisPlayer.setAttacks(0);
+                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/lives").setValue(thisPlayer.getLives());
                 database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/lives").setValue(opponent.getLives());
                 database.getReference("rooms/" + Common.currentRoomName + "/playing").setValue(opponent.getPlayerName());
                 finishMove.setEnabled(false);
@@ -300,7 +343,6 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     }
 
     private void setClassroom() {
-        ArrayList<Card> classRoom = new ArrayList<>();
         String stringClassroom = "";
         for (int i = 0; i < 4; i++) {
             stringClassroom = stringClassroom + generalDeck.get(i).getId();
@@ -316,55 +358,70 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         finishMove.setEnabled(true);
 
         // Check for Hexes in hand that opponent might put in players hand
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snapshotTmp : snapshot.getChildren()) {
-                    if (!(snapshotTmp.getKey().equals(""))) {
-                        drawCards(snapshotTmp.getKey().toString());
-                    } else {
-                        drawCards("");
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot snapshotTmp : snapshot.getChildren()) {
+//                    if (!(Objects.requireNonNull(snapshotTmp.getValue()).toString().equals(""))) {
+//                        drawCards(snapshotTmp.getValue().toString());
+//                    } else {
+//                        drawCards("");
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+        drawCards("");
     }
 
     private void drawCards(String stringHand) {
         // It will come 1,2,3 -> which may be hexes
-        if (!stringHand.equals(""))
+        if (!stringHand.equals("")) {
             stringHand += ",";
+        }
         int i;
         StringBuilder stringHandBuilder = new StringBuilder(stringHand);
+        StringBuilder hexes = new StringBuilder(stringHand);
         for (i = 0; i < 5; i++) {
             hand.add(ownDeck.get(0));
+            if (ownDeck.get(0).getType().equals("hex")) {
+                if (hexes.equals(""))
+                    hexes.append(ownHand.getId());
+                else
+                    hexes.append(",").append(ownHand.getId());
+
+            }
             stringHandBuilder.append(ownDeck.get(0).getId());
             if (!(i == 4))
                 stringHandBuilder.append(",");
             ownDeck.remove(0);
         }
-        ArrayList<Card> Allies = deckHelper.returnCardsFromString(thisPlayer.getAlly());
-        ownAllyAdapter.updateAllies();
+        if (!thisPlayer.getAlly().equals("")) {
+            ArrayList<Card> Allies = deckHelper.returnCardsFromString(thisPlayer.getAlly());
+            ownAllyAdapter.updateAllies();
+        }
 
-        stringHand = stringHandBuilder.toString();
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(stringHand);
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(stringHandBuilder.toString());
+
+        thisPlayer.setHexes(hexes.toString());
+        hand.add(Common.allCardsMap.get(10));
         iOnOwnHandShow.onShowHand(hand);
     }
 
     @Override
-    public void onShowClassroom(ArrayList<Card> classRoom) {
+    public void onShowClassroom(ArrayList<Card> classRoomTmp) {
+        classRoom = classRoomTmp;
         ClassroomAdapter imageAdapter = new ClassroomAdapter(this, classRoom, database, thisPlayer, iUpdateAttackGoldHeart);
         recyclerViewClassroom.setAdapter(imageAdapter);
     }
 
     @Override
     public void onShowHand(ArrayList<Card> cards) {
-        OwnHandAdapter ownHandAdapter = new OwnHandAdapter(this, cards, thisPlayer, opponent, ownDeck, hexDeck, database, iUpdateAttackGoldHeart, iOwnAllyListener);
+        OwnHandAdapter ownHandAdapter = new OwnHandAdapter(this, cards, thisPlayer, opponent, ownDeck, hexDeck, database, iUpdateAttackGoldHeart, iOwnAllyListener, classRoom);
         ownHand.setAdapter(ownHandAdapter);
     }
 
@@ -376,8 +433,20 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     }
 
     @Override
+    public void onOpponentAllysShow(ArrayList<Card> allys) {
+        OpponentAllyAdapter opponentAllyAdapter = new OpponentAllyAdapter(this, allys);
+        recyclerOpponentAlly.setAdapter(opponentAllyAdapter);
+    }
+
+    @Override
     public void onOwnAllyChange(Card ally) {
         ownAllyAdapter.addAlly(ally);
+    }
+
+    @Override
+    public void setNewAllys(ArrayList<Card> allys) {
+        ownAllyAdapter = new OwnAllyAdapter(this, allys, thisPlayer, opponent, ownDeck, hexDeck, database, iUpdateAttackGoldHeart);
+        recyclerOwnAllys.setAdapter(ownAllyAdapter);
     }
 
     @Override
@@ -435,10 +504,11 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
 
     @Override
     public void onUpdateAttackGoldHeart() {
-        playersHeart.setText(String.valueOf(thisPlayer.getLives()));
+        playersHeart.setText(String.valueOf(thisPlayer.getHeart()));
         playersAttack.setText(String.valueOf(thisPlayer.getAttacks()));
         playersGold.setText(String.valueOf(thisPlayer.getCoins()));
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/coins").setValue(thisPlayer.getCoins());
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/heart").setValue(thisPlayer.getHeart());
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/attacks").setValue(thisPlayer.getAttacks());
     }
 }

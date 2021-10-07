@@ -53,6 +53,21 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         this.iDisableAllyListener = this;
     }
 
+    public OwnAllyAdapter(Context context, ArrayList<Card> ownAllyCards, Player ownPlayer,
+                          Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes,
+                          FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
+        this.context = context;
+        this.ownAllyCard =  ownAllyCards;
+        this.cardViewList = new ArrayList<>();
+        this.ownPlayer = ownPlayer;
+        this.opponentPlayer = opponentPlayer;
+        this.ownDeck = ownDeck;
+        this.hexes = hexes;
+        this.database = database;
+        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+        this.iDisableAllyListener = this;
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

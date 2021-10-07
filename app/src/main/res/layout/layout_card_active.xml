@@ -104,10 +104,31 @@
             android:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/revealTopCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reveal top card"
+            android:visibility="gone"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/opponentDiscardAlly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Opponent discard ally"
+            android:visibility="gone"/>
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/opponentHexToHand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Opponent put Hex in hand"
+            android:visibility="gone"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/discardPileDrawItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Draw Item from discard"
             android:visibility="gone"/>
     </LinearLayout>
 </LinearLayout>

@@ -3,8 +3,17 @@ package com.example.hogwartsbattle.Model;
 import java.util.ArrayList;
 
 public class Player {
-    int deckCount, attacks, lives, deaths, id, coins;
-    String hand, playerName, discarded, deck, ally, firstPlayHand, house, notHandNotDiscarded;
+    int deckCount, attacks, lives, deaths, id, coins, heart;
+    String hand;
+    String playerName;
+    String discarded;
+    String deck;
+    String ally;
+    String firstPlayHand;
+    String house;
+    String notHandNotDiscarded;
+
+    String hexes;
 
 
     public Player(String playerName) {
@@ -21,6 +30,8 @@ public class Player {
         this.firstPlayHand = "";
         this.coins = 0;
         this.notHandNotDiscarded = "";
+        this.hexes = "";
+        this.heart = 0;
     }
 
     public Player() {
@@ -136,5 +147,21 @@ public class Player {
 
     public void setNotHandNotDiscarded(String notHandNotDiscarded) {
         this.notHandNotDiscarded = notHandNotDiscarded;
+    }
+
+    public String getHexes() {
+        return hexes;
+    }
+
+    public void setHexes(String hexes) {
+        this.hexes = hexes;
+    }
+
+    public int getHeart() {
+        return heart;
+    }
+
+    public void setHeart(int heart) {
+        this.heart = heart;
     }
 }

@@ -30,6 +30,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     Player ownPlayer, opponentPlayer;
     ArrayList<Card> ownDeck, hexes;
     ArrayList<Card> ownHandCard;
+    ArrayList<Card> classroom;
     FirebaseDatabase database;
 
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
@@ -39,7 +40,8 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
 
     public OwnHandAdapter(Context context, ArrayList<Card> ownHandCard, Player ownPlayer,
                           Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes,
-                          FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart, IOwnAllyListener iOwnAllyListener) {
+                          FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart, IOwnAllyListener iOwnAllyListener,
+                          ArrayList<Card> classroom) {
         this.context = context;
         this.ownHandCard = ownHandCard;
         cardViewList = new ArrayList<>();
@@ -50,6 +52,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         this.database = database;
         this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
         this.iOwnAllyListener = iOwnAllyListener;
+        this.classroom = classroom;
     }
 
     @NonNull
@@ -69,9 +72,10 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardDialog.getInstance().showCardFromHandDialog(context, position, iCardDeletedFromRecyclerView,
+                CardDialog cardDialog = new CardDialog(context, position, iCardDeletedFromRecyclerView,
                         ownHandCard.get(position), ownPlayer, opponentPlayer,
-                        ownDeck, ownHandCard, hexes, database, iUpdateAttackGoldHeart, iOwnAllyListener);
+                        ownDeck, ownHandCard, hexes, database, iUpdateAttackGoldHeart, iOwnAllyListener, classroom);
+                cardDialog.showDialog();
 
             }
         });
@@ -79,6 +83,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
             cardViewList.add(holder.card_Layout_card);
         }
     }
+
     @Override
     public int getItemCount() {
         return ownHandCard.size();
@@ -89,18 +94,33 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         ownHandCard.remove(position);
         notifyItemRemoved(position);
         notifyDataSetChanged();
-        String handString ="";
+        String handString = "";
         int i = 0;
-        for(Card cardTmp : ownHandCard){
-            if (i == ownHandCard.size()){
+        for (Card cardTmp : ownHandCard) {
+            if (i == ownHandCard.size()) {
                 handString += cardTmp.getId();
-            }else{
+            } else {
                 handString += cardTmp.getId() + ",";
             }
         }
         database.getReference("rooms/" + Common.currentRoomName + "/" + ownPlayer.getPlayerName() + "/hand").setValue(handString);
     }
 
+    @Override
+    public void onAddCard(Card card) {
+        ownHandCard.add(card);
+        notifyDataSetChanged();
+        String handString = "";
+        int i = 0;
+        for (Card cardTmp : ownHandCard) {
+            if (i == ownHandCard.size()) {
+                handString += cardTmp.getId();
+            } else {
+                handString += cardTmp.getId() + ",";
+            }
+        }
+        database.getReference("rooms/" + Common.currentRoomName + "/" + ownPlayer.getPlayerName() + "/hand").setValue(handString);
+    }
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         ImageView card_from_layout;

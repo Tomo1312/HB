@@ -84,10 +84,442 @@
         <coins>1</coins>
         <heart>0</heart>
         <attack>0</attack>
-        <type>item</type>
+        <type>spell</type>
     </Card>
     <Card>
         <id>7</id>
+        <name>Revelio</name>
+        <count>2</count>
+        <cost>2</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>8</id>
+        <name>Rictusempra</name>
+        <count>2</count>
+        <cost>2</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>9</id>
+        <name>Petrificus totalus</name>
+        <count>4</count>
+        <cost>2</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>10</id>
+        <name>Bombarda</name>
+        <count>2</count>
+        <cost>2</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>11</id>
+        <name>Accio</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>12</id>
+        <name>Aguamenti</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>13</id>
+        <name>Reparo</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>14</id>
+        <name>Arresto momenutm</name>
+        <count>1</count>
+        <cost>3</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>15</id>
+        <name>Protego</name>
+        <count>3</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>16</id>
+        <name>Scourgify</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>17</id>
+        <name>Incendio</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>18</id>
+        <name>Ascendio</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>19</id>
+        <name>Prioir incantatem</name>
+        <count>1</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>20</id>
+        <name>Flagrante</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>21</id>
+        <name>Oppugno</name>
+        <count>3</count>
+        <cost>5</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>22</id>
+        <name>Expecto Patronum</name>
+        <count>2</count>
+        <cost>5</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>23</id>
+        <name>Lumos</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>24</id>
+        <name>Cave Inimicum</name>
+        <count>2</count>
+        <cost>6</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>25</id>
+        <name>Langlock</name>
+        <count>2</count>
+        <cost>6</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>26</id>
+        <name>Impedimenta</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>27</id>
+        <name>Muffliato</name>
+        <count>1</count>
+        <cost>7</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>28</id>
+        <name>Crucio</name>
+        <count>1</count>
+        <cost>8</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>29</id>
+        <name>Tarantallegra</name>
+        <count>1</count>
+        <cost>8</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>2</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>30</id>
+        <name>Flipendo</name>
+        <count>1</count>
+        <cost>8</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>3</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>31</id>
+        <name>Butterbeer</name>
+        <count>2</count>
+        <cost>2</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>32</id>
+        <name>Quick qoutes quill</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>33</id>
+        <name>Potion kit</name>
+        <count>2</count>
+        <cost>5</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>34</id>
+        <name>Essence of Dittany</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>35</id>
+        <name>Fizzing whizbees</name>
+        <count>1</count>
+        <cost>7</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>2</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>36</id>
+        <name>Sleeping draught</name>
+        <count>2</count>
+        <cost>7</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>2</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>37</id>
+        <name>Shrunken head</name>
+        <count>1</count>
+        <cost>8</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>38</id>
+        <name>Ginny Weasley</name>
+        <count>1</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>39</id>
+        <name>Neville Longbottom Weasley</name>
+        <count>1</count>
+        <cost>4</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>40</id>
+        <name>Rubes Hagrid</name>
+        <count>1</count>
+        <cost>5</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>41</id>
+        <name>Mad-eye moody</name>
+        <count>1</count>
+        <cost>5</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>42</id>
+        <name>Remus Lupin</name>
+        <count>1</count>
+        <cost>7</cost>
+        <house>none</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>43</id>
         <name>Albus Dumbledore</name>
         <count>1</count>
         <cost>9</cost>
@@ -99,79 +531,91 @@
         <type>ally</type>
     </Card>
     <Card>
-        <id>8</id>
-        <name>Ron Weasley</name>
-        <count>1</count>
-        <cost>5</cost>
-        <house>gryffindor</house>
+        <id>44</id>
+        <name>Crystal ball</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>ravenclaw</house>
         <cardType>deck</cardType>
-        <coins>1</coins>
+        <coins>2</coins>
         <heart>0</heart>
-        <attack>1</attack>
-        <type>ally</type>
+        <attack>0</attack>
+        <type>item</type>
     </Card>
     <Card>
-        <id>9</id>
-        <name>Descendo</name>
-        <count>1</count>
-        <cost>5</cost>
-        <house>gryffindor</house>
+        <id>45</id>
+        <name>Spellotape</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>ravenclaw</house>
         <cardType>deck</cardType>
-        <coins>0</coins>
-        <heart>1</heart>
-        <attack>2</attack>
+        <coins>2</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>46</id>
+        <name>Wingardium leviosa</name>
+        <count>3</count>
+        <cost>4</cost>
+        <house>ravenclaw</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>2</heart>
+        <attack>0</attack>
         <type>spell</type>
     </Card>
     <Card>
-        <id>10</id>
-        <name>Ernie Macmillan</name>
+        <id>47</id>
+        <name>Obliviate</name>
+        <count>2</count>
+        <cost>5</cost>
+        <house>ravenclaw</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>48</id>
+        <name>Locomotor</name>
+        <count>2</count>
+        <cost>6</cost>
+        <house>ravenclaw</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>49</id>
+        <name>Gilderoy Lockheart</name>
         <count>1</count>
         <cost>5</cost>
-        <house>hufflepuff</house>
+        <house>ravenclaw</house>
         <cardType>deck</cardType>
         <coins>0</coins>
-        <heart>2</heart>
+        <heart>0</heart>
         <attack>0</attack>
         <type>ally</type>
     </Card>
     <Card>
-        <id>11</id>
-        <name>Feather</name>
-        <count>1</count>
-        <cost>3</cost>
-        <house>hufflepuff</house>
-        <cardType>deck</cardType>
-        <coins>1</coins>
-        <heart>0</heart>
-        <attack>0</attack>
-        <type>item</type>
-    </Card>
-    <Card>
-        <id>12</id>
-        <name>Gregory Goyle</name>
+        <id>50</id>
+        <name>Luna Lovegood</name>
         <count>1</count>
         <cost>6</cost>
-        <house>slytherin</house>
+        <house>ravenclaw</house>
         <cardType>deck</cardType>
         <coins>0</coins>
-        <heart>0</heart>
+        <heart>1</heart>
         <attack>0</attack>
         <type>ally</type>
     </Card>
     <Card>
-        <id>13</id>
-        <name>Polyjuice Potion</name>
-        <count>1</count>
-        <cost>3</cost>
-        <house>slytherin</house>
-        <cardType>deck</cardType>
-        <coins>0</coins>
-        <heart>0</heart>
-        <attack>0</attack>
-        <type>item</type>
-    </Card>
-    <Card>
-        <id>14</id>
+        <id>51</id>
         <name>Cho Chang</name>
         <count>1</count>
         <cost>6</cost>
@@ -183,21 +627,345 @@
         <type>ally</type>
     </Card>
     <Card>
-        <id>15</id>
-        <name>Wingardium Leviosa</name>
+        <id>52</id>
+        <name>Filius Flitwick</name>
         <count>1</count>
-        <cost>4</cost>
+        <cost>7</cost>
         <house>ravenclaw</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>53</id>
+        <name>Chocolate Frog</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>54</id>
+        <name>Sugared Butterfly wings</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>55</id>
+        <name>Expeliarmus</name>
+        <count>3</count>
+        <cost>4</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>56</id>
+        <name>Descendo</name>
+        <count>2</count>
+        <cost>5</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>2</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>57</id>
+        <name>Stupefy</name>
+        <count>2</count>
+        <cost>6</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>2</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>58</id>
+        <name>Ron Weasley</name>
+        <count>1</count>
+        <cost>5</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>59</id>
+        <name>Hermione Granger</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>60</id>
+        <name>Harry Potter</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>2</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>61</id>
+        <name>Minerva McGonagall</name>
+        <count>1</count>
+        <cost>7</cost>
+        <house>gryffindor</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>62</id>
+        <name>Polyjuice potion</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>63</id>
+        <name>Peruvian instant darkness powder</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>slytherin</house>
         <cardType>deck</cardType>
         <coins>2</coins>
         <heart>0</heart>
         <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>64</id>
+        <name>Imperio</name>
+        <count>3</count>
+        <cost>4</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
         <type>spell</type>
     </Card>
     <Card>
-        <id>16</id>
-        <name>Slugulus Eructo</name>
+        <id>65</id>
+        <name>Densaugeo</name>
+        <count>2</count>
+        <cost>5</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>66</id>
+        <name>Relashio</name>
+        <count>2</count>
+        <cost>6</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>67</id>
+        <name>Vincent crabbe</name>
         <count>1</count>
+        <cost>5</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>68</id>
+        <name>Gregory Goyle</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>69</id>
+        <name>Draco Malfoy</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>70</id>
+        <name>Servus Snape</name>
+        <count>1</count>
+        <cost>7</cost>
+        <house>slytherin</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>2</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>71</id>
+        <name>Feather</name>
+        <count>2</count>
+        <cost>3</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>72</id>
+        <name>Mandrake</name>
+        <count>2</count>
+        <cost>4</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>item</type>
+    </Card>
+    <Card>
+        <id>73</id>
+        <name>Sonorus</name>
+        <count>3</count>
+        <cost>4</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>2</coins>
+        <heart>0</heart>
+        <attack>1</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>74</id>
+        <name>Diffindo</name>
+        <count>2</count>
+        <cost>5</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>0</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>75</id>
+        <name>Engorgio</name>
+        <count>2</count>
+        <cost>6</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>1</heart>
+        <attack>2</attack>
+        <type>spell</type>
+    </Card>
+    <Card>
+        <id>76</id>
+        <name>Ernie Macmillan</name>
+        <count>1</count>
+        <cost>5</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>77</id>
+        <name>Nymphadora Tonks</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>78</id>
+        <name>Cedric Diggory</name>
+        <count>1</count>
+        <cost>6</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>0</coins>
+        <heart>1</heart>
+        <attack>1</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>79</id>
+        <name>Pomona Sprout</name>
+        <count>1</count>
+        <cost>7</cost>
+        <house>hufflepuff</house>
+        <cardType>deck</cardType>
+        <coins>1</coins>
+        <heart>2</heart>
+        <attack>0</attack>
+        <type>ally</type>
+    </Card>
+    <Card>
+        <id>80</id>
+        <name>Trip Jinx</name>
+        <count>4</count>
         <cost>0</cost>
         <house>none</house>
         <cardType>hex</cardType>
@@ -207,9 +975,129 @@
         <type>none</type>
     </Card>
     <Card>
-        <id>17</id>
+        <id>81</id>
+        <name>Levicorpus</name>
+        <count>4</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>82</id>
         <name>Furnunculas</name>
-        <count>1</count>
+        <count>3</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>83</id>
+        <name>Bat Bogey</name>
+        <count>3</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>84</id>
+        <name>Jelly-Brain Jinx</name>
+        <count>3</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>85</id>
+        <name>Toenail Growing</name>
+        <count>2</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>86</id>
+        <name>Slugulus Eructo</name>
+        <count>2</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>87</id>
+        <name>Geminio</name>
+        <count>2</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>88</id>
+        <name>Conjunctivitis</name>
+        <count>2</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>89</id>
+        <name>Stingning Jinx</name>
+        <count>2</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>90</id>
+        <name>Confudus</name>
+        <count>2</count>
+        <cost>0</cost>
+        <house>none</house>
+        <cardType>hex</cardType>
+        <coins>0</coins>
+        <heart>0</heart>
+        <attack>0</attack>
+        <type>none</type>
+    </Card>
+    <Card>
+        <id>91</id>
+        <name>Sectumsempra</name>
+        <count>2</count>
         <cost>0</cost>
         <house>none</house>
         <cardType>hex</cardType>
