@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.hogwartsbattle.Common.Common;
-import com.example.hogwartsbattle.Common.Helpers;
 import com.example.hogwartsbattle.Game.GameActivity;
 import com.example.hogwartsbattle.Interface.IOnClassroomShow;
 import com.example.hogwartsbattle.Interface.IOnOpponentHandShow;
@@ -19,17 +18,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ListenerHelpers {
     FirebaseDatabase database;
     Player thisPlayer, opponentPlayer;
-    Helpers deckHelper;
 
     public ListenerHelpers(FirebaseDatabase database, Player thisPlayer, Player opponentPlayer) {
         this.thisPlayer = thisPlayer;
         this.opponentPlayer = opponentPlayer;
         this.database = database;
-        deckHelper = new Helpers();
     }
 
     public ValueEventListener setListenerForClassroom(ArrayList<Card> generalDeck, IOnClassroomShow iOnClassroomShow) {
@@ -38,7 +36,7 @@ public class ListenerHelpers {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.getValue().equals("")) {
                     String stringCards = snapshot.getValue().toString();
-                    ArrayList<Card> classroom = new ArrayList<>(deckHelper.returnCardsFromString(stringCards));
+                    ArrayList<Card> classroom = new ArrayList<>(Helpers.getInstance().returnCardsFromString(stringCards));
                     if (classroom.size() == 3 && Common.currentUser.isHost()) {
                         Card cardTmp = generalDeck.get(0);
                         generalDeck.remove(0);
@@ -58,6 +56,66 @@ public class ListenerHelpers {
         };
         database.getReference("rooms/" + Common.currentRoomName + "/classroom").addValueEventListener(valueEventListenerClassroom);
         return valueEventListenerClassroom;
+    }
+
+    public ValueEventListener setListenerForDiscardCard(ArrayList<Card> ownDeck, GameActivity activity) {
+
+        ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (!snapshot.getValue().toString().equals("0")) {
+                    Log.e("WRONG VALUE", snapshot.getValue().toString());
+                    activity.deckNeedShuffle();
+                    if (snapshot.getValue().toString().equals("1")) {
+                        for (Card card : ownDeck) {
+                            if (!card.getCardType().equals("hex")) {
+                                if (!thisPlayer.getDiscarded().equals("")) {
+                                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ",");
+                                }
+                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + card.getId());
+                                ownDeck.remove(card);
+                                break;
+                            }
+                        }
+                    } else if (snapshot.getValue().toString().equals("1")) {
+                        if (!thisPlayer.getDiscarded().equals("")) {
+                            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ",");
+                        }
+                        thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ownDeck.get(0).getId());
+                        ownDeck.remove(0);
+                    }
+
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").setValue(0);
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").addValueEventListener(valueEventListenerForDiscardCard);
+        return valueEventListenerForDiscardCard;
+    }
+
+    public ValueEventListener setListenerForOpponentDiscardCards() {
+
+        ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                opponentPlayer.setDiscarded(snapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").addValueEventListener(valueEventListenerForDiscardCard);
+        return valueEventListenerForDiscardCard;
     }
 
     public ValueEventListener setListenerForOpponentHandCards(IOnOpponentHandShow iOnOpponentHandShow) {

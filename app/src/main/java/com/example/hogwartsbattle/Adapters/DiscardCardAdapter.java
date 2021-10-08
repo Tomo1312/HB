@@ -12,7 +12,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.Common.Common;
-import com.example.hogwartsbattle.Interface.ICardDeletedFromRecyclerView;
+import com.example.hogwartsbattle.Helpers.Helpers;
+import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -30,7 +31,9 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     Dialog dialog;
     Player opponentPlayer;
     Player thisPlayer;
-    ICardDeletedFromRecyclerView iCardDeletedFromRecyclerView;
+    ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
+    int extraAttacks, extraHearts, extraGolds, extraCards;
+    ArrayList<Card> ownDeck;
     /*
      0 - layout allys
      1 - layout card
@@ -49,24 +52,48 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         this.thisPlayer = thisPlayer;
     }
 
-    public ICardDeletedFromRecyclerView getICardDeletedFromRecyclerView() {
-        return iCardDeletedFromRecyclerView;
+    public ICardAddOrDeletedFromHand getICardAddOrDeletedFromHand() {
+        return iCardAddOrDeletedFromHand;
     }
 
-    public void setICardDeletedFromRecyclerView(ICardDeletedFromRecyclerView iCardDeletedFromRecyclerView) {
-        this.iCardDeletedFromRecyclerView = iCardDeletedFromRecyclerView;
+    public void setICardAddOrDeletedFromHand(ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand) {
+        this.iCardAddOrDeletedFromHand = iCardAddOrDeletedFromHand;
+    }
+
+    public void setAttacks(int extraAttacks) {
+        this.extraAttacks = extraAttacks;
+    }
+
+    public void setHearts(int extraHearts) {
+        this.extraHearts = extraHearts;
+    }
+
+    public void setOwnDeck(ArrayList<Card> ownDeck) {
+        this.ownDeck = ownDeck;
+    }
+
+    public void setGolds(int extraGolds) {
+        this.extraGolds = extraGolds;
+    }
+
+    public void setCards(int extraCards) {
+        this.extraCards = extraCards;
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView;
+        //0 - Opponent discard ally
+        //1 - Opponent discard from classroom
+        //2 - Opponent draw from discard pile Item
+        //3 - This player my banish a hex from discard pile
         switch (layoutInt) {
-            case 1:
-                itemView = LayoutInflater.from(context).inflate(R.layout.layout_card_own_hand, parent, false);
+            case 0:
+                itemView = LayoutInflater.from(context).inflate(R.layout.layout_card_own_allys, parent, false);
                 break;
             default:
-                itemView = LayoutInflater.from(context).inflate(R.layout.layout_card_own_allys, parent, false);
+                itemView = LayoutInflater.from(context).inflate(R.layout.layout_card_discard, parent, false);
                 break;
 
         }
@@ -79,7 +106,6 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         switch (layoutInt) {
             case 0:
                 cardName = "ally" + cards.get(position).getId();
-
                 break;
             default:
                 cardName = "id" + cards.get(position).getId();
@@ -101,6 +127,18 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                     case 2:
                         playerDrawItemFromDiscardPile(cards.get(position));
                         break;
+                    case 3:
+                        playerBanishHexInDiscardPile(cards.get(position));
+                        break;
+                    case 4:
+                        playerBanishCardFromDiscardPile(cards.get(position));
+                        break;
+                    case 5:
+                        copyPlayedSpell(cards.get(position));
+                        break;
+                    case 6:
+                        banishFromHand(cards.get(position));
+                        break;
                     default:
                         //cardName = "ally" + cards.get(position).getId();
                         break;
@@ -108,28 +146,93 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
             }
         });
-        if (!cardViewList.contains(holder.card_from_layout)) {
-            cardViewList.add(holder.card_Layout_card);
+//        if (!cardViewList.contains(holder.card_from_layout)) {
+//            cardViewList.add(holder.card_Layout_card);
+//        }
+    }
+
+    private void banishFromHand(Card banishedCard) {
+
+        iCardAddOrDeletedFromHand.onDeleteCard(banishedCard);
+        database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(banishedCard.getId());
+        dialog.dismiss();
+    }
+
+    private void copyPlayedSpell(Card spellToCopy) {
+        iCardAddOrDeletedFromHand.onAddCard(spellToCopy);
+        String[] cards = thisPlayer.getPlayedCards().split(",");
+        StringBuilder discardedCards = new StringBuilder();
+        int i = 1;
+        if (cards.length > 1) {
+            for (String stringCardTmp : cards) {
+                if (!stringCardTmp.equals(spellToCopy.getId()))
+                    discardedCards.append(spellToCopy.getId());
+
+                if (i != cards.length - 1)
+                    discardedCards.append(",");
+                i++;
+            }
         }
+        thisPlayer.setPlayedCards(discardedCards.toString());
+        dialog.dismiss();
+
+    }
+
+    private void playerBanishCardFromDiscardPile(Card banishedCard) {
+        String[] cards = thisPlayer.getDiscarded().split(",");
+        int i = 1;
+        StringBuilder newDiscardDeck = new StringBuilder();
+        for (String cardTmp : cards) {
+            if (cardTmp.equals(banishedCard.getId()))
+                continue;
+            newDiscardDeck.append(cardTmp);
+            if (i == cards.length)
+                newDiscardDeck.append(",");
+        }
+
+        if (banishedCard.getCardType().equals("hex")) {
+            if (extraHearts > 0)
+                thisPlayer.setLives(thisPlayer.getLives() + extraHearts);
+        }
+
+        if (extraGolds > 0) {
+            thisPlayer.setCoins(thisPlayer.getCoins() + extraGolds);
+        }
+        thisPlayer.setDiscarded(newDiscardDeck.toString());
+        database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(banishedCard.getId());
+        dialog.dismiss();
+    }
+
+    private void playerBanishHexInDiscardPile(Card hexToBanish) {
+        if (extraAttacks > 0) {
+            thisPlayer.setAttacks(thisPlayer.getAttacks() + extraAttacks);
+        } else if (extraCards > 0) {
+            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+            ownDeck.remove(0);
+            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+            ownDeck.remove(0);
+        }
+        database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(hexToBanish.getId());
+        dialog.dismiss();
     }
 
     private void playerDrawItemFromDiscardPile(Card activeCard) {
-        iCardDeletedFromRecyclerView.onAddCard(activeCard);
+        iCardAddOrDeletedFromHand.onAddCard(activeCard);
         String[] cards = thisPlayer.getDiscarded().split(",");
         StringBuilder discardedCards = new StringBuilder();
         int i = 1;
         if (cards.length > 0) {
             for (String stringCardTmp : cards) {
-                if(!stringCardTmp.equals(activeCard.getId()))
+                if (!stringCardTmp.equals(activeCard.getId()))
                     discardedCards.append(activeCard.getId());
 
-                if(i!=cards.length-1)
+                if (i != cards.length - 1)
                     discardedCards.append(",");
                 i++;
             }
         }
         thisPlayer.setDiscarded(discardedCards.toString());
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getDiscarded());
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
         dialog.dismiss();
     }
 
@@ -144,8 +247,10 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
             }
             i++;
         }
+        if (extraGolds > 0) {
+            thisPlayer.setCoins(thisPlayer.getCoins() + extraGolds);
+        }
         database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(stringCards.toString());
-
         dialog.dismiss();
     }
 
@@ -171,14 +276,13 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         return cards.size();
     }
 
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         ImageView card_from_layout;
-        CardView card_Layout_card;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            card_Layout_card = itemView.findViewById(R.id.card_Layout_card);
             card_from_layout = itemView.findViewById(R.id.card_from_layout);
 
         }

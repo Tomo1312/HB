@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.CustomDialog.CardDialog;
 import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
-import com.example.hogwartsbattle.Interface.ICardDeletedFromRecyclerView;
 import com.example.hogwartsbattle.Interface.IDisableAllyListener;
 import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;

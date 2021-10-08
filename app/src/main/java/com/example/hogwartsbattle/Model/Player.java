@@ -3,7 +3,7 @@ package com.example.hogwartsbattle.Model;
 import java.util.ArrayList;
 
 public class Player {
-    int deckCount, attacks, lives, deaths, id, coins, heart;
+    int deckCount, attacks, lives, deaths, id, coins, heart, discardCardSpell;
     String hand;
     String playerName;
     String discarded;
@@ -11,7 +11,7 @@ public class Player {
     String ally;
     String firstPlayHand;
     String house;
-    String notHandNotDiscarded;
+    String playedCards;
 
     String hexes;
 
@@ -29,9 +29,15 @@ public class Player {
         this.deaths = 0;
         this.firstPlayHand = "";
         this.coins = 0;
-        this.notHandNotDiscarded = "";
+        this.playedCards = "";
         this.hexes = "";
         this.heart = 0;
+
+        // 0 - trigger nothing
+        // 1 - discard non-hex
+        // 2 - discard card
+        this.discardCardSpell = 0;
+
     }
 
     public Player() {
@@ -141,12 +147,12 @@ public class Player {
         this.coins = coins;
     }
 
-    public String getNotHandNotDiscarded() {
-        return notHandNotDiscarded;
+    public String getPlayedCards() {
+        return playedCards;
     }
 
-    public void setNotHandNotDiscarded(String notHandNotDiscarded) {
-        this.notHandNotDiscarded = notHandNotDiscarded;
+    public void setPlayedCards(String notHandNotDiscarded) {
+        this.playedCards = notHandNotDiscarded;
     }
 
     public String getHexes() {
@@ -163,5 +169,13 @@ public class Player {
 
     public void setHeart(int heart) {
         this.heart = heart;
+    }
+
+    public int getDiscardCardSpell() {
+        return discardCardSpell;
+    }
+
+    public void setDiscardCardSpell(int discardCardSpell) {
+        this.discardCardSpell = discardCardSpell;
     }
 }

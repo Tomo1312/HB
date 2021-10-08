@@ -1,8 +1,10 @@
-package com.example.hogwartsbattle.Common;
+package com.example.hogwartsbattle.Helpers;
 
 import android.content.Context;
 
+import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Model.Card;
+import com.example.hogwartsbattle.Model.Player;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -11,11 +13,16 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Helpers {
-    public Helpers() {
-    }
 
+    private static Helpers instance;
+    public static Helpers getInstance() {
+        if (instance == null)
+            instance = new Helpers();
+        return instance;
+    }
 
     public ArrayList<Card> getDeck(Context context) throws XmlPullParserException, IOException {
         XmlPullParserFactory parserFactory;
@@ -78,5 +85,30 @@ public class Helpers {
             cardsList.add(Common.allCardsMap.get(Integer.valueOf(stringCardTmp)));
         }
         return cardsList;
+    }
+
+    public String returnCardsFromArray(ArrayList<Card> cards){
+
+        StringBuilder handString = new StringBuilder();
+        int i = 1;
+        for (Card cardTmp : cards) {
+            handString.append(cardTmp.getId());
+            if (i == cards.size()) {
+                handString.append(",");
+            }
+        }
+        return handString.toString();
+    }
+
+    // When player need to draw more then 1 card, so new deck will be discard pile + current deck
+    // That have size < 5
+    public ArrayList<Card> getDeckFromDiscardPileAndHand(Player thisPlayer, ArrayList<Card> ownDeck) {
+        ArrayList<Card> deck = new ArrayList<>(ownDeck);
+
+        deck.addAll(returnCardsFromString(thisPlayer.getDiscarded()));
+
+        Collections.shuffle(deck);
+
+        return deck;
     }
 }

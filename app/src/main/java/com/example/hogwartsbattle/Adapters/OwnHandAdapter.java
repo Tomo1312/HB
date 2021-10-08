@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.CardDialog;
-import com.example.hogwartsbattle.Interface.ICardDeletedFromRecyclerView;
+import com.example.hogwartsbattle.Helpers.Helpers;
+import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
 import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
@@ -23,7 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHolder> implements ICardDeletedFromRecyclerView {
+public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHolder> implements ICardAddOrDeletedFromHand {
 
     Context context;
     List<CardView> cardViewList;
@@ -35,7 +36,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
 
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
 
-    ICardDeletedFromRecyclerView iCardDeletedFromRecyclerView;
+    ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
     IOwnAllyListener iOwnAllyListener;
 
     public OwnHandAdapter(Context context, ArrayList<Card> ownHandCard, Player ownPlayer,
@@ -58,7 +59,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        iCardDeletedFromRecyclerView = this;
+        iCardAddOrDeletedFromHand = this;
         View itemView = LayoutInflater.from(context).inflate(R.layout.layout_card_own_hand, parent, false);
         return new MyViewHolder(itemView);
     }
@@ -72,7 +73,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardDialog cardDialog = new CardDialog(context, position, iCardDeletedFromRecyclerView,
+                CardDialog cardDialog = new CardDialog(context, position, iCardAddOrDeletedFromHand,
                         ownHandCard.get(position), ownPlayer, opponentPlayer,
                         ownDeck, ownHandCard, hexes, database, iUpdateAttackGoldHeart, iOwnAllyListener, classroom);
                 cardDialog.showDialog();
@@ -90,9 +91,8 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     }
 
     @Override
-    public void onDeleteCard(Card card, int position) {
-        ownHandCard.remove(position);
-        notifyItemRemoved(position);
+    public void onDeleteCard(Card card) {
+        ownHandCard.remove(card);
         notifyDataSetChanged();
         String handString = "";
         int i = 0;
@@ -110,16 +110,9 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     public void onAddCard(Card card) {
         ownHandCard.add(card);
         notifyDataSetChanged();
-        String handString = "";
-        int i = 0;
-        for (Card cardTmp : ownHandCard) {
-            if (i == ownHandCard.size()) {
-                handString += cardTmp.getId();
-            } else {
-                handString += cardTmp.getId() + ",";
-            }
-        }
+        String handString = Helpers.getInstance().returnCardsFromArray(ownHandCard);
         database.getReference("rooms/" + Common.currentRoomName + "/" + ownPlayer.getPlayerName() + "/hand").setValue(handString);
+        ownPlayer.setHand(handString);
     }
     public class MyViewHolder extends RecyclerView.ViewHolder {
 

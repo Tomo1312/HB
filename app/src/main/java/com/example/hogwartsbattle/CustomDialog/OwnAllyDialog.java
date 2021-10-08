@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.hogwartsbattle.Common.Common;
-import com.example.hogwartsbattle.Interface.ICardDeletedFromRecyclerView;
 import com.example.hogwartsbattle.Interface.IDisableAllyListener;
 import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
@@ -48,7 +47,6 @@ public class OwnAllyDialog extends CustomDialog {
         this.iDisableAllyListener = iDisableAllyListener;
     }
 
-    ICardDeletedFromRecyclerView iCardDeletedFromRecyclerView;
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
     IOwnAllyListener iOwnAllyListener;
 
