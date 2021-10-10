@@ -16,10 +16,10 @@ public class Common {
     public static String currentRoomName;
     public static Map<Integer, Card> allCardsMap;
     public static Map<Integer, String> Houses = new HashMap<Integer, String>() {{
-        put(0, "Gryffindor");
-        put(1, "Ravenclaw");
-        put(2, "Hufflepuff");
-        put(3, "Slytherin");
+        put(0, "gryffindor");
+        put(1, "ravenclaw");
+        put(2, "hufflepuff");
+        put(3, "slytherin");
     }};
 
     public static final String ATTACK = "Attack";

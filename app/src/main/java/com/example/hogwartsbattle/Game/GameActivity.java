@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,13 +97,16 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     ListenerHelpers listenerHelpers;
     Button finishMove;
 
+    ImageView opponent_house_image, own_house_image;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
         getPlayers();
-        //Common.Houses.get(id)
+        opponent_house_image = findViewById(R.id.opponent_house_image);
+        own_house_image = findViewById(R.id.own_house_image);
         loading = new SpotsDialog.Builder().setCancelable(false).setContext(GameActivity.this).build();
         iChooseAllyDialog = this;
         iChooseHouseDialog = this;
@@ -167,6 +171,8 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         thisPlayer.setHouse(Common.Houses.get(id));
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/house").setValue(Common.Houses.get(id));
 
+        int house = getResources().getIdentifier("drawable/" + thisPlayer.getHouse(), null, getPackageName());
+        own_house_image.setImageResource(house);
 
         ChooseAllyDialog.getInstance().showChooseAllyDialog(this, iChooseAllyDialog);
     }
@@ -176,6 +182,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         dialog.dismiss();
         Card starterAlly = Common.allCardsMap.get(id);
         ownDeck.add(starterAlly);
+        Collections.shuffle(ownDeck);
         RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iRockPaperScissorsDialog);
 
     }
@@ -376,9 +383,9 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.getValue().toString().equals("")){
+                if (!snapshot.getValue().toString().equals("")) {
                     drawCards(snapshot.getValue().toString());
-                } else{
+                } else {
                     drawCards("");
                 }
             }
@@ -407,7 +414,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
                     hexesString.append(ownHand.getId());
                 else
                     hexesString.append(",").append(ownHand.getId());
-            }else{
+            } else {
                 stringHandBuilder.append(ownDeck.get(0).getId());
                 if (!(i == 4))
                     stringHandBuilder.append(",");
@@ -416,8 +423,10 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             ownDeck.remove(0);
         }
 
-        for(Card hexTmp : Helpers.getInstance().returnCardsFromString(hexesString.toString())){
-            ShowCardDialog.getInstance().showCardDialog(this,hexTmp, "You have draw Hex");
+        if (!hexesString.toString().equals("")) {
+            for (Card hexTmp : Helpers.getInstance().returnCardsFromString(hexesString.toString())) {
+                ShowCardDialog.getInstance().showCardDialog(this, hexTmp, "You have draw Hex");
+            }
         }
         if (!thisPlayer.getAlly().equals("")) {
             ownAllyAdapter.updateAllies();
@@ -514,7 +523,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
                     }
                 }
                 listenerHelpers = new ListenerHelpers(database, thisPlayer, opponent);
-                valueEventListenerOpponentHouse = listenerHelpers.getOpponentHouse();
+                valueEventListenerOpponentHouse = listenerHelpers.getOpponentHouse(getApplicationContext(), opponent_house_image);
                 setListenerForFirstOpponentHand();
             }
 

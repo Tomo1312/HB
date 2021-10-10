@@ -1,6 +1,8 @@
 package com.example.hogwartsbattle.Helpers;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -182,13 +184,16 @@ public class ListenerHelpers {
         return valueEventListenerPlaying;
     }
 
-    public ValueEventListener getOpponentHouse() {
+    public ValueEventListener getOpponentHouse(Context context,ImageView opponent_house_image) {
         ValueEventListener valueEventListenerPlaying = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 if (!snapshot.getValue().equals("") && snapshot.exists()) {
                     opponentPlayer.setHouse(snapshot.getValue().toString());
+                    int id = context.getResources().getIdentifier("drawable/" + opponentPlayer.getHouse(), null, context.getPackageName());
+                    opponent_house_image.setImageResource(id);
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/house").removeEventListener(this);
                 }
             }
 
