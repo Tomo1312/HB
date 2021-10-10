@@ -1,6 +1,7 @@
 package com.example.hogwartsbattle.Helpers;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -63,17 +64,17 @@ public class ListenerHelpers {
         ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                 if (!snapshot.getValue().toString().equals("0")) {
                     Log.e("WRONG VALUE", snapshot.getValue().toString());
                     activity.deckNeedShuffle();
                     if (snapshot.getValue().toString().equals("1")) {
                         for (Card card : ownDeck) {
                             if (!card.getCardType().equals("hex")) {
-                                if (!thisPlayer.getDiscarded().equals("")) {
-                                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ",");
+                                if (thisPlayer.getDiscarded().equals("")) {
+                                    thisPlayer.setDiscarded(card.getId());
+                                } else {
+                                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + card.getId());
                                 }
-                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + card.getId());
                                 ownDeck.remove(card);
                                 break;
                             }
@@ -85,7 +86,6 @@ public class ListenerHelpers {
                         thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ownDeck.get(0).getId());
                         ownDeck.remove(0);
                     }
-
                     database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").setValue(0);
                     database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
 
@@ -118,6 +118,24 @@ public class ListenerHelpers {
         return valueEventListenerForDiscardCard;
     }
 
+    public ValueEventListener setListenerForThisPlayerDiscardCards() {
+
+        ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!thisPlayer.getDiscarded().equals(snapshot.getValue().toString()))
+                    thisPlayer.setDiscarded(snapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").addValueEventListener(valueEventListenerForDiscardCard);
+        return valueEventListenerForDiscardCard;
+    }
+
     public ValueEventListener setListenerForOpponentHandCards(IOnOpponentHandShow iOnOpponentHandShow) {
         ValueEventListener valueEventListenerOpponentHandCards = new ValueEventListener() {
             @Override
@@ -131,9 +149,9 @@ public class ListenerHelpers {
                     }
                     if (!opponentsHandCards.isEmpty()) {
                         iOnOpponentHandShow.onOpponentShowHand(opponentsHandCards);
-                    } else {
-                        iOnOpponentHandShow.onShowHandEmpty();
                     }
+                } else {
+                    iOnOpponentHandShow.onShowHandEmpty();
                 }
             }
 
@@ -184,17 +202,22 @@ public class ListenerHelpers {
     }
 
     public ValueEventListener setListenerForOpponentAllys(IOpponentAllysListener iOpponentAllysListener) {
-        ValueEventListener valueEventListenerOpponentHandCards = new ValueEventListener() {
+        ValueEventListener valueEventListenerOpponentAllys = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.getValue().equals("")) {
-                    ArrayList<Card> opponentsHandCards = new ArrayList<>();
+                    ArrayList<Card> opponentsOpponentAllys = new ArrayList<>();
                     String stringCards = snapshot.getValue().toString();
                     String[] cards = stringCards.split(",");
                     for (String stringCardTmp : cards) {
-                        opponentsHandCards.add(Common.allCardsMap.get(Integer.valueOf(stringCardTmp)));
+                        opponentsOpponentAllys.add(Common.allCardsMap.get(Integer.valueOf(stringCardTmp)));
                     }
-                    iOpponentAllysListener.onOpponentAllysShow(opponentsHandCards);
+
+                    opponentPlayer.setAlly(snapshot.getValue().toString());
+                    iOpponentAllysListener.onOpponentAllysShow(opponentsOpponentAllys);
+                } else {
+                    opponentPlayer.setAlly("");
+                    iOpponentAllysListener.onOpponentAllysShow(new ArrayList<>());
                 }
             }
 
@@ -203,22 +226,16 @@ public class ListenerHelpers {
 
             }
         };
-        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentHandCards);
-        return valueEventListenerOpponentHandCards;
+        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentAllys);
+        return valueEventListenerOpponentAllys;
     }
 
     public ValueEventListener setListenerForOwnAllys(IOwnAllyListener iOwnAllyListener) {
-        ValueEventListener valueEventListenerOpponentHandCards = new ValueEventListener() {
+        ValueEventListener valueEventListenerOwnAllys = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.getValue().equals("")) {
-                    ArrayList<Card> opponentsHandCards = new ArrayList<>();
-                    String stringCards = snapshot.getValue().toString();
-                    String[] cards = stringCards.split(",");
-                    for (String stringCardTmp : cards) {
-                        opponentsHandCards.add(Common.allCardsMap.get(Integer.valueOf(stringCardTmp)));
-                    }
-                    iOwnAllyListener.setNewAllys(opponentsHandCards);
+                    iOwnAllyListener.removeAlly(Common.allCardsMap.get(Integer.valueOf(snapshot.getValue().toString())));
                 }
             }
 
@@ -227,7 +244,7 @@ public class ListenerHelpers {
 
             }
         };
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentHandCards);
-        return valueEventListenerOpponentHandCards;
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/idAllyToDiscard").addValueEventListener(valueEventListenerOwnAllys);
+        return valueEventListenerOwnAllys;
     }
 }

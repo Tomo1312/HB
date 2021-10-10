@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Player {
     int deckCount, attacks, lives, deaths, id, coins, heart, discardCardSpell;
+    boolean isPlaying;
     String hand;
     String playerName;
     String discarded;
@@ -13,6 +14,7 @@ public class Player {
     String house;
     String playedCards;
 
+    String idAllyToDiscard;
     String hexes;
 
 
@@ -33,6 +35,8 @@ public class Player {
         this.hexes = "";
         this.heart = 0;
 
+        // When opponent discard your ally here will be written id
+        this.idAllyToDiscard = "";
         // 0 - trigger nothing
         // 1 - discard non-hex
         // 2 - discard card
@@ -171,11 +175,27 @@ public class Player {
         this.heart = heart;
     }
 
+    public String getIdAllyToDiscard() {
+        return idAllyToDiscard;
+    }
+
+    public void setIdAllyToDiscard(String idAllyToDiscard) {
+        this.idAllyToDiscard = idAllyToDiscard;
+    }
+
     public int getDiscardCardSpell() {
         return discardCardSpell;
     }
 
     public void setDiscardCardSpell(int discardCardSpell) {
         this.discardCardSpell = discardCardSpell;
+    }
+
+    public boolean isPlaying() {
+        return isPlaying;
+    }
+
+    public void setPlaying(boolean playing) {
+        isPlaying = playing;
     }
 }

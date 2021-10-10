@@ -5,6 +5,7 @@ import com.example.hogwartsbattle.Model.Card;
 import java.util.ArrayList;
 
 public interface IOwnAllyListener {
+    //IN game activity
     void onOwnAllyChange(Card ally);
-    void setNewAllys(ArrayList<Card> allys);
+    void removeAlly(Card ally);
 }

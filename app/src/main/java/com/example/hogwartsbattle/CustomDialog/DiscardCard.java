@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.Adapters.DiscardCardAdapter;
+import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Common.SpacesItemDecoration;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
+import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -25,23 +27,22 @@ public class DiscardCard extends CustomDialog {
     Player opponentPlayer;
     Player thisPlayer;
     FirebaseDatabase database;
-    int cardSpells, position;
     // classroom, cards from discard pile, from hand,etc...
-    ArrayList<Card> allCardsToDisplay;
-    String opponentStringAlly;
+    ArrayList<Card> allCardsToDisplay, classroom, hexes;
     int layout, extraAttacks, extraHearts, extraGolds, extraCards;
 
     RecyclerView viewCardsForDelete;
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
+    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    OwnHandAdapter ownHandAdapter;
     ArrayList ownDeck;
 
     Helpers helper = new Helpers();
 
     public DiscardCard(Context context, FirebaseDatabase database, String opponentStringAlly, int layout, Player opponentPlayer, Player thisPlayer) {
         super(context, 0);
-        this.position = position;
         this.database = database;
-        this.opponentStringAlly = opponentStringAlly;
+        this.allCardsToDisplay = helper.returnCardsFromString(opponentStringAlly);
         this.layout = layout;
         this.thisPlayer = thisPlayer;
         this.opponentPlayer = opponentPlayer;
@@ -64,6 +65,14 @@ public class DiscardCard extends CustomDialog {
         this.iCardAddOrDeletedFromHand = iCardDeletedFromRecyclerView;
     }
 
+    public OwnHandAdapter getOwnHandAdapter() {
+        return ownHandAdapter;
+    }
+
+    public void setOwnHandAdapter(OwnHandAdapter ownHandAdapter) {
+        this.ownHandAdapter = ownHandAdapter;
+    }
+
     public void setAttacks(int attacks) {
         this.extraAttacks = attacks;
     }
@@ -84,6 +93,18 @@ public class DiscardCard extends CustomDialog {
         this.ownDeck = ownDeck;
     }
 
+    public void setClassroom(ArrayList<Card> classroom) {
+        this.classroom = classroom;
+    }
+
+    public void setHexes(ArrayList<Card> hexes) {
+        this.hexes = hexes;
+    }
+
+    public void setIUpdateAttackGoldHeart(IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
+        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+    }
+
     public void showDialog() {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -92,11 +113,18 @@ public class DiscardCard extends CustomDialog {
         LinearLayoutManager horizontalLayoutManagerOwnHand = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         switch (layout) {
             case 0:
-                //Opponent discard ally
-                dialog.setContentView(R.layout.layout_discard_card_horizontal);
+            case 10:
+                //0 - Discards opponent ally
+                dialog.setContentView(R.layout.layout_discard_card_vertical);
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(new GridLayoutManager(context, 1));
-                discardCardAdapter = new DiscardCardAdapter(context, helper.returnCardsFromString(opponentStringAlly), layout, database, dialog, opponentPlayer, thisPlayer);
+                discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
+                if (ownHandAdapter != null) {
+                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
+                    discardCardAdapter.setClassroom(classroom);
+                    discardCardAdapter.setHexes(hexes);
+                    discardCardAdapter.setIUpdateAttackGoldHeart(iUpdateAttackGoldHeart);
+                }
                 break;
             case 1:
                 //1- Opponent discard from classroom
@@ -111,17 +139,33 @@ public class DiscardCard extends CustomDialog {
             case 2:
             case 5:
             case 6:
+            case 7:
+            case 9:
+            case 11:
                 //2- Opponent draw from discard pile Item
                 //5- Copy any spell from played cards
                 //6- Banish from hand
+                //7 - Discard from hand
+                //9 - Discard card from spell and gain effects
+                //11 - Banish Hex from played cards
                 dialog.setContentView(R.layout.layout_discard_card_horizontal);
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(horizontalLayoutManagerOwnHand);
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
-                discardCardAdapter.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
+                if (iCardAddOrDeletedFromHand != null)
+                    discardCardAdapter.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
+                else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
+                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
+                    discardCardAdapter.setAttacks(1);
+                    discardCardAdapter.setHearts(1);
+                    discardCardAdapter.setCards(1);
+                } else if (ownHandAdapter != null)
+                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                 break;
             case 3:
-                //3- This player my banish a hex from discard pile
+            case 8:
+                //3- This player may banish a hex from discard pile
+                //8- put card from thisPlayer discard pile to opponent discard pile
                 dialog.setContentView(R.layout.layout_discard_card_horizontal);
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(horizontalLayoutManagerOwnHand);
@@ -157,10 +201,13 @@ public class DiscardCard extends CustomDialog {
 
         viewCardsForDelete.setAdapter(discardCardAdapter);
 
-        dialog.setCancelable(true);
+        if (layout != 7)
+            dialog.setCancelable(true);
+        else
+            dialog.setCancelable(false);
         dialog.show();
         Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
 }

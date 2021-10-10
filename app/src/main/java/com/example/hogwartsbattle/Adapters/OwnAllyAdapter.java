@@ -10,8 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.CardDialog;
 import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
+import com.example.hogwartsbattle.Helpers.Helpers;
+import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
 import com.example.hogwartsbattle.Interface.IDisableAllyListener;
 import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
@@ -27,23 +30,26 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
 
     Context context;
     List<CardView> cardViewList;
-    Player ownPlayer, opponentPlayer;
-    ArrayList<Card> ownDeck, hexes;
+    Player thisPlayer, opponentPlayer;
+    ArrayList<Card> ownDeck, hexes, classroom;
     ArrayList<Card> ownAllyCard;
     FirebaseDatabase database;
 
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
     IDisableAllyListener iDisableAllyListener;
 
-    IOwnAllyListener iOwnAllyListener;
+    ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
 
-    public OwnAllyAdapter(Context context, Player ownPlayer,
-                          Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes,
+    OwnHandAdapter ownHandAdapter;
+
+    public OwnAllyAdapter(Context context, Player thisPlayer,
+                          Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes, ArrayList<Card> classroom,
                           FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
         this.context = context;
-        this.ownAllyCard =  new ArrayList<>();
+        this.ownAllyCard = new ArrayList<>();
         this.cardViewList = new ArrayList<>();
-        this.ownPlayer = ownPlayer;
+        this.thisPlayer = thisPlayer;
+        this.classroom = classroom;
         this.opponentPlayer = opponentPlayer;
         this.ownDeck = ownDeck;
         this.hexes = hexes;
@@ -52,19 +58,20 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         this.iDisableAllyListener = this;
     }
 
-    public OwnAllyAdapter(Context context, ArrayList<Card> ownAllyCards, Player ownPlayer,
-                          Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes,
+    public OwnAllyAdapter(Context context, ArrayList<Card> ownAllyCards, Player thisPlayer,
+                          Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes, ArrayList<Card> classroom,
                           FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
         this.context = context;
-        this.ownAllyCard =  ownAllyCards;
+        this.ownAllyCard = ownAllyCards;
         this.cardViewList = new ArrayList<>();
-        this.ownPlayer = ownPlayer;
+        this.thisPlayer = thisPlayer;
         this.opponentPlayer = opponentPlayer;
         this.ownDeck = ownDeck;
         this.hexes = hexes;
         this.database = database;
         this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
         this.iDisableAllyListener = this;
+        this.classroom = classroom;
     }
 
     @NonNull
@@ -80,13 +87,14 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         int id = context.getResources().getIdentifier("drawable/" + cardName, null, context.getPackageName());
         holder.card_from_layout.setImageResource(id);
 
+
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!ownAllyCard.get(position).isUsed()) {
-                    OwnAllyDialog ownAllyDialog = new OwnAllyDialog(context, position,
-                            ownAllyCard.get(position), ownPlayer, opponentPlayer,
-                            ownDeck, ownAllyCard, hexes, database, iUpdateAttackGoldHeart, iOwnAllyListener, iDisableAllyListener);
+                if (!ownAllyCard.get(position).isUsed() && thisPlayer.isPlaying()) {
+                    OwnAllyDialog ownAllyDialog = new OwnAllyDialog(context, ownAllyCard.get(position),
+                            thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iUpdateAttackGoldHeart,
+                            iDisableAllyListener, ownHandAdapter);
                     ownAllyDialog.showDialog();
                 }
 
@@ -98,8 +106,21 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
     public void addAlly(Card activeCard) {
-        this.ownAllyCard.add(activeCard);
+        ownAllyCard.add(activeCard);
         notifyDataSetChanged();
+        thisPlayer.setAlly(Helpers.getInstance().returnCardsFromArray(ownAllyCard));
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
+    }
+
+    public void removeAlly(Card removedAlly) {
+        ownAllyCard.add(removedAlly);
+        notifyDataSetChanged();
+        thisPlayer.setAlly(Helpers.getInstance().returnCardsFromArray(ownAllyCard));
+        if(thisPlayer.getDiscarded().equals(""))
+            thisPlayer.setDiscarded(removedAlly.getId());
+        else
+            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + removedAlly.getId());
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
     }
 
     @Override
@@ -108,7 +129,7 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
     public void updateAllies() {
-        for(Card cardTmp : ownAllyCard){
+        for (Card cardTmp : ownAllyCard) {
             cardTmp.setUsed(false);
         }
         notifyDataSetChanged();
@@ -119,6 +140,15 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         notifyDataSetChanged();
     }
 
+    public void setOwnHandAdapter(OwnHandAdapter ownHandAdapter) {
+        this.ownHandAdapter = ownHandAdapter;
+    }
+
+    public boolean checkIfHandAdapterIsSet() {
+        if (ownHandAdapter == null)
+            return false;
+        return true;
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 

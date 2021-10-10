@@ -28,6 +28,10 @@ public class OpponentHandAdapter extends RecyclerView.Adapter<OpponentHandAdapte
         cardViewList = new ArrayList<>();
     }
 
+    public OpponentHandAdapter(Context context) {
+        this.context = context;
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -55,6 +59,12 @@ public class OpponentHandAdapter extends RecyclerView.Adapter<OpponentHandAdapte
     @Override
     public int getItemCount() {
         return opponentHandCard.size();
+    }
+
+    public void clear() {
+        opponentHandCard.clear();
+        cardViewList.clear();
+        notifyDataSetChanged();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

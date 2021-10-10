@@ -17,55 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/card_image"
         android:layout_marginTop="-20dp"
-        android:orientation="horizontal">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/gold"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
-            android:text="gold"
-            android:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/attack"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
-            android:text="attack"
-            android:visibility="visible"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/heart"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
-            android:text="heart"
-            android:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/banishDiscardPile"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
-            android:text="Banish"
-            android:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/drawCard"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
-            android:text="Draw"
-            android:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/opponentHexToDiscardPile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Opponent put Hex in discard pile"
-            android:visibility="gone" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/opponentHexToHand"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
-            android:text="Look"
-            android:visibility="visible"/>
+        android:id="@+id/layout_ally_attack"
+        android:orientation="vertical">
     </LinearLayout>
 </RelativeLayout>

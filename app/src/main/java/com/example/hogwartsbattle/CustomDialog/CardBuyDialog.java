@@ -54,7 +54,7 @@ public class CardBuyDialog extends CustomDialog {
         dialog.setCancelable(true);
         dialog.show();
         Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     private void setOnClickButtons(Dialog dialog) {

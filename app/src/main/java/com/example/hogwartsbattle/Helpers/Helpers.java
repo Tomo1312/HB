@@ -82,7 +82,7 @@ public class Helpers {
         ArrayList<Card> cardsList = new ArrayList<>();
         String[] cards = stringCards.split(",");
         for (String stringCardTmp : cards) {
-            cardsList.add(Common.allCardsMap.get(Integer.valueOf(stringCardTmp)));
+            cardsList.add(Common.allCardsMap.get(Integer.parseInt(stringCardTmp)));
         }
         return cardsList;
     }
@@ -93,22 +93,22 @@ public class Helpers {
         int i = 1;
         for (Card cardTmp : cards) {
             handString.append(cardTmp.getId());
-            if (i == cards.size()) {
+            if (i != cards.size()) {
                 handString.append(",");
             }
+            i++;
         }
         return handString.toString();
     }
 
     // When player need to draw more then 1 card, so new deck will be discard pile + current deck
     // That have size < 5
-    public ArrayList<Card> getDeckFromDiscardPileAndHand(Player thisPlayer, ArrayList<Card> ownDeck) {
+    public ArrayList<Card> getDeckFromDiscardPileAndDeck(Player thisPlayer, ArrayList<Card> ownDeck) {
         ArrayList<Card> deck = new ArrayList<>(ownDeck);
-
         deck.addAll(returnCardsFromString(thisPlayer.getDiscarded()));
-
         Collections.shuffle(deck);
 
         return deck;
     }
+
 }
