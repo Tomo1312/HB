@@ -7,8 +7,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.hogwartsbattle.Common.Common;
+import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
@@ -18,7 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 public class CardBuyDialog extends CustomDialog {
-    Player ownPlayer;
+    Player thisPlayer;
     Card activeCard;
     FirebaseDatabase database;
 
@@ -26,17 +28,20 @@ public class CardBuyDialog extends CustomDialog {
 
     ImageView cardImage;
     Button buyCard;
-    ArrayList<Card> classroom;
+    ArrayList<Card> classroom, ownDeck;
+    int library;
 
-    public CardBuyDialog(Context context, ArrayList<Card> classroom, int position, Card activeCard, Player thisPlayer,
-                         FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
-        super(context, position);
+    public CardBuyDialog(Context context, ArrayList<Card> classroom, int library, Card activeCard, Player thisPlayer,
+                         FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart, ArrayList<Card> ownDeck) {
+        super(context, 0);
 
         this.activeCard = activeCard;
-        this.ownPlayer = thisPlayer;
+        this.thisPlayer = thisPlayer;
         this.database = database;
         this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
         this.classroom = classroom;
+        this.ownDeck = ownDeck;
+        this.library=library;
     }
 
     public void showDialog() {
@@ -61,30 +66,42 @@ public class CardBuyDialog extends CustomDialog {
         buyCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ownPlayer.getCoins() >= Integer.parseInt(activeCard.getCost())) {
-                    if (ownPlayer.getDiscarded() == "")
-                        ownPlayer.setDiscarded(activeCard.getId());
-                    else
-                        ownPlayer.setDiscarded(ownPlayer.getDiscarded() + "," + activeCard.getId());
-                    ownPlayer.setCoins(ownPlayer.getCoins() - Integer.parseInt(activeCard.getCost()));
-                    iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
-
-                    String newClassroom ="";
-                    classroom.remove(activeCard);
-                    int i = 0;
-                    for (Card cardTmp : classroom){
-
-                        if(i==2){
-                            newClassroom += cardTmp.getId();
-                        }else{
-                            newClassroom += cardTmp.getId() +",";
+                if (thisPlayer.getCoins() >= Integer.parseInt(activeCard.getCost())) {
+                    if (activeCard.getId().equals(0)) {
+                        //Card 46, says to put item on top of deck
+                        if (thisPlayer.getPlayedCards().contains("46")) {
+                            ownDeck.add(0, activeCard);
+                        } else {
+                            if (thisPlayer.getDiscarded() == "")
+                                thisPlayer.setDiscarded(activeCard.getId());
+                            else
+                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
                         }
-                        i++;
+                        library--;
+                        database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
+                    } else {
+                        if (thisPlayer.getPlayedCards().contains("46") && activeCard.getType().equals("item")) {
+                            ownDeck.add(0, activeCard);
+                        }else if(thisPlayer.getPlayedCards().contains("45") && activeCard.getType().equals("spell")){
+                            ownDeck.add(0, activeCard);
+                        }else if(thisPlayer.getPlayedCards().contains("34") && activeCard.getType().equals("ally")){
+                            ownDeck.add(0, activeCard);
+                        }else{
+                            if (thisPlayer.getDiscarded() == "")
+                                thisPlayer.setDiscarded(activeCard.getId());
+                            else
+                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
+                        }
+                        thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()));
+                        classroom.remove(activeCard);
+
+                        iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
+                        database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(Helpers.getInstance().returnCardsFromArray(classroom));
                     }
-
-                    database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(newClassroom);
-
                     dialog.dismiss();
+                } else {
+                    Toast.makeText(context, "Don't have enough money!", Toast.LENGTH_LONG).show();
+
                 }
             }
         });

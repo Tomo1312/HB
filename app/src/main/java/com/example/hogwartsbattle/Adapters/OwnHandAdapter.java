@@ -39,6 +39,8 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
     IOwnAllyListener iOwnAllyListener;
 
+    int library;
+
     public OwnHandAdapter(Context context, ArrayList<Card> ownHandCard, Player thisPlayer,
                           Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes,
                           FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart, IOwnAllyListener iOwnAllyListener,
@@ -55,6 +57,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         this.iOwnAllyListener = iOwnAllyListener;
         this.classroom = classroom;
     }
+
 
     @NonNull
     @Override
@@ -73,7 +76,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardDialog cardDialog = new CardDialog(context, position, iCardAddOrDeletedFromHand,
+                CardDialog cardDialog = new CardDialog(context, library, iCardAddOrDeletedFromHand,
                         ownHandCard.get(position), thisPlayer, opponentPlayer,
                         ownDeck, ownHandCard, hexes, database, iUpdateAttackGoldHeart,
                         iOwnAllyListener, classroom);
@@ -136,6 +139,10 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
             notifyDataSetChanged();
         }
 
+    }
+
+    public void setLibrary(int library) {
+        this.library=library;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

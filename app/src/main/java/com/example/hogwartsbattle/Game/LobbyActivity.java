@@ -79,7 +79,9 @@ public class LobbyActivity extends AppCompatActivity {
                 roomRef = databse.getReference("rooms/" + roomName + "/" + playerName);
                 databse.getReference("rooms/" + roomName + "/startGame").setValue("false");
                 databse.getReference("rooms/" + roomName + "/classroom").setValue("");
+                databse.getReference("rooms/" + roomName + "/classroomBought").setValue("");
                 databse.getReference("rooms/" + roomName + "/banished").setValue("");
+                databse.getReference("rooms/" + roomName + "/library").setValue("8");
                 databse.getReference("rooms/" + roomName + "/playing").setValue("");
                 Player player = new Player(playerName);
                 addRoomEventListener();

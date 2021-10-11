@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Game.GameActivity;
+import com.example.hogwartsbattle.Interface.ILibraryListener;
 import com.example.hogwartsbattle.Interface.IOnClassroomShow;
 import com.example.hogwartsbattle.Interface.IOnOpponentHandShow;
 import com.example.hogwartsbattle.Interface.IOpponentAllysListener;
@@ -251,5 +252,23 @@ public class ListenerHelpers {
         };
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/idAllyToDiscard").addValueEventListener(valueEventListenerOwnAllys);
         return valueEventListenerOwnAllys;
+    }
+
+    public ValueEventListener setListenerForLibrary(ILibraryListener iLibraryListener) {
+        ValueEventListener valueEventListenerLibrary = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.getValue().equals("")) {
+                    iLibraryListener.onLibraryChange(Integer.parseInt(snapshot.getValue().toString()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        database.getReference("rooms/" + Common.currentRoomName + "/library").addValueEventListener(valueEventListenerLibrary);
+        return valueEventListenerLibrary;
     }
 }

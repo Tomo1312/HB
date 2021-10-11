@@ -30,6 +30,8 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.MyVi
 
     Player thisPlayer;
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    ArrayList<Card> ownDeck;
+
 
     public ClassroomAdapter(Context context, ArrayList<Card> classroom, FirebaseDatabase database, Player thisPlayer, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
         this.context = context;
@@ -55,7 +57,7 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.MyVi
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardBuyDialog cardBuyDialog = new CardBuyDialog(context, classroom, position, classroom.get(position), thisPlayer, database, iUpdateAttackGoldHeart);
+                CardBuyDialog cardBuyDialog = new CardBuyDialog(context, classroom, position, classroom.get(position), thisPlayer, database, iUpdateAttackGoldHeart, ownDeck);
                 cardBuyDialog.showDialog();
             }
         });
@@ -67,6 +69,10 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.MyVi
     @Override
     public int getItemCount() {
         return classroom.size();
+    }
+
+    public void setOwnDeck(ArrayList<Card> ownDeck) {
+        this.ownDeck = ownDeck;
     }
 
 

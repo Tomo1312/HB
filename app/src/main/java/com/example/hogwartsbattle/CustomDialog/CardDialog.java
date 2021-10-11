@@ -33,7 +33,7 @@ public class CardDialog extends CustomDialog {
     Card activeCard;
     ArrayList<Card> ownDeck, hand, hexes;
     FirebaseDatabase database;
-    int cardSpells, position;
+    int cardSpells, library;
 
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
@@ -49,11 +49,11 @@ public class CardDialog extends CustomDialog {
 
     LinearLayout layout;
 
-    public CardDialog(Context context, int position, ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand,
+    public CardDialog(Context context, int library, ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand,
                       Card activeCard, Player thisPlayer, Player opponentPlayer, ArrayList<Card> ownDeck,
                       ArrayList<Card> hand, ArrayList<Card> hexes, FirebaseDatabase database,
                       IUpdateAttackGoldHeart iUpdateAttackGoldHeart, IOwnAllyListener iOwnAllyListener, ArrayList<Card> classroom) {
-        super(context, position);
+        super(context, 0);
 
         this.iCardAddOrDeletedFromHand = iCardAddOrDeletedFromHand;
         this.activeCard = activeCard;
@@ -63,7 +63,7 @@ public class CardDialog extends CustomDialog {
         this.hand = hand;
         this.database = database;
         this.hexes = hexes;
-        this.position = position;
+        this.library = library;
         this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
         this.iOwnAllyListener = iOwnAllyListener;
         this.classroom = classroom;
@@ -726,6 +726,8 @@ public class CardDialog extends CustomDialog {
                         }
                         break;
                     case Common.RETURN_TO_LIBRARY:
+                        library++;
+                        database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
                         break;
                     default:
                         break;

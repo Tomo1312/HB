@@ -155,7 +155,8 @@ public class RoomActivity extends AppCompatActivity {
                 playersList.clear();
                 for (DataSnapshot snapshotTmp : snapshot.getChildren()) {
                     if (!(snapshotTmp.getKey().equals("startGame")) && !(snapshotTmp.getKey().equals("banished")) && !(snapshotTmp.getKey().equals("classroom"))
-                            && !(snapshotTmp.getKey().equals("playing")) && !(snapshotTmp.getKey().equals(Common.currentUser.getUserName()))) { // || !(snapshotTmp.getKey().equals("idCount"))
+                            && !(snapshotTmp.getKey().equals("playing")) && !(snapshotTmp.getKey().equals("classroomBought"))
+                            && !(snapshotTmp.getKey().equals("library")) && !(snapshotTmp.getKey().equals(Common.currentUser.getUserName()))) { // || !(snapshotTmp.getKey().equals("idCount"))
                         playersList.add(snapshotTmp.getKey());
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(RoomActivity.this,
                                 android.R.layout.simple_list_item_1, playersList);
