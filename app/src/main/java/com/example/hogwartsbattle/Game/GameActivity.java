@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import com.example.hogwartsbattle.Adapters.OwnAllyAdapter;
 import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.CardBuyDialog;
+import com.example.hogwartsbattle.CustomDialog.DiscardCard;
 import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Common.SpacesItemDecoration;
@@ -112,6 +114,8 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     ImageView opponent_life_start, opponent_life_1, opponent_life_2, opponent_life_3, opponent_life_4, opponent_life_5, opponent_life_6;
     ImageView own_life_start, own_life_1, own_life_2, own_life_3, own_life_4, own_life_5, own_life_6;
 
+    ImageView own_discard_pile, own_deck_pile;
+
     ImageView opponent_visible_helper, own_visible_helper;
 
     ImageView libraryImageView;
@@ -122,11 +126,12 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        loading = new SpotsDialog.Builder().setCancelable(false).setContext(GameActivity.this).build();
+        loading.show();
         getPlayers();
         opponent_house_image = findViewById(R.id.opponent_house_image);
         own_house_image = findViewById(R.id.own_house_image);
         setUiForPlayerImage();
-        loading = new SpotsDialog.Builder().setCancelable(false).setContext(GameActivity.this).build();
         iChooseAllyDialog = this;
         iChooseHouseDialog = this;
         iRockPaperScissorsDialog = this;
@@ -137,9 +142,6 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         iOpponentAllysListener = this;
         iLibraryListener = this;
         buildDecks();
-
-        ChooseHouseDialog.getInstance().showChooseHouseDialog(this, iChooseHouseDialog);
-
     }
 
     private void setUiForPlayerImage() {
@@ -195,10 +197,15 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         Common.allCardsMap = new HashMap<>(allCardsMap);
         allCardsMap.clear();
         Collections.shuffle(generalDeck);
+        Collections.shuffle(generalDeck);
+        Collections.shuffle(generalDeck);
+        Collections.shuffle(generalDeck);
         Collections.shuffle(ownDeck);
 
-        if (loading.isShowing())
+        if (loading.isShowing()) {
             loading.dismiss();
+            ChooseHouseDialog.getInstance().showChooseHouseDialog(this, iChooseHouseDialog);
+        }
 
     }
 
@@ -235,12 +242,11 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
 
     @Override
     public void onPaperRockScissorsChoose(DialogInterface dialog, String hand) {
+        if (!loading.isShowing())
+            loading.show();
         dialog.dismiss();
         thisPlayer.setFirstPlayHand(hand);
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue(hand);
-        if (!loading.isShowing()) {
-            loading.show();
-        }
         checkForWinner();
 
     }
@@ -305,30 +311,18 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         // Need to be deleted in onDestroy!
         // All listeners for game will be here
 
-        valueEventListenerPlaying = listenerHelpers.startListenerForPlaying(this);
+        valueEventListenerPlaying = listenerHelpers.startListenerForPlaying(GameActivity.this);
         valueEventListenerOpponentHandCards = listenerHelpers.setListenerForOpponentHandCards(iOnOpponentHandShow);
         valueEventListenerOpponentAlly = listenerHelpers.setListenerForOpponentAllys(iOpponentAllysListener);
         valueEventListenerOwnAlly = listenerHelpers.setListenerForOwnAllys(iOwnAllyListener);
         valueEventListenerClassroom = listenerHelpers.setListenerForClassroom(generalDeck, iOnClassroomShow);
-        valueEventListenerForDiscardCardSpell = listenerHelpers.setListenerForDiscardCard(ownDeck, this);
+        valueEventListenerForDiscardCardSpell = listenerHelpers.setListenerForDiscardCard(ownDeck, GameActivity.this);
         valueEventListenerForOpponentDiscardCards = listenerHelpers.setListenerForOpponentDiscardCards();
         valueEventListenerForThisPlayerDiscardCards = listenerHelpers.setListenerForThisPlayerDiscardCards();
         valueEventListenerLibrary = listenerHelpers.setListenerForLibrary(iLibraryListener);
+        listenerHelpers.setListenerForBoughtClassroomCard(GameActivity.this);
+        listenerHelpers.setListenerForBanishedCard(GameActivity.this);
 
-        // Set opponent player image
-        int opponentHouse = getResources().getIdentifier("drawable/" + opponent.getHouse() + "1", null, getPackageName());
-        opponent_life_start.setImageResource(opponentHouse);
-        opponent_life_1.setImageResource(opponentHouse);
-        opponent_life_2.setImageResource(opponentHouse);
-        opponent_life_3.setImageResource(opponentHouse);
-        opponent_life_4.setImageResource(opponentHouse);
-        opponent_life_5.setImageResource(opponentHouse);
-        opponent_life_6.setImageResource(opponentHouse);
-
-        opponent_visible_helper = opponent_life_start;
-        own_visible_helper = own_life_start;
-        own_life_start.setVisibility(View.VISIBLE);
-        opponent_life_start.setVisibility(View.VISIBLE);
     }
 
     private void setUIView() {
@@ -342,7 +336,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         playersGold = findViewById(R.id.playersGold);
         playersHeart = findViewById(R.id.playersHeart);
 
-        libraryImageView  = findViewById(R.id.books);
+        libraryImageView = findViewById(R.id.books);
 
         iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
 
@@ -375,7 +369,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             @Override
             public void onClick(View v) {
                 if (thisPlayer.getDiscarded().equals(""))
-                    thisPlayer.setDiscarded(thisPlayer.getDiscarded());
+                    thisPlayer.setDiscarded(thisPlayer.getPlayedCards());
                 else
                     thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getPlayedCards());
 
@@ -385,16 +379,31 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
                     ownHandAdapter.cleanCardsInHand();
                 opponent.setLives(opponent.getLives() - thisPlayer.getAttacks());
 
+                // Player got death!
+                // Let's start again!
                 if (opponent.getLives() < 1) {
-
+                    Toast.makeText(GameActivity.this, "You have stunned " + opponent.getPlayerName(), Toast.LENGTH_LONG).show();
+                    thisPlayer.setLives(7);
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/lives").setValue(opponent.getLives());
+                    opponent.setLives(7);
+                    opponent.setDeaths(opponent.getDeaths() + 1);
+                    if (!thisPlayer.getAlly().equals("")) {
+                        ownAllyAdapter.clearAlly();
+                    }
+                    if (!thisPlayer.getDiscarded().equals("")) {
+                        ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+                        thisPlayer.setDiscarded("");
+                    }
+                } else {
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/lives").setValue(opponent.getLives());
                 }
-                if (thisPlayer.getHeart() > 0) {
-                    if (thisPlayer.getLives() < 7)
-                        if (thisPlayer.getLives() + thisPlayer.getHeart() >= 7) {
-                            thisPlayer.setLives(7);
-                        } else {
-                            thisPlayer.setLives(thisPlayer.getLives() + thisPlayer.getHeart());
-                        }
+
+                if (thisPlayer.getHeart() > 0 && thisPlayer.getLives() < 7) {
+                    if (thisPlayer.getLives() + thisPlayer.getHeart() >= 7) {
+                        thisPlayer.setLives(7);
+                    } else {
+                        thisPlayer.setLives(thisPlayer.getLives() + thisPlayer.getHeart());
+                    }
                 }
                 thisPlayer.setCoins(0);
                 thisPlayer.setAttacks(0);
@@ -403,38 +412,68 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
                 database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
                 database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue("");
                 database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/lives").setValue(thisPlayer.getLives());
-                database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/lives").setValue(opponent.getLives());
+
                 database.getReference("rooms/" + Common.currentRoomName + "/playing").setValue(opponent.getPlayerName());
                 finishMove.setEnabled(false);
-
+                onUpdateAttackGoldHeart();
                 updatePlayerImage();
-//                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//                lp.width = 50;
-//                lp.height = 50;
-//                top_margin += 95;
-//                lp.setMargins(0, top_margin, 0, 0);
-//                lp.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//                iv.setLayoutParams(lp);
+                discardPileShow();
+
             }
         });
         finishMove.setEnabled(false);
         libraryImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardBuyDialog cardBuyDialog = new CardBuyDialog(getApplicationContext(), classRoom, library, Common.allCardsMap.get(0), thisPlayer, database, iUpdateAttackGoldHeart, ownDeck);
-                cardBuyDialog.showDialog();
+                if (thisPlayer.isPlaying()) {
+                    CardBuyDialog cardBuyDialog = new CardBuyDialog(GameActivity.this, classRoom, library, Common.allCardsMap.get(0), thisPlayer, database, iUpdateAttackGoldHeart, ownDeck);
+                    cardBuyDialog.showDialog();
+                } else
+                    Toast.makeText(getApplicationContext(), "In library is " + String.valueOf(library) + " books", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Set opponent player image
+        int opponentHouse = getResources().getIdentifier("drawable/" + opponent.getHouse() + "1", null, getPackageName());
+        opponent_life_start.setImageResource(opponentHouse);
+        opponent_life_1.setImageResource(opponentHouse);
+        opponent_life_2.setImageResource(opponentHouse);
+        opponent_life_3.setImageResource(opponentHouse);
+        opponent_life_4.setImageResource(opponentHouse);
+        opponent_life_5.setImageResource(opponentHouse);
+        opponent_life_6.setImageResource(opponentHouse);
+
+        opponent_visible_helper = opponent_life_start;
+        own_visible_helper = own_life_start;
+        own_life_start.setVisibility(View.VISIBLE);
+        opponent_life_start.setVisibility(View.VISIBLE);
+
+        own_discard_pile = findViewById(R.id.own_discard_pile);
+        own_deck_pile = findViewById(R.id.own_deck_pile);
+
+        own_discard_pile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!thisPlayer.getDiscarded().equals("")) {
+                    DiscardCard discardCard = new DiscardCard(GameActivity.this, database, thisPlayer.getDiscarded(), 12, opponent, thisPlayer);
+                    discardCard.showDialog();
+                }
+            }
+        });
+        own_deck_pile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "You have " + ownDeck.size() + " in deck!", Toast.LENGTH_LONG).show();
             }
         });
     }
+
 
     private void updatePlayerImage() {
         opponent_visible_helper.setVisibility(View.INVISIBLE);
         own_visible_helper.setVisibility(View.INVISIBLE);
 
         switch (opponent.getLives()) {
-            case 7:
-                opponent_visible_helper = opponent_life_start;
-                break;
             case 6:
                 opponent_visible_helper = opponent_life_1;
                 break;
@@ -453,12 +492,12 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             case 1:
                 opponent_visible_helper = opponent_life_6;
                 break;
+            default:
+                opponent_visible_helper = opponent_life_start;
+                break;
         }
 
         switch (thisPlayer.getLives()) {
-            case 7:
-                own_visible_helper = own_life_start;
-                break;
             case 6:
                 own_visible_helper = own_life_1;
                 break;
@@ -477,6 +516,9 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             case 1:
                 own_visible_helper = own_life_6;
                 break;
+            default:
+                own_visible_helper = own_life_start;
+                break;
         }
         opponent_visible_helper.setVisibility(View.VISIBLE);
         own_visible_helper.setVisibility(View.VISIBLE);
@@ -485,16 +527,24 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     private void setClassroom() {
         String stringClassroom = "";
         for (int i = 0; i < 4; i++) {
-            stringClassroom = stringClassroom + generalDeck.get(i).getId();
+            stringClassroom = stringClassroom + generalDeck.get(0).getId();
             if (!(i == 3))
                 stringClassroom = stringClassroom + ",";
-            classRoom.add(generalDeck.get(i));
-            generalDeck.remove(i);
+            classRoom.add(generalDeck.get(0));
+            generalDeck.remove(0);
         }
         database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(stringClassroom);
     }
 
+    public void discardPileShow() {
+        if (thisPlayer.getDiscarded().equals(""))
+            own_discard_pile.setVisibility(View.INVISIBLE);
+        else
+            own_discard_pile.setVisibility(View.VISIBLE);
+    }
+
     public void playTurn() {
+        loading.show();
         finishMove.setEnabled(true);
         thisPlayer.setPlaying(true);
 
@@ -507,11 +557,27 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         opponent.setLives(Integer.parseInt(snapshot.getValue().toString()));
-                        Log.e("NESTONEVALJASAZIVOTIMA", "opponent lives:" + opponent.getLives() + " thisplayerLives:" + thisPlayer.getLives());
-                        updatePlayerImage();
                         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (loading.isShowing())
+                                    loading.dismiss();
+
+                                discardPileShow();
+                                if (thisPlayer.getLives() < 1) {
+                                    Toast.makeText(GameActivity.this, opponent.getPlayerName() + " stunned you!", Toast.LENGTH_LONG).show();
+                                    thisPlayer.setLives(7);
+                                    opponent.setLives(7);
+                                    thisPlayer.setDeaths(thisPlayer.getDeaths() + 1);
+                                    if (!thisPlayer.getAlly().equals("")) {
+                                        ownAllyAdapter.clearAlly();
+                                    }
+                                    if (!thisPlayer.getDiscarded().equals("")) {
+                                        ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+                                        thisPlayer.setDiscarded("");
+                                    }
+                                }
+                                updatePlayerImage();
                                 if (!snapshot.getValue().toString().equals("")) {
                                     drawCards(snapshot.getValue().toString());
                                 } else {
@@ -684,6 +750,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
             thisPlayer.setDiscarded("");
             database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");
+            discardPileShow();
         }
     }
 
@@ -700,10 +767,10 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     @Override
     public void onLibraryChange(int libraryFromDatabase) {
         library = libraryFromDatabase;
-        if(library == 0){
+        if (library == 0) {
             libraryImageView.setVisibility(View.INVISIBLE);
             libraryImageView.setEnabled(false);
-        }else{
+        } else {
             libraryImageView.setVisibility(View.VISIBLE);
             libraryImageView.setEnabled(true);
         }

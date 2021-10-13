@@ -41,7 +41,7 @@ public class ShowCardDialog {
             heading.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
             heading.setText(title);
-            heading.setTextSize(26);
+            heading.setTextSize(18);
             heading.setTextColor(Color.parseColor("#000000"));
             parent.addView(heading);
         }
@@ -61,24 +61,23 @@ public class ShowCardDialog {
         dialog.setContentView(parent);
 
         dialog.setCancelable(false);
-        dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.show();
 
-//        TimerTask task = new TimerTask() {
-//            public void run() {
-//
-//            }
-//        };
-//        Timer timer = new Timer("Timer");
-//
-//        long delay = 1000L;
-//        timer.schedule(task, delay * 2);
-        try {
-            TimeUnit.MILLISECONDS.sleep(2500 );
-            dialog.dismiss();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        TimerTask task = new TimerTask() {
+            public void run() {
+                dialog.dismiss();
+            }
+        };
+        Timer timer = new Timer("Timer");
+
+        long delay = 1000L;
+        timer.schedule(task, delay * 2);
+//        try {
+//            TimeUnit.MILLISECONDS.sleep(2500 );
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 }

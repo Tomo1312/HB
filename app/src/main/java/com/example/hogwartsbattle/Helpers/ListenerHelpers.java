@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.example.hogwartsbattle.Common.Common;
+import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
 import com.example.hogwartsbattle.Game.GameActivity;
 import com.example.hogwartsbattle.Interface.ILibraryListener;
 import com.example.hogwartsbattle.Interface.IOnClassroomShow;
@@ -126,7 +127,7 @@ public class ListenerHelpers {
         ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(!thisPlayer.getDiscarded().equals(snapshot.getValue().toString()))
+                if (!thisPlayer.getDiscarded().equals(snapshot.getValue().toString()))
                     thisPlayer.setDiscarded(snapshot.getValue().toString());
             }
 
@@ -185,7 +186,7 @@ public class ListenerHelpers {
         return valueEventListenerPlaying;
     }
 
-    public ValueEventListener getOpponentHouse(Context context,ImageView opponent_house_image) {
+    public ValueEventListener getOpponentHouse(Context context, ImageView opponent_house_image) {
         ValueEventListener valueEventListenerPlaying = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -212,18 +213,35 @@ public class ListenerHelpers {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.getValue().equals("")) {
-                    ArrayList<Card> opponentsOpponentAllys = new ArrayList<>();
-                    String stringCards = snapshot.getValue().toString();
-                    String[] cards = stringCards.split(",");
-                    for (String stringCardTmp : cards) {
-                        opponentsOpponentAllys.add(Common.allCardsMap.get(Integer.valueOf(stringCardTmp)));
-                    }
-
                     opponentPlayer.setAlly(snapshot.getValue().toString());
-                    iOpponentAllysListener.onOpponentAllysShow(opponentsOpponentAllys);
+                    iOpponentAllysListener.onOpponentAllysShow(Helpers.getInstance().returnCardsFromString(snapshot.getValue().toString()));
                 } else {
                     opponentPlayer.setAlly("");
                     iOpponentAllysListener.onOpponentAllysShow(new ArrayList<>());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentAllys);
+        return valueEventListenerOpponentAllys;
+    }
+
+    public ValueEventListener setListenerForBanishedCard(Context context) {
+        ValueEventListener valueEventListenerBanishedCard = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.getValue().equals("")) {
+                    Card cardToShow = Common.allCardsMap.get(Integer.parseInt(snapshot.getValue().toString()));
+                    String title;
+                    if (thisPlayer.isPlaying())
+                        title = thisPlayer.getPlayerName() + " have banished:";
+                    else
+                        title = opponentPlayer.getPlayerName() + " have banished:";
+                    ShowCardDialog.getInstance().showCardDialog(context, cardToShow, title);
+                    database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue("");
                 }
             }
 
@@ -232,8 +250,33 @@ public class ListenerHelpers {
 
             }
         };
-        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentAllys);
-        return valueEventListenerOpponentAllys;
+        database.getReference("rooms/" + Common.currentRoomName + "/banished").addValueEventListener(valueEventListenerBanishedCard);
+        return valueEventListenerBanishedCard;
+    }
+
+    public ValueEventListener setListenerForBoughtClassroomCard(Context context) {
+        ValueEventListener valueEventListenerBanishedCard = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.getValue().equals("")) {
+                    Card cardToShow = Common.allCardsMap.get(Integer.parseInt(snapshot.getValue().toString()));
+                    String title;
+                    if (thisPlayer.isPlaying())
+                        title = thisPlayer.getPlayerName() + " have bought:";
+                    else
+                        title = opponentPlayer.getPlayerName() + " have bought:";
+                    ShowCardDialog.getInstance().showCardDialog(context, cardToShow, title);
+                    database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue("");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").addValueEventListener(valueEventListenerBanishedCard);
+        return valueEventListenerBanishedCard;
     }
 
     public ValueEventListener setListenerForOwnAllys(IOwnAllyListener iOwnAllyListener) {

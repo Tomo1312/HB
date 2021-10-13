@@ -98,10 +98,10 @@ public class CardBuyDialog extends CustomDialog {
                         iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
                         database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(Helpers.getInstance().returnCardsFromArray(classroom));
                     }
+                    database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue(activeCard.getId());
                     dialog.dismiss();
                 } else {
                     Toast.makeText(context, "Don't have enough money!", Toast.LENGTH_LONG).show();
-
                 }
             }
         });

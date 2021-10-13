@@ -15,28 +15,15 @@
             android:layout_height="match_parent"
             android:id="@+id/gryffindor"
             android:layout_weight="1.0"
+            android:background="@color/gryffidor"
             android:src="@drawable/gryffindor1"/>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/ravenclaw"
             android:layout_weight="1.0"
+            android:background="@color/ravenclaw"
             android:src="@drawable/ravenclaw1"/>
-<!--        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/white"
-            android:layout_weight="1.0"
-            android:text="Button" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_green_light"
-            android:layout_weight="1.0"
-            android:text="Button" />-->
 
     </LinearLayout>
 
@@ -51,12 +38,14 @@
             android:layout_height="match_parent"
             android:id="@+id/slytherin"
             android:layout_weight="1.0"
+            android:background="@color/slytherin"
             android:src="@drawable/slytherin1"/>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/hufflepuff"
             android:layout_weight="1.0"
+            android:background="@color/hufflepuff"
             android:src="@drawable/hufflepuff1"/>
 
         <!--        <androidx.appcompat.widget.AppCompatButton-->

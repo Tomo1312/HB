@@ -4,22 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     tools:context=".Game.RoomActivity">
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/listPlayers"
-        android:layout_above="@+id/btnStartGame"
-        android:layout_alignParentTop="true">
-
-    </ListView>
-
-    <Button
-        android:id="@+id/btnStartGame"
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="10dp"
+        android:src="@drawable/wand" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="10dp"
+        android:src="@drawable/wand2" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
+        android:weightSum="2"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/opponent_name"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Hanna"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textAlignment="center"
+            android:fontFamily="@font/lumos"
+            android:textSize="36dp"/>
+        <TextView
+            android:id="@+id/own_name"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Tomo"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:fontFamily="@font/lumos"
+            android:textSize="36dp"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Start Game" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnLeaveRoom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lumos"
+            android:background="@drawable/button_border_create_room"
+            android:text="Leave Room"
+            android:layout_margin="10dp"/>
+        <Button
+            android:id="@+id/btnStartGame"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/lumos"
+            android:background="@drawable/button_border_create_room"
+            android:text="Start Game"
+            android:layout_margin="10dp" />
+    </LinearLayout>
+    <!--    <ListView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:id="@+id/listPlayers"-->
+<!--        android:layout_above="@+id/btnStartGame"-->
+<!--        android:layout_alignParentTop="true">-->
+
+<!--    </ListView>-->
+
 </RelativeLayout>

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -107,8 +108,10 @@ public class Helpers {
         ArrayList<Card> deck = new ArrayList<>(ownDeck);
         deck.addAll(returnCardsFromString(thisPlayer.getDiscarded()));
         Collections.shuffle(deck);
-
         return deck;
     }
 
+    public void startAfterPlayerDied(FirebaseDatabase database, Player thisPlayer, ArrayList<Card> ownDeck) {
+
+    }
 }

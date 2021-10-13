@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LobbyActivity extends AppCompatActivity {
 
@@ -42,10 +45,30 @@ public class LobbyActivity extends AppCompatActivity {
 
     ValueEventListener valueEventListenerRoom, valueEventListenerCreateRoom;
 
+    Timer timer;
+    MediaPlayer mediaPlayer;
+    ArrayList<Integer> playList;
+    int i = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+
+        playList = new ArrayList<>();
+        playList.add(R.raw.christmasathogwarts);
+        playList.add(R.raw.entryintothegreathallandthebanquet);
+        playList.add(R.raw.hagridtheprofessor);
+        playList.add(R.raw.harryswondrousworld);
+        playList.add(R.raw.prologue);
+        playList.add(R.raw.visittothezooandletterfromhogwarts);
+
+        int random = (int) (Math.random() * 5 + 0);
+        i = random;
+        mediaPlayer = MediaPlayer.create(getApplicationContext(), playList.get(random));
+        mediaPlayer.start();
+        timer = new Timer();
+        if (playList.size() > 1) playNext();
 
 
         databse = FirebaseDatabase.getInstance();
@@ -59,6 +82,26 @@ public class LobbyActivity extends AppCompatActivity {
         }
         setUiView();
     }
+
+    private void playNext() {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mediaPlayer.reset();
+                while (true) {
+                    int random = (int) (Math.random() * 5 + 0);
+                    if (i != random) {
+                        i = random;
+                        break;
+                    }
+                }
+                mediaPlayer = MediaPlayer.create(LobbyActivity.this, playList.get(i));
+                mediaPlayer.start();
+                if (playList.size() > 1) playNext();
+            }
+        }, mediaPlayer.getDuration() + 100);
+    }
+
     private void setUiView() {
 
         playerName = Common.currentUser.getUserName();
@@ -111,6 +154,9 @@ public class LobbyActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), RoomActivity.class);
                 intent.putExtra("roomName", roomName);
                 Common.currentRoomName = roomName;
+                //mediaPlayer.stop();
+                timer.cancel();
+                mediaPlayer.release();
                 finish();
                 startActivity(intent);
             }
@@ -131,14 +177,21 @@ public class LobbyActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 roomsList.clear();
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(LobbyActivity.this,
+                        R.layout.simple_list_lobby_layout, roomsList);
+                listView.setAdapter(adapter);
                 Iterable<DataSnapshot> rooms = snapshot.getChildren();
                 for (DataSnapshot snapshotTmp : rooms) {
-                    if (snapshotTmp.child("startGame").getValue().equals("false")) {
-                        roomsList.add(snapshotTmp.getKey());
+                    if (!(snapshotTmp.getKey().equals("holder"))) {
+                        if (snapshotTmp.child("startGame").getValue().equals("false")) {
+                            roomsList.add(snapshotTmp.getKey());
 
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(LobbyActivity.this,
-                                android.R.layout.simple_list_item_1, roomsList);
-                        listView.setAdapter(adapter);
+                            adapter = new ArrayAdapter<>(LobbyActivity.this,
+                                    R.layout.simple_list_lobby_layout, roomsList);
+                            listView.setAdapter(adapter);
+                        }
+
                     }
                 }
             }
@@ -147,39 +200,18 @@ public class LobbyActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         };
+
         roomsRef.addValueEventListener(valueEventListenerRoom);
-    }
-    private void checkIfItsInRoom() {
-        SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-        boolean isPlaying = preferences.getBoolean("playerInRoom", false);
-        final String roomNameTmp = preferences.getString("roomName", "");
-
-        if (isPlaying && !(roomNameTmp.equals(""))) {
-            databse.getReference("rooms/").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.hasChild(roomNameTmp)) {
-                        Intent intent = new Intent(getApplicationContext(), RoomActivity.class);
-                        intent.putExtra("roomName", roomNameTmp);
-                        finish();
-                        startActivity(intent);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
     }
 
     @Override
     protected void onStop() {
+        timer.cancel();
         if (valueEventListenerRoom != null)
             roomsRef.removeEventListener(valueEventListenerRoom);
         if (valueEventListenerCreateRoom != null)
             roomRef.removeEventListener(valueEventListenerCreateRoom);
         super.onStop();
     }
+
 }

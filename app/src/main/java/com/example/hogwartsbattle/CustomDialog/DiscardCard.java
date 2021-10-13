@@ -142,6 +142,7 @@ public class DiscardCard extends CustomDialog {
             case 7:
             case 9:
             case 11:
+            case 12:
                 //2- Opponent draw from discard pile Item
                 //5- Copy any spell from played cards
                 //6- Banish from hand
@@ -154,6 +155,10 @@ public class DiscardCard extends CustomDialog {
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
                 if (iCardAddOrDeletedFromHand != null)
                     discardCardAdapter.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
+                else if (extraHearts > 0 ) {
+                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
+                    discardCardAdapter.setHearts(1);
+                }
                 else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setAttacks(1);

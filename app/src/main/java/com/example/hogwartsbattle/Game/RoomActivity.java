@@ -9,9 +9,12 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.R;
@@ -28,9 +31,9 @@ import java.util.Random;
 public class RoomActivity extends AppCompatActivity {
 
     ListView listView;
-    Button btnStartGame;
+    Button btnStartGame, btnLeaveRoom;
 
-    List<String> playersList;
+    // List<String> playersList;
 
     String playerName = "";
     String roomName = "";
@@ -41,7 +44,9 @@ public class RoomActivity extends AppCompatActivity {
 
     ValueEventListener valueEventListenerPlayerId, valueEventListenerPlayersInRoom, valueEventListenerStartGame;
 
-    boolean idSet = false;
+    //boolean idSet = false;
+
+    TextView opponent_name, own_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +57,6 @@ public class RoomActivity extends AppCompatActivity {
         getPreload();
         saveRoomName();
 
-
-        btnStartGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setIdToPlayers();
-            }
-        });
         checkPlayersInRoomListener();
         checkIfGameIsStarted();
     }
@@ -67,6 +65,7 @@ public class RoomActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         roomName = extras.getString("roomName");
         playerName = Common.currentUser.getUserName();
+        own_name.setText(playerName);
 
         //idCountReference = databse.getReference("rooms/" + roomName + "/idCount");
         if (extras != null) {
@@ -83,16 +82,59 @@ public class RoomActivity extends AppCompatActivity {
         if (role.equals("host")) {
             btnStartGame.setVisibility(View.VISIBLE);
             btnStartGame.setEnabled(true);
+
+        } else {
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.weight = 2;
+            btnLeaveRoom.setLayoutParams(lp);
         }
+
+        btnStartGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setIdToPlayers();
+            }
+        });
+        btnLeaveRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (role.equals("host")) {
+                    killListeners();
+                    Intent intent = new Intent(RoomActivity.this, LobbyActivity.class);
+                    Common.currentRoomName = "";
+                    startActivity(intent);
+                    databse.getReference("rooms/" + roomName ).removeValue();
+                }else{
+                    Intent intent = new Intent(RoomActivity.this, LobbyActivity.class);
+                    Common.currentRoomName = "";
+                    startActivity(intent);
+                    databse.getReference("rooms/" + roomName  + "/" + playerName).removeValue();
+                }
+                finish();
+            }
+        });
+    }
+
+    private void killListeners() {
+        if (valueEventListenerStartGame != null)
+            databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);
+        if (valueEventListenerPlayerId != null)
+            databse.getReference("rooms/" + roomName).removeEventListener(valueEventListenerPlayerId);
+        if (valueEventListenerPlayersInRoom != null)
+            databse.getReference("rooms/" + roomName).removeEventListener(valueEventListenerPlayersInRoom);
     }
 
     private void setUiView() {
         btnStartGame = findViewById(R.id.btnStartGame);
         btnStartGame.setEnabled(false);
-        btnStartGame.setVisibility(View.INVISIBLE);
+        btnStartGame.setVisibility(View.GONE);
+        btnLeaveRoom = findViewById(R.id.btnLeaveRoom);
 
-        playersList = new ArrayList<>();
-        listView = findViewById(R.id.listPlayers);
+        own_name = findViewById(R.id.own_name);
+        opponent_name = findViewById(R.id.opponent_name);
+
+        //playersList = new ArrayList<>();
+        //listView = findViewById(R.id.listPlayers);
     }
 
     private void saveRoomName() {
@@ -152,15 +194,19 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                playersList.clear();
+                btnStartGame.setEnabled(false);
+                opponent_name.setText("");
+//                playersList.clear();
                 for (DataSnapshot snapshotTmp : snapshot.getChildren()) {
                     if (!(snapshotTmp.getKey().equals("startGame")) && !(snapshotTmp.getKey().equals("banished")) && !(snapshotTmp.getKey().equals("classroom"))
                             && !(snapshotTmp.getKey().equals("playing")) && !(snapshotTmp.getKey().equals("classroomBought"))
                             && !(snapshotTmp.getKey().equals("library")) && !(snapshotTmp.getKey().equals(Common.currentUser.getUserName()))) { // || !(snapshotTmp.getKey().equals("idCount"))
-                        playersList.add(snapshotTmp.getKey());
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(RoomActivity.this,
-                                android.R.layout.simple_list_item_1, playersList);
-                        listView.setAdapter(adapter);
+
+                        if (role.equals("host")) {
+                            btnStartGame.setEnabled(true);
+                            databse.getReference("rooms/" + roomName + "/playing").setValue("true");
+                        }
+                        opponent_name.setText(snapshotTmp.getKey());
                     }
                 }
 

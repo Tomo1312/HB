@@ -113,13 +113,25 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
     public void removeAlly(Card removedAlly) {
-        ownAllyCard.add(removedAlly);
+        ownAllyCard.remove(removedAlly);
         notifyDataSetChanged();
         thisPlayer.setAlly(Helpers.getInstance().returnCardsFromArray(ownAllyCard));
-        if(thisPlayer.getDiscarded().equals(""))
+        if (thisPlayer.getDiscarded().equals(""))
             thisPlayer.setDiscarded(removedAlly.getId());
         else
             thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + removedAlly.getId());
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
+    }
+
+
+    public void clearAlly() {
+        ownAllyCard.clear();
+        notifyDataSetChanged();
+        if (thisPlayer.getDiscarded().equals(""))
+            thisPlayer.setDiscarded(thisPlayer.getAlly());
+        else
+            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getAlly());
+        thisPlayer.setAlly("");
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
     }
 

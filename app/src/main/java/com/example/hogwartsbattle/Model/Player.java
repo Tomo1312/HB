@@ -28,7 +28,6 @@ public class Player {
         this.deckCount = 0;
         this.attacks = 0;
         this.lives = 7;
-        this.deaths = 0;
         this.firstPlayHand = "";
         this.coins = 0;
         this.playedCards = "";

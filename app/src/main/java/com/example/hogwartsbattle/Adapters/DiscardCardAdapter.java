@@ -126,6 +126,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         String cardName;
         switch (layoutInt) {
             case 0:
+            case 10:
                 cardName = "ally" + cards.get(position).getId();
                 break;
             default:
@@ -255,6 +256,9 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
     private void banishFromHand(Card banishedCard) {
 
+        if(extraHearts>0 && banishedCard.getCardType().equals("hex")){
+            thisPlayer.setHeart(thisPlayer.getHeart()+extraHearts);
+        }
         iCardAddOrDeletedFromHand.onBanishCard(banishedCard);
         database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(banishedCard.getId());
         dialog.dismiss();
