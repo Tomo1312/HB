@@ -29,6 +29,7 @@ import com.example.hogwartsbattle.Adapters.OpponentHandAdapter;
 import com.example.hogwartsbattle.Adapters.OwnAllyAdapter;
 import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Common.Common;
+import com.example.hogwartsbattle.Common.HarryMediaPlayer;
 import com.example.hogwartsbattle.CustomDialog.CardBuyDialog;
 import com.example.hogwartsbattle.CustomDialog.DiscardCard;
 import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
@@ -82,6 +83,7 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     ArrayList<Card> banishedDeck = new ArrayList<>();
     ArrayList<Card> books = new ArrayList<>();
     Map<Integer, Card> allCardsMap = new HashMap<>();
+    HarryMediaPlayer mediaPlayer;
 
     IChooseHouseDialog iChooseHouseDialog;
     IChooseAllyDialog iChooseAllyDialog;
@@ -126,8 +128,11 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        mediaPlayer = new HarryMediaPlayer(this);
+        mediaPlayer.startPlaying();
         loading = new SpotsDialog.Builder().setCancelable(false).setContext(GameActivity.this).build();
         loading.show();
+
         getPlayers();
         opponent_house_image = findViewById(R.id.opponent_house_image);
         own_house_image = findViewById(R.id.own_house_image);
@@ -687,9 +692,11 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
     @Override
     public void removeAlly(Card removedAlly) {
         ownAllyAdapter.removeAlly(removedAlly);
-//        ownAllyAdapter = new OwnAllyAdapter(this, allys, thisPlayer, opponent, ownDeck, hexDeck,classRoom, database, iUpdateAttackGoldHeart);
-//        ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
-//        recyclerOwnAllys.setAdapter(ownAllyAdapter);
+    }
+
+    @Override
+    public void setAllyAvailable(Card ally) {
+        ownAllyAdapter.setAllyAvailable(ally);
     }
 
     @Override
@@ -774,5 +781,11 @@ public class GameActivity extends AppCompatActivity implements IChooseAllyDialog
             libraryImageView.setVisibility(View.VISIBLE);
             libraryImageView.setEnabled(true);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        mediaPlayer.stopMediaPlayer();
+        super.onStop();
     }
 }

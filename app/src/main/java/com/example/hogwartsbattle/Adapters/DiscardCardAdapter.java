@@ -15,6 +15,7 @@ import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
+import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
@@ -38,6 +39,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     ArrayList<Card> ownDeck, classroom, hexes;
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
     OwnHandAdapter ownHandAdapter;
+    IOwnAllyListener iOwnAllyListener;
     /*
      0 - layout allys
      1 - layout card
@@ -100,6 +102,9 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
     }
 
+    public void setOwnAllyListener(IOwnAllyListener iOwnAllyListener) {
+        this.iOwnAllyListener = iOwnAllyListener;
+    }
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -171,7 +176,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                         discardCardAndGainEffects(cards.get(position));
                         break;
                     case 10:
-                        cards.get(position).setUsed(true);
+                        iOwnAllyListener.setAllyAvailable(cards.get(position));
                         dialog.dismiss();
                         break;
                     case 11:
@@ -378,6 +383,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     public int getItemCount() {
         return cards.size();
     }
+
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

@@ -7,14 +7,20 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hogwartsbattle.Common.Common;
+import com.example.hogwartsbattle.Common.HarryMediaPlayer;
 import com.example.hogwartsbattle.Game.LobbyActivity;
 import com.example.hogwartsbattle.MainActivity;
 import com.example.hogwartsbattle.Model.Player;
@@ -31,12 +37,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
 
 public class LoginActivity extends AppCompatActivity {
 
     TextView txt_eMail, txt_password, txt_Username;
+    TextView eMailWand, passwordWand, usernameWand, tmpWand;
     boolean register = false;
     Button btnLogin, btnRegister;
 
@@ -46,6 +57,9 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseDatabase databse;
     DatabaseReference userRef;
 
+    LinearLayout linear_layout_username;
+    HarryMediaPlayer mediaPlayer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +68,13 @@ public class LoginActivity extends AppCompatActivity {
         txt_eMail = findViewById(R.id.tvEmail);
         txt_password = findViewById(R.id.tvPassword);
         txt_Username = findViewById(R.id.tvUsername);
+        eMailWand  = findViewById(R.id.tvEmailWand);
+        passwordWand = findViewById(R.id.tvPasswordWand);
+        usernameWand = findViewById(R.id.tvUsernameWand);
+
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
+        linear_layout_username = findViewById(R.id.linear_layout_username);
         mAuth = FirebaseAuth.getInstance();
         databse = FirebaseDatabase.getInstance();
 
@@ -68,8 +87,6 @@ public class LoginActivity extends AppCompatActivity {
             databse.getReference("/Users/"+userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-
                     Common.currentUser = snapshot.getValue(User.class);
                     Intent intent = new Intent(LoginActivity.this, LobbyActivity.class);
                     intent.putExtra(Common.KEY_USER_ID, userId);
@@ -77,8 +94,6 @@ public class LoginActivity extends AppCompatActivity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
-
-
                 }
 
                 @Override
@@ -94,13 +109,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!register) {
+                    loading.show();
                     String userEmail = txt_eMail.getText().toString();
                     String passwordTmp = txt_password.getText().toString();
                     if (checkForEmtpy())
                         validate(userEmail, passwordTmp);
                 } else {
                     register = false;
-                    txt_Username.setVisibility(View.GONE);
+                    linear_layout_username.setVisibility(View.GONE);
                 }
 
             }
@@ -113,13 +129,52 @@ public class LoginActivity extends AppCompatActivity {
                         startEmailVerification();
                 } else {
                     register = true;
-                    txt_Username.setVisibility(View.VISIBLE);
+                    linear_layout_username.setVisibility(View.VISIBLE);
                 }
 
             }
         });
+        txt_Username.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tmpWand!=null){
+                    tmpWand.setVisibility(View.INVISIBLE);
+                }
+                tmpWand = usernameWand;
+                tmpWand.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+        txt_eMail.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tmpWand!=null){
+                    tmpWand.setVisibility(View.INVISIBLE);
+                }
+                tmpWand = eMailWand;
+                tmpWand.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+        txt_password.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tmpWand!=null){
+                    tmpWand.setVisibility(View.INVISIBLE);
+                }
+                tmpWand = passwordWand;
+                tmpWand.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+
+        setMediaPlayer();
     }
 
+    private void setMediaPlayer() {
+        mediaPlayer = new HarryMediaPlayer(LoginActivity.this);
+        mediaPlayer.startPlaying();
+    }
     private void startEmailVerification() {
         loading.show();
         String userEmail = txt_eMail.getText().toString();
@@ -190,6 +245,8 @@ public class LoginActivity extends AppCompatActivity {
     private void checkEmailVerification() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         Boolean emailFlag = firebaseUser.isEmailVerified();
+        if(loading.isShowing())
+            loading.dismiss();
         if (emailFlag) {
 
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -220,6 +277,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        mediaPlayer.stopMediaPlayer();
         super.onDestroy();
         if(loading.isShowing())
             loading.dismiss();

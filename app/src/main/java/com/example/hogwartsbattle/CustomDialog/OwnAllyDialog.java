@@ -89,6 +89,16 @@ public class OwnAllyDialog extends CustomDialog {
 
     private void showButtonsOnCardId(Dialog dialog) {
         switch (Integer.parseInt(activeAlly.getId())) {
+            case 1:
+                cardSpells = 1;
+                chooseEffect = true;
+                EffectsToDisable.add(createButton(Common.SAVE_GOLD, dialog));
+                EffectsToDisable.add(createButton(Common.COLLECT_ALL_GOLD, dialog));
+                break;
+            case 3:
+                cardSpells = 1;
+                createButton(Common.HEART, dialog);
+                break;
             case 38:
             case 67:
             case 68:
@@ -176,6 +186,7 @@ public class OwnAllyDialog extends CustomDialog {
                     createButton(Common.DRAW_CARD, dialog);
                 }
                 break;
+            case 2:
             case 60:
                 if (checkIfPlayerPlayedThreeSpells()) {
                     cardSpells = 1;
@@ -199,13 +210,13 @@ public class OwnAllyDialog extends CustomDialog {
                 createButton(Common.HEART, dialog);
                 createButton(Common.BANISH_HEX_FROM_DISCARD_PILE, dialog);
                 break;
-            case 71:
+            case 76:
                 if (checkIfPlayerPlayedItem()) {
                     cardSpells = 1;
                     createButton(Common.HEART, dialog);
                 }
                 break;
-            case 72:
+            case 77:
                 if (!thisPlayer.getHexes().equals("")) {
                     cardSpells = 3;
                     mayUseSpell = true;
@@ -214,14 +225,14 @@ public class OwnAllyDialog extends CustomDialog {
                     createButton(Common.DRAW_CARD, dialog);
                 }
                 break;
-            case 73:
+            case 78:
                 if (thisPlayer.getHeart() > 0) {
                     cardSpells = 2;
                     createButton(Common.HEART, dialog);
                     createButton(Common.ATTACK, dialog);
                 }
                 break;
-            case 74:
+            case 79:
                 cardSpells = 2;
                 createButton(Common.GOLD, dialog);
                 createButton(Common.HEART, dialog);
@@ -249,7 +260,7 @@ public class OwnAllyDialog extends CustomDialog {
         } else {
             int playedSpells = 0;
             for (Card cardTmp : Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards())) {
-                if (cardTmp.getType().equals("item")) {
+                if (cardTmp.getType().equals("spell")) {
                     playedSpells++;
                     if (playedSpells == 3)
                         return true;
@@ -264,6 +275,9 @@ public class OwnAllyDialog extends CustomDialog {
         Button newButton = new Button(context);
         newButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         newButton.setText(title);
+        if (activeAlly.getId().equals("1") && title.equals(Common.COLLECT_ALL_GOLD)) {
+            newButton.setText(title + " (" + activeAlly.getSavedGold() + ")");
+        }
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -280,7 +294,6 @@ public class OwnAllyDialog extends CustomDialog {
                         thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
                         break;
                     case Common.ATTACK:
-
                         thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
                         break;
                     case Common.REVEAL_TOP_CARD:
@@ -305,6 +318,22 @@ public class OwnAllyDialog extends CustomDialog {
                                 database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/hand").setValue(opponentPlayer.getHand());
                                 hexes.remove(0);
                             }
+                        }
+                        break;
+                    case Common.SAVE_GOLD:
+                        if (thisPlayer.getCoins() > 0) {
+                            thisPlayer.setCoins(thisPlayer.getCoins() - 1);
+                            activeAlly.setSavedGold();
+                        } else {
+                            Toast.makeText(context, "You don't have enough money fool!", Toast.LENGTH_LONG);
+                        }
+                        break;
+                    case Common.COLLECT_ALL_GOLD:
+                        if (activeAlly.getSavedGold() > 0) {
+                            thisPlayer.setCoins(thisPlayer.getCoins() + activeAlly.getSavedGold());
+                            activeAlly.setSavedGoldToZero();
+                        } else {
+                            Toast.makeText(context, "You don't have enough money fool!", Toast.LENGTH_LONG);
                         }
                         break;
                     case Common.DRAW_CARD:
@@ -379,7 +408,6 @@ public class OwnAllyDialog extends CustomDialog {
                         discardCard.showDialog();
                         break;
                     case Common.BANISH_PLAYED_HEX:
-
                         discardedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards());
                         ArrayList<Card> playedHexes = new ArrayList<>();
                         for (Card cardTmp : discardedCards) {
@@ -632,7 +660,6 @@ public class OwnAllyDialog extends CustomDialog {
         if (cardSpells == 0) {
             activeAlly.setUsed(true);
             dialog.dismiss();
-            thisPlayerDiscardCard(activeAlly);
             iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
 
             if (iDisableAllyListener != null)

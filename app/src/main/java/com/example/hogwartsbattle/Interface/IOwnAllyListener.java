@@ -8,4 +8,5 @@ public interface IOwnAllyListener {
     //IN game activity
     void onOwnAllyChange(Card ally);
     void removeAlly(Card ally);
+    void setAllyAvailable(Card ally);
 }

@@ -69,7 +69,6 @@ public class ListenerHelpers {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.getValue().toString().equals("0")) {
-                    Log.e("WRONG VALUE", snapshot.getValue().toString());
                     activity.deckNeedShuffle();
                     if (snapshot.getValue().toString().equals("1")) {
                         for (Card card : ownDeck) {
@@ -83,7 +82,7 @@ public class ListenerHelpers {
                                 break;
                             }
                         }
-                    } else if (snapshot.getValue().toString().equals("1")) {
+                    } else if (snapshot.getValue().toString().equals("2")) {
                         if (!thisPlayer.getDiscarded().equals("")) {
                             thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ",");
                         }

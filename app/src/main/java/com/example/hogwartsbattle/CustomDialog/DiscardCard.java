@@ -14,6 +14,7 @@ import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Common.SpacesItemDecoration;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
+import com.example.hogwartsbattle.Interface.IOwnAllyListener;
 import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
@@ -34,6 +35,7 @@ public class DiscardCard extends CustomDialog {
     RecyclerView viewCardsForDelete;
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
     IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    IOwnAllyListener iOwnAllyListener;
     OwnHandAdapter ownHandAdapter;
     ArrayList ownDeck;
 
@@ -105,6 +107,10 @@ public class DiscardCard extends CustomDialog {
         this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
     }
 
+    public void setOwnAllyListener(IOwnAllyListener iOwnAllyListener) {
+        this.iOwnAllyListener = iOwnAllyListener;
+    }
+
     public void showDialog() {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -119,7 +125,9 @@ public class DiscardCard extends CustomDialog {
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(new GridLayoutManager(context, 1));
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
-                if (ownHandAdapter != null) {
+                if (iOwnAllyListener != null) {
+                    discardCardAdapter.setOwnAllyListener(iOwnAllyListener);
+                }else if (ownHandAdapter != null) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setClassroom(classroom);
                     discardCardAdapter.setHexes(hexes);
@@ -155,11 +163,10 @@ public class DiscardCard extends CustomDialog {
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
                 if (iCardAddOrDeletedFromHand != null)
                     discardCardAdapter.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
-                else if (extraHearts > 0 ) {
+                else if (extraHearts > 0) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setHearts(1);
-                }
-                else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
+                } else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setAttacks(1);
                     discardCardAdapter.setHearts(1);

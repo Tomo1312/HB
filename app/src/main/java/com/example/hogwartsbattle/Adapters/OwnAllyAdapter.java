@@ -106,6 +106,8 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
     public void addAlly(Card activeCard) {
+        activeCard.setSavedGoldToZero();
+        activeCard.setUsed(false);
         ownAllyCard.add(activeCard);
         notifyDataSetChanged();
         thisPlayer.setAlly(Helpers.getInstance().returnCardsFromArray(ownAllyCard));
@@ -124,6 +126,14 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
 
+    public void setAllyAvailable(Card ally) {
+        for(Card cardTmp : ownAllyCard){
+            if(cardTmp.getId().equals(ally.getId())){
+                cardTmp.setUsed(false);
+            }
+        }
+        notifyDataSetChanged();
+    }
     public void clearAlly() {
         ownAllyCard.clear();
         notifyDataSetChanged();
@@ -161,6 +171,7 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
             return false;
         return true;
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 

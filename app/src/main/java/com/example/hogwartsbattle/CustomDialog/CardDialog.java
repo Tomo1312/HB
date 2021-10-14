@@ -169,6 +169,7 @@ public class CardDialog extends CustomDialog {
                 createButton(Common.DRAW_CARD, dialog, R.drawable.button_border_normall_spell);
                 break;
             case 15:
+            case 22:
                 cardSpells = 2;
                 mayUseSpell = true;
                 createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
@@ -204,13 +205,6 @@ public class CardDialog extends CustomDialog {
                 cardSpells = 1;
                 createButton(Common.OPPONENT_PUT_HEX_TO_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell);
                 break;
-            case 22:
-                cardSpells = 2;
-                mayUseSpell = true;
-                createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
-                createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
-                createButton(Common.BANISH_HEX_FROM_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell);
-                break;
             case 23:
                 cardSpells = 3;
                 createButton(Common.ATTACK, dialog, R.drawable.button_border_normall_spell);
@@ -223,7 +217,7 @@ public class CardDialog extends CustomDialog {
                 createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
                 chooseEffect = true;
                 EffectsToDisable.add(createButton(Common.BANISH_FROM_HAND, dialog, R.drawable.button_border_normall_spell));
-                EffectsToDisable.add(createButton(Common.BANISH_HEX_FROM_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell));
+                EffectsToDisable.add(createButton(Common.BANISH_FROM_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell));
                 break;
             case 25:
                 cardSpells = 2;
@@ -413,7 +407,7 @@ public class CardDialog extends CustomDialog {
                 break;
             case 66:
                 cardSpells = 2;
-                createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
+                createButton(Common.ATTACK, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.OPPONENT_DISCARD_NON_HEX_CARD, dialog, R.drawable.button_border_normall_spell);
 
                 if (checkForSameHouse()) {
@@ -473,14 +467,8 @@ public class CardDialog extends CustomDialog {
                 break;
             default:
                 if (activeCard.getType().equals("ally")) {
-                    if (thisPlayer.getAlly().equals("")) {
-                        thisPlayer.setAlly(activeCard.getId());
-                    } else {
-                        thisPlayer.setAlly(thisPlayer.getAlly() + "," + activeCard.getId());
-                    }
                     iOwnAllyListener.onOwnAllyChange(activeCard);
                     iCardAddOrDeletedFromHand.onPlayedAlly(activeCard);
-                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
                 }
                 // code block
         }
@@ -522,7 +510,7 @@ public class CardDialog extends CustomDialog {
                         }
                         break;
                     case Common.REVEAL_TOP_CARD:
-                        if(ownDeck.size()<1){
+                        if (ownDeck.size() < 1) {
                             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
                             thisPlayer.setDiscarded("");
                         }
@@ -585,29 +573,33 @@ public class CardDialog extends CustomDialog {
                         }
                         break;
                     case Common.BANISH_HEX_FROM_DISCARD_PILE:
-                        discardedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
-                        ArrayList<Card> discardedCardsHexes = new ArrayList<>();
+                        if (thisPlayer.getDiscarded().equals("")) {
+                            Toast.makeText(context, "Discard pile empty!", Toast.LENGTH_LONG).show();
+                        } else {
+                            discardedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
+                            ArrayList<Card> discardedCardsHexes = new ArrayList<>();
 
-                        for (Card cardTmp : discardedCards) {
-                            if (cardTmp.getCardType().equals("hex")) {
-                                discardedCardsHexes.add(cardTmp);
-                            }
-                        }
-                        if (discardedCardsHexes.size() > 0) {
-                            discardCard = new DiscardCard(context, database, discardedCardsHexes, 3, opponentPlayer, thisPlayer);
-                            if (Integer.parseInt(activeCard.getId()) == 15)
-                                discardCard.setAttacks(2);
-                            else if (Integer.parseInt(activeCard.getId()) == 22) {
-                                discardCard.setCards(2);
-                                discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
-                                //If deck don't have 2 cards we need new one
-                                if (ownDeck.size() <= 1) {
-                                    ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-                                    thisPlayer.setDiscarded("");
+                            for (Card cardTmp : discardedCards) {
+                                if (cardTmp.getCardType().equals("hex")) {
+                                    discardedCardsHexes.add(cardTmp);
                                 }
-                                discardCard.setOwnDeck(ownDeck);
                             }
-                            discardCard.showDialog();
+                            if (discardedCardsHexes.size() > 0) {
+                                discardCard = new DiscardCard(context, database, discardedCardsHexes, 3, opponentPlayer, thisPlayer);
+                                if (Integer.parseInt(activeCard.getId()) == 15)
+                                    discardCard.setAttacks(2);
+                                else if (Integer.parseInt(activeCard.getId()) == 22) {
+                                    discardCard.setCards(2);
+                                    discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
+                                    //If deck don't have 2 cards we need new one
+                                    if (ownDeck.size() <= 1) {
+                                        ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+                                        thisPlayer.setDiscarded("");
+                                    }
+                                    discardCard.setOwnDeck(ownDeck);
+                                }
+                                discardCard.showDialog();
+                            }
                         }
                         break;
                     case Common.DRAW_CARD:
@@ -676,6 +668,7 @@ public class CardDialog extends CustomDialog {
                                         playedAllys.add(cardTmp);
                                 }
                                 discardCard = new DiscardCard(context, database, playedAllys, 10, opponentPlayer, thisPlayer);
+                                discardCard.setOwnAllyListener(iOwnAllyListener);
                                 discardCard.showDialog();
                             } else {
                                 Toast.makeText(context, "You don't have any ally!", Toast.LENGTH_LONG).show();
@@ -701,7 +694,7 @@ public class CardDialog extends CustomDialog {
                             opponentPlayer.setDiscarded(hexes.get(0).getId());
                         else
                             opponentPlayer.setDiscarded(opponentPlayer.getDiscarded() + "," + hexes.get(0).getId());
-                        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discard").setValue(opponentPlayer.getDiscarded());
+                        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").setValue(opponentPlayer.getDiscarded());
                         hexes.remove(0);
                         break;
                     case Common.DRAW_CARD_THEN_DISCARD_ANY:

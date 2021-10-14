@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.hogwartsbattle.Common.Common;
+import com.example.hogwartsbattle.Common.HarryMediaPlayer;
 import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,6 +46,7 @@ public class RoomActivity extends AppCompatActivity {
     ValueEventListener valueEventListenerPlayerId, valueEventListenerPlayersInRoom, valueEventListenerStartGame;
 
     //boolean idSet = false;
+    HarryMediaPlayer mediaPlayer;
 
     TextView opponent_name, own_name;
 
@@ -53,6 +55,8 @@ public class RoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
         databse = FirebaseDatabase.getInstance();
+        mediaPlayer = new HarryMediaPlayer(this);
+        mediaPlayer.startPlaying();
         setUiView();
         getPreload();
         saveRoomName();
@@ -222,6 +226,7 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        mediaPlayer.stopMediaPlayer();
         if (valueEventListenerStartGame != null)
             databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);
         if (valueEventListenerPlayerId != null)
