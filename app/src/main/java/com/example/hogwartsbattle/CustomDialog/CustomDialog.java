@@ -13,4 +13,5 @@ public abstract class CustomDialog {
 
     }
     public abstract void showDialog();
+
 }

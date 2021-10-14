@@ -2,7 +2,6 @@ package com.example.hogwartsbattle.CustomDialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -10,8 +9,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
-import com.example.hogwartsbattle.Interface.IChooseAllyDialog;
-import com.example.hogwartsbattle.Interface.IOnOpponentHandShow;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;

@@ -14,8 +14,7 @@ import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.CardDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
-import com.example.hogwartsbattle.Interface.IOwnAllyListener;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -33,18 +32,15 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     ArrayList<Card> ownHandCard;
     ArrayList<Card> classroom;
     FirebaseDatabase database;
-
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    IChooseDialog iChooseDialog;
 
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
-    IOwnAllyListener iOwnAllyListener;
 
     int library;
 
     public OwnHandAdapter(Context context, ArrayList<Card> ownHandCard, Player thisPlayer,
                           Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes,
-                          FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart, IOwnAllyListener iOwnAllyListener,
-                          ArrayList<Card> classroom) {
+                          FirebaseDatabase database, IChooseDialog iChooseDialog, ArrayList<Card> classroom) {
         this.context = context;
         this.ownHandCard = ownHandCard;
         cardViewList = new ArrayList<>();
@@ -53,8 +49,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         this.ownDeck = ownDeck;
         this.hexes = hexes;
         this.database = database;
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
-        this.iOwnAllyListener = iOwnAllyListener;
+        this.iChooseDialog = iChooseDialog;
         this.classroom = classroom;
     }
 
@@ -78,8 +73,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
             public void onClick(View v) {
                 CardDialog cardDialog = new CardDialog(context, library, iCardAddOrDeletedFromHand,
                         ownHandCard.get(position), thisPlayer, opponentPlayer,
-                        ownDeck, ownHandCard, hexes, database, iUpdateAttackGoldHeart,
-                        iOwnAllyListener, classroom);
+                        ownDeck, ownHandCard, hexes, database, iChooseDialog, classroom);
                 cardDialog.setOwnHandAdapter(OwnHandAdapter.this);
                 cardDialog.showDialog();
 
@@ -134,7 +128,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
 
     public void cleanCardsInHand() {
         if (ownHandCard.size() > 0) {
-            if(thisPlayer.getDiscarded().equals(""))
+            if (thisPlayer.getDiscarded().equals(""))
                 thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(ownHandCard));
             else
                 thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + Helpers.getInstance().returnCardsFromArray(ownHandCard));

@@ -1,15 +1,21 @@
 package com.example.hogwartsbattle.Common;
 
+import android.media.MediaPlayer;
+
 import androidx.collection.CircularArray;
 
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.Model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 
 public class Common {
+
+
     public static final String KEY_LOGGED = "logged";
     public static final String KEY_USER_ID = "userid";
     public static User currentUser;
@@ -50,4 +56,6 @@ public class Common {
     public static final String DISCARD_SPELL = "Discard spell from hand";
     public static final String COPY_ALLY_SPELL = "Copy ability of your Ally (activate again)";
     public static final String BANISH_PLAYED_HEX = "Banish played Hex";
+    public static final String SAVE_GOLD = "Save 1 gold";
+    public static final String COLLECT_ALL_GOLD = "Collect all golds";
 }

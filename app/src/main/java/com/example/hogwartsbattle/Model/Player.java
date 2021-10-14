@@ -3,7 +3,7 @@ package com.example.hogwartsbattle.Model;
 import java.util.ArrayList;
 
 public class Player {
-    int deckCount, attacks, lives, deaths, id, coins, heart, discardCardSpell;
+    int attacks, lives, deaths, id, coins, heart, discardCardSpell;
     boolean isPlaying;
     String hand;
     String playerName;
@@ -22,10 +22,9 @@ public class Player {
         this.playerName = playerName;
         this.house = "";
         this.ally = "";
-        this.deck = "";
         this.discarded = "";
         this.hand = "";
-        this.deckCount = 0;
+        //this.deckCount = 0;
         this.attacks = 0;
         this.lives = 7;
         this.firstPlayHand = "";
@@ -52,14 +51,6 @@ public class Player {
 
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
-    }
-
-    public int getDeckCount() {
-        return deckCount;
-    }
-
-    public void setDeckCount(int deckCount) {
-        this.deckCount = deckCount;
     }
 
     public int getAttacks() {

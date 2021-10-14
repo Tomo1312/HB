@@ -14,7 +14,7 @@ import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Common.SpacesItemDecoration;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -33,7 +33,7 @@ public class DiscardCard extends CustomDialog {
 
     RecyclerView viewCardsForDelete;
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    IChooseDialog iChooseDialog;
     OwnHandAdapter ownHandAdapter;
     ArrayList ownDeck;
 
@@ -101,8 +101,8 @@ public class DiscardCard extends CustomDialog {
         this.hexes = hexes;
     }
 
-    public void setIUpdateAttackGoldHeart(IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+    public void setIChooseDialog(IChooseDialog iChooseDialog) {
+        this.iChooseDialog = iChooseDialog;
     }
 
     public void showDialog() {
@@ -119,11 +119,13 @@ public class DiscardCard extends CustomDialog {
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(new GridLayoutManager(context, 1));
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
-                if (ownHandAdapter != null) {
+                if (iChooseDialog != null) {
+                    discardCardAdapter.setIChooseDialog(iChooseDialog);
+                }else if (ownHandAdapter != null) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setClassroom(classroom);
                     discardCardAdapter.setHexes(hexes);
-                    discardCardAdapter.setIUpdateAttackGoldHeart(iUpdateAttackGoldHeart);
+                    discardCardAdapter.setIChooseDialog(iChooseDialog);
                 }
                 break;
             case 1:
@@ -155,11 +157,10 @@ public class DiscardCard extends CustomDialog {
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
                 if (iCardAddOrDeletedFromHand != null)
                     discardCardAdapter.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
-                else if (extraHearts > 0 ) {
+                else if (extraHearts > 0) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setHearts(1);
-                }
-                else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
+                } else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setAttacks(1);
                     discardCardAdapter.setHearts(1);

@@ -68,6 +68,7 @@ public class ShowCardDialog {
         TimerTask task = new TimerTask() {
             public void run() {
                 dialog.dismiss();
+                mDialog= null;
             }
         };
         Timer timer = new Timer("Timer");

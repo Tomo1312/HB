@@ -14,9 +14,8 @@ import android.widget.Toast;
 import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Helpers.Helpers;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Interface.IDisableAllyListener;
-import com.example.hogwartsbattle.Interface.IOwnAllyListener;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -36,10 +35,11 @@ public class OwnAllyDialog extends CustomDialog {
     IDisableAllyListener iDisableAllyListener;
     LinearLayout layoutAllyAttack;
     OwnHandAdapter ownHandAdapter;
+    IChooseDialog iChooseDialog;
 
     public OwnAllyDialog(Context context, Card activeAlly, Player thisPlayer, Player opponentPlayer, ArrayList<Card> ownDeck,
                          ArrayList<Card> classroom, ArrayList<Card> hexes, FirebaseDatabase database,
-                         IUpdateAttackGoldHeart iUpdateAttackGoldHeart, IDisableAllyListener iDisableAllyListener, OwnHandAdapter ownHandAdapter) {
+                         IChooseDialog iChooseDialog, IDisableAllyListener iDisableAllyListener, OwnHandAdapter ownHandAdapter) {
         super(context, 0);
         this.activeAlly = activeAlly;
         this.thisPlayer = thisPlayer;
@@ -48,13 +48,10 @@ public class OwnAllyDialog extends CustomDialog {
         this.classroom = classroom;
         this.database = database;
         this.hexes = hexes;
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+        this.iChooseDialog = iChooseDialog;
         this.iDisableAllyListener = iDisableAllyListener;
         this.ownHandAdapter = ownHandAdapter;
     }
-
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
-    IOwnAllyListener iOwnAllyListener;
 
     boolean chooseEffect, mayUseSpell = false;
     ArrayList<Button> EffectsToDisable = new ArrayList<>();
@@ -89,6 +86,16 @@ public class OwnAllyDialog extends CustomDialog {
 
     private void showButtonsOnCardId(Dialog dialog) {
         switch (Integer.parseInt(activeAlly.getId())) {
+            case 1:
+                cardSpells = 1;
+                chooseEffect = true;
+                EffectsToDisable.add(createButton(Common.SAVE_GOLD, dialog));
+                EffectsToDisable.add(createButton(Common.COLLECT_ALL_GOLD, dialog));
+                break;
+            case 3:
+                cardSpells = 1;
+                createButton(Common.HEART, dialog);
+                break;
             case 38:
             case 67:
             case 68:
@@ -176,6 +183,7 @@ public class OwnAllyDialog extends CustomDialog {
                     createButton(Common.DRAW_CARD, dialog);
                 }
                 break;
+            case 2:
             case 60:
                 if (checkIfPlayerPlayedThreeSpells()) {
                     cardSpells = 1;
@@ -199,13 +207,13 @@ public class OwnAllyDialog extends CustomDialog {
                 createButton(Common.HEART, dialog);
                 createButton(Common.BANISH_HEX_FROM_DISCARD_PILE, dialog);
                 break;
-            case 71:
+            case 76:
                 if (checkIfPlayerPlayedItem()) {
                     cardSpells = 1;
                     createButton(Common.HEART, dialog);
                 }
                 break;
-            case 72:
+            case 77:
                 if (!thisPlayer.getHexes().equals("")) {
                     cardSpells = 3;
                     mayUseSpell = true;
@@ -214,14 +222,14 @@ public class OwnAllyDialog extends CustomDialog {
                     createButton(Common.DRAW_CARD, dialog);
                 }
                 break;
-            case 73:
+            case 78:
                 if (thisPlayer.getHeart() > 0) {
                     cardSpells = 2;
                     createButton(Common.HEART, dialog);
                     createButton(Common.ATTACK, dialog);
                 }
                 break;
-            case 74:
+            case 79:
                 cardSpells = 2;
                 createButton(Common.GOLD, dialog);
                 createButton(Common.HEART, dialog);
@@ -249,7 +257,7 @@ public class OwnAllyDialog extends CustomDialog {
         } else {
             int playedSpells = 0;
             for (Card cardTmp : Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards())) {
-                if (cardTmp.getType().equals("item")) {
+                if (cardTmp.getType().equals("spell")) {
                     playedSpells++;
                     if (playedSpells == 3)
                         return true;
@@ -264,6 +272,9 @@ public class OwnAllyDialog extends CustomDialog {
         Button newButton = new Button(context);
         newButton.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         newButton.setText(title);
+        if (activeAlly.getId().equals("1") && title.equals(Common.COLLECT_ALL_GOLD)) {
+            newButton.setText(title + " (" + activeAlly.getSavedGold() + ")");
+        }
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -280,18 +291,19 @@ public class OwnAllyDialog extends CustomDialog {
                         thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
                         break;
                     case Common.ATTACK:
-
                         thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
                         break;
                     case Common.REVEAL_TOP_CARD:
-                        if (ownDeck.size() <= 0) {
+                        if (ownDeck.size() < 1) {
                             shuffleDeck();
                         }
-                        ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), "Top card:");
+                        String title = "Top card:";
+                        ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), title);
                         if (Integer.parseInt(activeAlly.getId()) == 38) {
-                            thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
-                            thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeAlly.getCoins()));
-
+                            if (Integer.parseInt(ownDeck.get(0).getCost()) > 0) {
+                                thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
+                                thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeAlly.getCoins()));
+                            }
                         } else if (Integer.parseInt(activeAlly.getId()) == 67) {
                             if (Integer.parseInt(ownDeck.get(0).getCost()) > 0) {
                                 database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discardCardSpell").setValue(2);
@@ -305,6 +317,22 @@ public class OwnAllyDialog extends CustomDialog {
                                 database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/hand").setValue(opponentPlayer.getHand());
                                 hexes.remove(0);
                             }
+                        }
+                        break;
+                    case Common.SAVE_GOLD:
+                        if (thisPlayer.getCoins() > 0) {
+                            thisPlayer.setCoins(thisPlayer.getCoins() - 1);
+                            activeAlly.setSavedGold();
+                        } else {
+                            Toast.makeText(context, "You don't have enough money fool!", Toast.LENGTH_LONG);
+                        }
+                        break;
+                    case Common.COLLECT_ALL_GOLD:
+                        if (activeAlly.getSavedGold() > 0) {
+                            thisPlayer.setCoins(thisPlayer.getCoins() + activeAlly.getSavedGold());
+                            activeAlly.setSavedGoldToZero();
+                        } else {
+                            Toast.makeText(context, "You don't have enough money fool!", Toast.LENGTH_LONG);
                         }
                         break;
                     case Common.DRAW_CARD:
@@ -379,7 +407,6 @@ public class OwnAllyDialog extends CustomDialog {
                         discardCard.showDialog();
                         break;
                     case Common.BANISH_PLAYED_HEX:
-
                         discardedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards());
                         ArrayList<Card> playedHexes = new ArrayList<>();
                         for (Card cardTmp : discardedCards) {
@@ -414,9 +441,13 @@ public class OwnAllyDialog extends CustomDialog {
     }
 
     private void shuffleDeck() {
-        ownDeck = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
-        Collections.shuffle(ownDeck);
-        thisPlayer.setDiscarded("");
+        Log.e("OwnAllyDialog", "before shuffleDeck:" + ownDeck.size());
+        if (!thisPlayer.getDiscarded().equals("")) {
+            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer,ownDeck);
+            Collections.shuffle(ownDeck);
+            thisPlayer.setDiscarded("");
+            Log.e("OwnAllyDialog", "after shuffleDeck:" + ownDeck.size());
+        }
     }
 //    private void showButtonsOnCardId() {
 //        switch (Integer.valueOf(activeAlly.getId())) {
@@ -632,8 +663,7 @@ public class OwnAllyDialog extends CustomDialog {
         if (cardSpells == 0) {
             activeAlly.setUsed(true);
             dialog.dismiss();
-            thisPlayerDiscardCard(activeAlly);
-            iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
+            iChooseDialog.onUpdateAttackGoldHeart();
 
             if (iDisableAllyListener != null)
                 iDisableAllyListener.onDisableListener();

@@ -1,22 +1,18 @@
 package com.example.hogwartsbattle.CustomDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.media.Image;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.example.hogwartsbattle.Interface.IChooseAllyDialog;
-import com.example.hogwartsbattle.Interface.IChooseHouseDialog;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.R;
 
 public class ChooseHouseDialog {
 
     public static ChooseHouseDialog mDialog;
-    IChooseHouseDialog iChooseHouseDialog;
+    IChooseDialog iChooseDialog;
 
 
     ImageView gryffindor, ravenclaw, hufflepuff, slytherin;
@@ -28,8 +24,8 @@ public class ChooseHouseDialog {
     }
 
     public void showChooseHouseDialog(Context context,
-                                     IChooseHouseDialog iChooseHouseDialog) {
-        this.iChooseHouseDialog = iChooseHouseDialog;
+                                      IChooseDialog iChooseDialog) {
+        this.iChooseDialog = iChooseDialog;
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.choose_house_dialog_layout);
@@ -43,7 +39,7 @@ public class ChooseHouseDialog {
             @Override
             public void onClick(View v) {
 
-                iChooseHouseDialog.onChooseHouse(dialog, 0);
+                iChooseDialog.onChooseHouse(dialog, 0);
             }
         });
 
@@ -51,7 +47,7 @@ public class ChooseHouseDialog {
             @Override
             public void onClick(View v) {
 
-                iChooseHouseDialog.onChooseHouse(dialog, 1);
+                iChooseDialog.onChooseHouse(dialog, 1);
             }
         });
 
@@ -59,7 +55,7 @@ public class ChooseHouseDialog {
             @Override
             public void onClick(View v) {
 
-                iChooseHouseDialog.onChooseHouse(dialog, 2);
+                iChooseDialog.onChooseHouse(dialog, 2);
             }
         });
 
@@ -67,7 +63,7 @@ public class ChooseHouseDialog {
             @Override
             public void onClick(View v) {
 
-                iChooseHouseDialog.onChooseHouse(dialog,3);
+                iChooseDialog.onChooseHouse(dialog,3);
             }
         });
 

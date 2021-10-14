@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Helpers.Helpers;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -24,7 +24,7 @@ public class CardBuyDialog extends CustomDialog {
     Card activeCard;
     FirebaseDatabase database;
 
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    IChooseDialog iChooseDialog;
 
     ImageView cardImage;
     Button buyCard;
@@ -32,13 +32,13 @@ public class CardBuyDialog extends CustomDialog {
     int library;
 
     public CardBuyDialog(Context context, ArrayList<Card> classroom, int library, Card activeCard, Player thisPlayer,
-                         FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart, ArrayList<Card> ownDeck) {
+                         FirebaseDatabase database, IChooseDialog iChooseDialog, ArrayList<Card> ownDeck) {
         super(context, 0);
 
         this.activeCard = activeCard;
         this.thisPlayer = thisPlayer;
         this.database = database;
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+        this.iChooseDialog = iChooseDialog;
         this.classroom = classroom;
         this.ownDeck = ownDeck;
         this.library=library;
@@ -87,7 +87,7 @@ public class CardBuyDialog extends CustomDialog {
                         }else if(thisPlayer.getPlayedCards().contains("34") && activeCard.getType().equals("ally")){
                             ownDeck.add(0, activeCard);
                         }else{
-                            if (thisPlayer.getDiscarded() == "")
+                            if (thisPlayer.getDiscarded().equals(""))
                                 thisPlayer.setDiscarded(activeCard.getId());
                             else
                                 thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
@@ -95,10 +95,11 @@ public class CardBuyDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()));
                         classroom.remove(activeCard);
 
-                        iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
+                        iChooseDialog.onUpdateAttackGoldHeart();
                         database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(Helpers.getInstance().returnCardsFromArray(classroom));
                     }
                     database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue(activeCard.getId());
+
                     dialog.dismiss();
                 } else {
                     Toast.makeText(context, "Don't have enough money!", Toast.LENGTH_LONG).show();

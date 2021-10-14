@@ -15,7 +15,7 @@ import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -36,8 +36,8 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
     int extraAttacks, extraHearts, extraGolds, extraCards;
     ArrayList<Card> ownDeck, classroom, hexes;
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
     OwnHandAdapter ownHandAdapter;
+    IChooseDialog iChooseDialog;
     /*
      0 - layout allys
      1 - layout card
@@ -96,10 +96,9 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         this.hexes = hexes;
     }
 
-    public void setIUpdateAttackGoldHeart(IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+    public void setIChooseDialog(IChooseDialog iChooseDialog) {
+        this.iChooseDialog = iChooseDialog;
     }
-
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -171,7 +170,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                         discardCardAndGainEffects(cards.get(position));
                         break;
                     case 10:
-                        cards.get(position).setUsed(true);
+                        iChooseDialog.setAllyAvailable(cards.get(position));
                         dialog.dismiss();
                         break;
                     case 11:
@@ -255,10 +254,6 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     }
 
     private void banishFromHand(Card banishedCard) {
-
-        if(extraHearts>0 && banishedCard.getCardType().equals("hex")){
-            thisPlayer.setHeart(thisPlayer.getHeart()+extraHearts);
-        }
         iCardAddOrDeletedFromHand.onBanishCard(banishedCard);
         database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(banishedCard.getId());
         dialog.dismiss();
@@ -367,7 +362,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
         if (ownHandAdapter != null) {
             OwnAllyDialog ownAllyDialog = new OwnAllyDialog(context, activeCard,
-                    thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iUpdateAttackGoldHeart,
+                    thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iChooseDialog,
                     null, ownHandAdapter);
             ownAllyDialog.showDialog();
         }
@@ -378,6 +373,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     public int getItemCount() {
         return cards.size();
     }
+
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
