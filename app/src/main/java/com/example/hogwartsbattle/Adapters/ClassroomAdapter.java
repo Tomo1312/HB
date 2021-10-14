@@ -11,7 +11,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.CustomDialog.CardBuyDialog;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -29,17 +29,17 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.MyVi
     FirebaseDatabase database;
 
     Player thisPlayer;
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    IChooseDialog iChooseDialog;
     ArrayList<Card> ownDeck;
 
 
-    public ClassroomAdapter(Context context, ArrayList<Card> classroom, FirebaseDatabase database, Player thisPlayer, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
+    public ClassroomAdapter(Context context, ArrayList<Card> classroom, FirebaseDatabase database, Player thisPlayer, IChooseDialog iChooseDialog) {
         this.context = context;
         this.classroom = classroom;
         cardViewList = new ArrayList<>();
         this.database = database;
         this.thisPlayer = thisPlayer;
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+        this.iChooseDialog = iChooseDialog;
     }
 
     @NonNull
@@ -57,7 +57,7 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.MyVi
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardBuyDialog cardBuyDialog = new CardBuyDialog(context, classroom, position, classroom.get(position), thisPlayer, database, iUpdateAttackGoldHeart, ownDeck);
+                CardBuyDialog cardBuyDialog = new CardBuyDialog(context, classroom, position, classroom.get(position), thisPlayer, database, iChooseDialog, ownDeck);
                 cardBuyDialog.showDialog();
             }
         });

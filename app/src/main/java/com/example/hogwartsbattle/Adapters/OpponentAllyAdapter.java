@@ -10,14 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
-import com.example.hogwartsbattle.Interface.IDisableAllyListener;
-import com.example.hogwartsbattle.Interface.IOwnAllyListener;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
-import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;

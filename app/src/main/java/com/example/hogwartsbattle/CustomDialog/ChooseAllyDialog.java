@@ -3,22 +3,17 @@ package com.example.hogwartsbattle.CustomDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.example.hogwartsbattle.Interface.IChooseAllyDialog;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.R;
 
 public class ChooseAllyDialog {
 
     public static ChooseAllyDialog mDialog;
-    IChooseAllyDialog iChooseAllyDialog;
+    IChooseDialog iChooseDialog;
 
     ImageView btnCat, btnFrog, btnOwl;
 
@@ -29,8 +24,8 @@ public class ChooseAllyDialog {
     }
 
     public void showChooseAllyDialog(Context context,
-                                  IChooseAllyDialog iChooseAllyDialog) {
-        this.iChooseAllyDialog = iChooseAllyDialog;
+                                  IChooseDialog iChooseDialog) {
+        this.iChooseDialog = iChooseDialog;
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.choose_ally_dialog_layout);
@@ -48,7 +43,7 @@ public class ChooseAllyDialog {
                 view.invalidate();
                 btnCat.setImageResource(R.drawable.cat);
 //                        btnCat.setImageBitmap(btnCat.getDrawable(R.drawable.img_down));
-                iChooseAllyDialog.onChooseAlly(dialog, 2);
+                iChooseDialog.onChooseAlly(dialog, 2);
             }
         });
 
@@ -56,7 +51,7 @@ public class ChooseAllyDialog {
             @Override
             public void onClick(View v) {
 
-                iChooseAllyDialog.onChooseAlly(dialog, 3);
+                iChooseDialog.onChooseAlly(dialog, 3);
             }
         });
 
@@ -64,7 +59,7 @@ public class ChooseAllyDialog {
             @Override
             public void onClick(View v) {
 
-                iChooseAllyDialog.onChooseAlly(dialog, 1);
+                iChooseDialog.onChooseAlly(dialog, 1);
             }
         });
 

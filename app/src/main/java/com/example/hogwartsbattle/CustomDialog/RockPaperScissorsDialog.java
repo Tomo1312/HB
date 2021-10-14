@@ -5,17 +5,15 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 
-import com.example.hogwartsbattle.Interface.IChooseHouseDialog;
-import com.example.hogwartsbattle.Interface.IRockPaperScissorsDialog;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.R;
 
 public class RockPaperScissorsDialog {
 
     public static RockPaperScissorsDialog mDialog;
-    IRockPaperScissorsDialog iRockPaperScissorsDialog;
+    IChooseDialog iChooseDialog;
 
 
     ImageView rock, paper, scissors;
@@ -26,8 +24,8 @@ public class RockPaperScissorsDialog {
         return mDialog;
     }
 
-    public void showRockPaperScissorsDialog(Context context, IRockPaperScissorsDialog iRockPaperScissorsDialog) {
-        this.iRockPaperScissorsDialog = iRockPaperScissorsDialog;
+    public void showRockPaperScissorsDialog(Context context, IChooseDialog iChooseDialog) {
+
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.rock_paper_scissors_dialog_layout);
@@ -40,7 +38,7 @@ public class RockPaperScissorsDialog {
             @Override
             public void onClick(View v) {
 
-                iRockPaperScissorsDialog.onPaperRockScissorsChoose(dialog, "rock");
+                iChooseDialog.onPaperRockScissorsChoose(dialog, "rock");
             }
         });
 
@@ -48,7 +46,7 @@ public class RockPaperScissorsDialog {
             @Override
             public void onClick(View v) {
 
-                iRockPaperScissorsDialog.onPaperRockScissorsChoose(dialog, "paper");
+                iChooseDialog.onPaperRockScissorsChoose(dialog, "paper");
             }
         });
 
@@ -56,7 +54,7 @@ public class RockPaperScissorsDialog {
             @Override
             public void onClick(View v) {
 
-                iRockPaperScissorsDialog.onPaperRockScissorsChoose(dialog, "scissors");
+                iChooseDialog.onPaperRockScissorsChoose(dialog, "scissors");
             }
         });
 

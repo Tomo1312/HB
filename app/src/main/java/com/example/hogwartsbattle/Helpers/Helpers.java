@@ -1,6 +1,7 @@
 package com.example.hogwartsbattle.Helpers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Model.Card;
@@ -19,6 +20,7 @@ import java.util.Collections;
 public class Helpers {
 
     private static Helpers instance;
+
     public static Helpers getInstance() {
         if (instance == null)
             instance = new Helpers();
@@ -51,7 +53,7 @@ public class Helpers {
                     } else if (currentCard != null) {
                         if ("id".equals(eltName)) {
                             currentCard.setId(parser.nextText());
-                        }else if ("name".equals(eltName)) {
+                        } else if ("name".equals(eltName)) {
                             currentCard.setName(parser.nextText());
                         } else if ("count".equals(eltName)) {
                             currentCard.setCount(parser.nextText());
@@ -67,7 +69,7 @@ public class Helpers {
                             currentCard.setHeart(parser.nextText());
                         } else if ("attack".equals(eltName)) {
                             currentCard.setAttack(parser.nextText());
-                        }else if ("type".equals(eltName)) {
+                        } else if ("type".equals(eltName)) {
                             currentCard.setType(parser.nextText());
                         }
                     }
@@ -78,17 +80,18 @@ public class Helpers {
         return deck;
     }
 
-    public ArrayList<Card> returnCardsFromString(String stringCards){
-
+    public ArrayList<Card> returnCardsFromString(String stringCards) {
         ArrayList<Card> cardsList = new ArrayList<>();
         String[] cards = stringCards.split(",");
         for (String stringCardTmp : cards) {
-            cardsList.add(Common.allCardsMap.get(Integer.parseInt(stringCardTmp)));
+            if (!stringCardTmp.equals("")) {
+                cardsList.add(Common.allCardsMap.get(Integer.parseInt(stringCardTmp)));
+            }
         }
         return cardsList;
     }
 
-    public String returnCardsFromArray(ArrayList<Card> cards){
+    public String returnCardsFromArray(ArrayList<Card> cards) {
 
         StringBuilder handString = new StringBuilder();
         int i = 1;
@@ -104,11 +107,10 @@ public class Helpers {
 
     // When player need to draw more then 1 card, so new deck will be discard pile + current deck
     // That have size < 5
-    public ArrayList<Card> getDeckFromDiscardPileAndDeck(Player thisPlayer, ArrayList<Card> ownDeck) {
-        ArrayList<Card> deck = new ArrayList<>(ownDeck);
-        deck.addAll(returnCardsFromString(thisPlayer.getDiscarded()));
-        Collections.shuffle(deck);
-        return deck;
+    public ArrayList<Card>  getDeckFromDiscardPileAndDeck(Player thisPlayer, ArrayList<Card> ownDeck) {
+        ownDeck.addAll(returnCardsFromString(thisPlayer.getDiscarded()));
+        Collections.shuffle(ownDeck);
+        return ownDeck;
     }
 
     public void startAfterPlayerDied(FirebaseDatabase database, Player thisPlayer, ArrayList<Card> ownDeck) {

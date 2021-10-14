@@ -3,6 +3,8 @@ package com.example.hogwartsbattle.Model;
 public class Card {
     String id, name, count, cost, house, cardType, coins, heart, attack, type;
     boolean used;
+    //only for owl
+    int savedGold;
 
     public Card() {
     }
@@ -107,5 +109,16 @@ public class Card {
 
     public void setUsed(boolean used) {
         this.used = used;
+    }
+
+    public int getSavedGold() {
+        return savedGold;
+    }
+
+    public void setSavedGold() {
+        this.savedGold += 1;
+    }
+    public void setSavedGoldToZero() {
+        this.savedGold = 0;
     }
 }

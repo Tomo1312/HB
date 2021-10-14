@@ -11,13 +11,11 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.Common.Common;
-import com.example.hogwartsbattle.CustomDialog.CardDialog;
 import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
+import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Interface.IDisableAllyListener;
-import com.example.hogwartsbattle.Interface.IOwnAllyListener;
-import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -35,16 +33,14 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     ArrayList<Card> ownAllyCard;
     FirebaseDatabase database;
 
-    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
     IDisableAllyListener iDisableAllyListener;
-
-    ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
+    IChooseDialog iChooseDialog;
 
     OwnHandAdapter ownHandAdapter;
 
     public OwnAllyAdapter(Context context, Player thisPlayer,
                           Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes, ArrayList<Card> classroom,
-                          FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
+                          FirebaseDatabase database, IChooseDialog iChooseDialog) {
         this.context = context;
         this.ownAllyCard = new ArrayList<>();
         this.cardViewList = new ArrayList<>();
@@ -54,24 +50,8 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         this.ownDeck = ownDeck;
         this.hexes = hexes;
         this.database = database;
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
+        this.iChooseDialog = iChooseDialog;
         this.iDisableAllyListener = this;
-    }
-
-    public OwnAllyAdapter(Context context, ArrayList<Card> ownAllyCards, Player thisPlayer,
-                          Player opponentPlayer, ArrayList<Card> ownDeck, ArrayList<Card> hexes, ArrayList<Card> classroom,
-                          FirebaseDatabase database, IUpdateAttackGoldHeart iUpdateAttackGoldHeart) {
-        this.context = context;
-        this.ownAllyCard = ownAllyCards;
-        this.cardViewList = new ArrayList<>();
-        this.thisPlayer = thisPlayer;
-        this.opponentPlayer = opponentPlayer;
-        this.ownDeck = ownDeck;
-        this.hexes = hexes;
-        this.database = database;
-        this.iUpdateAttackGoldHeart = iUpdateAttackGoldHeart;
-        this.iDisableAllyListener = this;
-        this.classroom = classroom;
     }
 
     @NonNull
@@ -93,7 +73,7 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
             public void onClick(View v) {
                 if (!ownAllyCard.get(position).isUsed() && thisPlayer.isPlaying()) {
                     OwnAllyDialog ownAllyDialog = new OwnAllyDialog(context, ownAllyCard.get(position),
-                            thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iUpdateAttackGoldHeart,
+                            thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iChooseDialog,
                             iDisableAllyListener, ownHandAdapter);
                     ownAllyDialog.showDialog();
                 }
@@ -106,6 +86,8 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
     public void addAlly(Card activeCard) {
+        activeCard.setSavedGoldToZero();
+        activeCard.setUsed(false);
         ownAllyCard.add(activeCard);
         notifyDataSetChanged();
         thisPlayer.setAlly(Helpers.getInstance().returnCardsFromArray(ownAllyCard));
@@ -124,15 +106,13 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
 
-    public void clearAlly() {
-        ownAllyCard.clear();
+    public void setAllyAvailable(Card ally) {
+        for (Card cardTmp : ownAllyCard) {
+            if (cardTmp.getId().equals(ally.getId())) {
+                cardTmp.setUsed(false);
+            }
+        }
         notifyDataSetChanged();
-        if (thisPlayer.getDiscarded().equals(""))
-            thisPlayer.setDiscarded(thisPlayer.getAlly());
-        else
-            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getAlly());
-        thisPlayer.setAlly("");
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
     }
 
     @Override
@@ -161,6 +141,7 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
             return false;
         return true;
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
