@@ -492,18 +492,25 @@ public class CardDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeCard.getCoins()));
                         break;
                     case Common.HEART:
-                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() > 1))
-                            thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeCard.getHeart()));
+                        thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeCard.getHeart()));
                         break;
                     case Common.ATTACK:
-                        thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeCard.getAttack()));
-                        if (Integer.parseInt(activeCard.getId()) == 28) {
-                            ArrayList<Card> opponentDiscarded = Helpers.getInstance().returnCardsFromString(opponentPlayer.getDiscarded());
-                            for (Card cardTmp : opponentDiscarded) {
-                                if (cardTmp.getCardType().equals("Hex")) {
-                                    thisPlayer.setAttacks(thisPlayer.getAttacks() + 1);
+                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() == 0)) {
+                            if (thisPlayer.getHexes().contains("90")) {
+                                thisPlayer.setAttacks(1);
+                            } else {
+                                thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeCard.getAttack()));
+                                if (Integer.parseInt(activeCard.getId()) == 28) {
+                                    ArrayList<Card> opponentDiscarded = Helpers.getInstance().returnCardsFromString(opponentPlayer.getDiscarded());
+                                    for (Card cardTmp : opponentDiscarded) {
+                                        if (cardTmp.getCardType().equals("Hex")) {
+                                            thisPlayer.setAttacks(thisPlayer.getAttacks() + 1);
+                                        }
+                                    }
                                 }
                             }
+                        } else {
+                            Toast.makeText(context, "You have active Hexes!", Toast.LENGTH_LONG).show();
                         }
                         break;
                     case Common.REVEAL_TOP_CARD:

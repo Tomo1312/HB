@@ -291,7 +291,8 @@ public class OwnAllyDialog extends CustomDialog {
                         thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
                         break;
                     case Common.ATTACK:
-                        thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
+                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() > 1))
+                            thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
                         break;
                     case Common.REVEAL_TOP_CARD:
                         if (ownDeck.size() < 1) {

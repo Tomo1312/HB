@@ -661,6 +661,14 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             if (cardTmp.getId().equals("80")) {
                 hand.remove(cardTmp);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
+            } else if (cardTmp.getId().equals("81")) {
+                if (!thisPlayer.getAlly().equals("")) {
+                    DiscardCard discardOwnAlly = new DiscardCard(GameActivity.this, database, thisPlayer.getAlly(), 12, null, thisPlayer);
+                    discardOwnAlly.setIChooseDialog(iChooseDialog);
+                    discardOwnAlly.showDialog();
+                } else {
+                    Toast.makeText(GameActivity.this, "You lucky wizard, you don't have any ally currently active!", Toast.LENGTH_LONG).show();
+                }
             }
         }
 //        SOME FAILED SHIT WITH HEX

@@ -179,6 +179,10 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                         thisPlayer.setPlayedCards(Helpers.getInstance().returnCardsFromArray(playedCards));
                         dialog.dismiss();
                         break;
+                    case 12:
+                        iChooseDialog.removeAlly(cards.get(position));
+                        dialog.dismiss();
+                        break;
                     default:
                         break;
                 }
@@ -195,7 +199,10 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
             iCardAddOrDeletedFromHand.onDiscardCard(discardedCard);
         else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
             ownHandAdapter.onDiscardCard(discardedCard);
-            thisPlayer.setAttacks(thisPlayer.getAttacks() + extraAttacks);
+
+            if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() > 1))
+                thisPlayer.setAttacks(thisPlayer.getAttacks() + extraAttacks);
+
             thisPlayer.setHeart(thisPlayer.getHeart() + extraHearts);
             ownHandAdapter.onAddCard(ownDeck.get(0));
             ownDeck.remove(0);
@@ -295,7 +302,8 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
     private void playerBanishHexInDiscardPile(Card hexToBanish) {
         if (extraAttacks > 0) {
-            thisPlayer.setAttacks(thisPlayer.getAttacks() + extraAttacks);
+            if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() > 1))
+                thisPlayer.setAttacks(thisPlayer.getAttacks() + extraAttacks);
         } else if (extraCards > 0) {
             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
             ownDeck.remove(0);
