@@ -107,11 +107,23 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
 
 
     public void setAllyAvailable(Card ally) {
+<<<<<<< HEAD
         for (Card cardTmp : ownAllyCard) {
             if (cardTmp.getId().equals(ally.getId())) {
                 cardTmp.setUsed(false);
             }
         }
+=======
+        for(Card cardTmp : ownAllyCard){
+            if(cardTmp.getId().equals(ally.getId())){
+                cardTmp.setUsed(false);
+            }
+        }
+        notifyDataSetChanged();
+    }
+    public void clearAlly() {
+        ownAllyCard.clear();
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
         notifyDataSetChanged();
     }
 

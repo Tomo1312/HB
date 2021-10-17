@@ -14,7 +14,12 @@ import com.example.hogwartsbattle.Adapters.OwnHandAdapter;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Common.SpacesItemDecoration;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
+<<<<<<< HEAD
 import com.example.hogwartsbattle.Interface.IChooseDialog;
+=======
+import com.example.hogwartsbattle.Interface.IOwnAllyListener;
+import com.example.hogwartsbattle.Interface.IUpdateAttackGoldHeart;
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
@@ -33,7 +38,12 @@ public class DiscardCard extends CustomDialog {
 
     RecyclerView viewCardsForDelete;
     ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand;
+<<<<<<< HEAD
     IChooseDialog iChooseDialog;
+=======
+    IUpdateAttackGoldHeart iUpdateAttackGoldHeart;
+    IOwnAllyListener iOwnAllyListener;
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
     OwnHandAdapter ownHandAdapter;
     ArrayList ownDeck;
 
@@ -105,6 +115,10 @@ public class DiscardCard extends CustomDialog {
         this.iChooseDialog = iChooseDialog;
     }
 
+    public void setOwnAllyListener(IOwnAllyListener iOwnAllyListener) {
+        this.iOwnAllyListener = iOwnAllyListener;
+    }
+
     public void showDialog() {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -119,8 +133,13 @@ public class DiscardCard extends CustomDialog {
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(new GridLayoutManager(context, 1));
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
+<<<<<<< HEAD
                 if (iChooseDialog != null) {
                     discardCardAdapter.setIChooseDialog(iChooseDialog);
+=======
+                if (iOwnAllyListener != null) {
+                    discardCardAdapter.setOwnAllyListener(iOwnAllyListener);
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
                 }else if (ownHandAdapter != null) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setClassroom(classroom);

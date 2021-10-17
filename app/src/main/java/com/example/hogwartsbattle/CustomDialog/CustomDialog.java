@@ -2,6 +2,8 @@ package com.example.hogwartsbattle.CustomDialog;
 
 import android.content.Context;
 
+import com.example.hogwartsbattle.Interface.IOwnAllyListener;
+
 public abstract class CustomDialog {
 
     Context context;

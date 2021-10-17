@@ -663,7 +663,11 @@ public class OwnAllyDialog extends CustomDialog {
         if (cardSpells == 0) {
             activeAlly.setUsed(true);
             dialog.dismiss();
+<<<<<<< HEAD
             iChooseDialog.onUpdateAttackGoldHeart();
+=======
+            iUpdateAttackGoldHeart.onUpdateAttackGoldHeart();
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
 
             if (iDisableAllyListener != null)
                 iDisableAllyListener.onDisableListener();

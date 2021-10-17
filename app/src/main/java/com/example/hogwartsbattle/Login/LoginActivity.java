@@ -5,8 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+<<<<<<< HEAD
+=======
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+<<<<<<< HEAD
+=======
+import android.text.TextWatcher;
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +40,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;

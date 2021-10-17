@@ -464,7 +464,11 @@ public class CardDialog extends CustomDialog {
                 break;
             default:
                 if (activeCard.getType().equals("ally")) {
+<<<<<<< HEAD
                     iChooseDialog.onOwnAllyChange(activeCard);
+=======
+                    iOwnAllyListener.onOwnAllyChange(activeCard);
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
                     iCardAddOrDeletedFromHand.onPlayedAlly(activeCard);
                 }
         }
@@ -666,7 +670,11 @@ public class CardDialog extends CustomDialog {
                                         playedAllys.add(cardTmp);
                                 }
                                 discardCard = new DiscardCard(context, database, playedAllys, 10, opponentPlayer, thisPlayer);
+<<<<<<< HEAD
                                 discardCard.setIChooseDialog(iChooseDialog);
+=======
+                                discardCard.setOwnAllyListener(iOwnAllyListener);
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
                                 discardCard.showDialog();
                             } else {
                                 Toast.makeText(context, "You don't have any ally!", Toast.LENGTH_LONG).show();

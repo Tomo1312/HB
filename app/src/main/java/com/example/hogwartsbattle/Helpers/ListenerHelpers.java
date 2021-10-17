@@ -68,6 +68,7 @@ public class ListenerHelpers {
         ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+<<<<<<< HEAD
 
                 if (snapshot.exists()) {
                     if (!snapshot.getValue().toString().equals("0")) {
@@ -82,6 +83,17 @@ public class ListenerHelpers {
                                     }
                                     ownDeck.remove(card);
                                     break;
+=======
+                if (!snapshot.getValue().toString().equals("0")) {
+                    activity.deckNeedShuffle();
+                    if (snapshot.getValue().toString().equals("1")) {
+                        for (Card card : ownDeck) {
+                            if (!card.getCardType().equals("hex")) {
+                                if (thisPlayer.getDiscarded().equals("")) {
+                                    thisPlayer.setDiscarded(card.getId());
+                                } else {
+                                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + card.getId());
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
                                 }
                             }
                         } else if (snapshot.getValue().toString().equals("2")) {
@@ -91,8 +103,17 @@ public class ListenerHelpers {
                             thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ownDeck.get(0).getId());
                             ownDeck.remove(0);
                         }
+<<<<<<< HEAD
                         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").setValue(0);
                         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
+=======
+                    } else if (snapshot.getValue().toString().equals("2")) {
+                        if (!thisPlayer.getDiscarded().equals("")) {
+                            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ",");
+                        }
+                        thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ownDeck.get(0).getId());
+                        ownDeck.remove(0);
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
                     }
                 }
             }

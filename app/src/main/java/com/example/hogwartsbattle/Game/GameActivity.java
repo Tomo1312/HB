@@ -822,7 +822,10 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     @Override
     protected void onStop() {
         mediaPlayer.stopMediaPlayer();
+<<<<<<< HEAD
         killAllListeners();
+=======
+>>>>>>> d2550793e59c55b50480a3229252c6b8835fb41f
         super.onStop();
     }
 }
