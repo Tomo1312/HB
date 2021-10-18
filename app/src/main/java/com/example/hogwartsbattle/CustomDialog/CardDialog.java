@@ -492,7 +492,13 @@ public class CardDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeCard.getCoins()));
                         break;
                     case Common.HEART:
-                        thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeCard.getHeart()));
+                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("91") && thisPlayer.getAttacks() == 0)) {
+                            if (thisPlayer.getHexes().contains("91")) {
+                                thisPlayer.setHeart(1);
+                            } else {
+                                thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeCard.getHeart()));
+                            }
+                        }
                         break;
                     case Common.ATTACK:
                         if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() == 0)) {
@@ -607,13 +613,17 @@ public class CardDialog extends CustomDialog {
                         }
                         break;
                     case Common.DRAW_CARD:
-                        if (ownDeck.size() == 0) {
-                            ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                            Collections.shuffle(ownDeck);
-                            thisPlayer.setDiscarded("");
+                        if (thisPlayer.getHexes().contains("83")) {
+                            Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ownDeck.size() == 0) {
+                                ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                Collections.shuffle(ownDeck);
+                                thisPlayer.setDiscarded("");
+                            }
+                            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
                         }
-                        iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
-                        ownDeck.remove(0);
                         break;
                     case Common.BANISH_FROM_DISCARD_PILE:
                         if (thisPlayer.getDiscarded().equals("")) {
@@ -704,45 +714,53 @@ public class CardDialog extends CustomDialog {
                         hexes.remove(0);
                         break;
                     case Common.DRAW_CARD_THEN_DISCARD_ANY:
-                        if (ownDeck.size() < 0) {
-                            ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                            Collections.shuffle(ownDeck);
-                            thisPlayer.setDiscarded("");
-                        }
-                        iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
-                        ownDeck.remove(0);
-                        ArrayList<Card> cardToDiscardTmp = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
-                        ArrayList<Card> cardToDiscard = new ArrayList<>();
-                        for (Card cardTmp : cardToDiscardTmp) {
-                            if (!cardTmp.getId().equals(activeCard.getId())) {
-                                cardToDiscard.add(cardTmp);
+                        if (thisPlayer.getHexes().contains("83")) {
+                            Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ownDeck.size() < 0) {
+                                ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                Collections.shuffle(ownDeck);
+                                thisPlayer.setDiscarded("");
                             }
-                        }
+                            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
+                            ArrayList<Card> cardToDiscardTmp = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
+                            ArrayList<Card> cardToDiscard = new ArrayList<>();
+                            for (Card cardTmp : cardToDiscardTmp) {
+                                if (!cardTmp.getId().equals(activeCard.getId())) {
+                                    cardToDiscard.add(cardTmp);
+                                }
+                            }
 
-                        discardCard = new DiscardCard(context, database, cardToDiscard, 7, opponentPlayer, thisPlayer);
-                        discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
-                        discardCard.showDialog();
+                            discardCard = new DiscardCard(context, database, cardToDiscard, 7, opponentPlayer, thisPlayer);
+                            discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
+                            discardCard.showDialog();
+                        }
                         break;
                     case Common.DRAW_TWO_CARD_THEN_DISCARD_ANY:
-                        if (ownDeck.size() <= 1) {
-                            ownDeck = new ArrayList<>(Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck));
-                            thisPlayer.setDiscarded("");
-                        }
-
-                        iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
-                        ownDeck.remove(0);
-                        iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
-                        ownDeck.remove(0);
-                        ArrayList<Card> cardToDiscardTmp2 = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
-                        ArrayList<Card> cardToDiscard2 = new ArrayList<>();
-                        for (Card cardTmp : cardToDiscardTmp2) {
-                            if (!cardTmp.getId().equals(activeCard.getId())) {
-                                cardToDiscard2.add(cardTmp);
+                        if (thisPlayer.getHexes().contains("83")) {
+                            Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ownDeck.size() <= 1) {
+                                ownDeck = new ArrayList<>(Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck));
+                                thisPlayer.setDiscarded("");
                             }
+
+                            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
+                            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
+                            ArrayList<Card> cardToDiscardTmp2 = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
+                            ArrayList<Card> cardToDiscard2 = new ArrayList<>();
+                            for (Card cardTmp : cardToDiscardTmp2) {
+                                if (!cardTmp.getId().equals(activeCard.getId())) {
+                                    cardToDiscard2.add(cardTmp);
+                                }
+                            }
+                            discardCard = new DiscardCard(context, database, cardToDiscard2, 7, opponentPlayer, thisPlayer);
+                            discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
+                            discardCard.showDialog();
                         }
-                        discardCard = new DiscardCard(context, database, cardToDiscard2, 7, opponentPlayer, thisPlayer);
-                        discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
-                        discardCard.showDialog();
                         break;
                     case Common.GOLD_PER_ALLY:
                         String[] allysGold = thisPlayer.getAlly().split(",");

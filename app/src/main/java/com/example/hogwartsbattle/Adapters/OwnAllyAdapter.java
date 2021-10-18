@@ -1,5 +1,6 @@
 package com.example.hogwartsbattle.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,7 +63,7 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String cardName = "ally" + ownAllyCard.get(position).getId();
         int id = context.getResources().getIdentifier("drawable/" + cardName, null, context.getPackageName());
         holder.card_from_layout.setImageResource(id);

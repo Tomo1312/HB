@@ -288,7 +288,13 @@ public class OwnAllyDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeAlly.getCoins()));
                         break;
                     case Common.HEART:
-                        thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
+                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("91") && thisPlayer.getAttacks() == 0)) {
+                            if (thisPlayer.getHexes().contains("91")) {
+                                thisPlayer.setHeart(1);
+                            } else {
+                                thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
+                            }
+                        }
                         break;
                     case Common.ATTACK:
                         if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() > 1))
@@ -337,11 +343,15 @@ public class OwnAllyDialog extends CustomDialog {
                         }
                         break;
                     case Common.DRAW_CARD:
-                        if (ownDeck.size() < 1) {
-                            shuffleDeck();
+                        if (thisPlayer.getHexes().contains("83")) {
+                            Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ownDeck.size() < 1) {
+                                shuffleDeck();
+                            }
+                            ownHandAdapter.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
                         }
-                        ownHandAdapter.onAddCard(ownDeck.get(0));
-                        ownDeck.remove(0);
                         break;
                     case Common.DISCARD_CARD:
                         if (ownDeck.size() < 1) {
@@ -352,14 +362,18 @@ public class OwnAllyDialog extends CustomDialog {
                         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discardCardSpell").setValue(1);
                         break;
                     case Common.DRAW_CARD_THEN_DISCARD_ANY:
-                        if (ownDeck.size() < 1) {
-                            shuffleDeck();
+                        if (thisPlayer.getHexes().contains("83")) {
+                            Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ownDeck.size() < 1) {
+                                shuffleDeck();
+                            }
+                            ownHandAdapter.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
+                            discardCard = new DiscardCard(context, database, Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()), 7, opponentPlayer, thisPlayer);
+                            discardCard.setOwnHandAdapter(ownHandAdapter);
+                            discardCard.showDialog();
                         }
-                        ownHandAdapter.onAddCard(ownDeck.get(0));
-                        ownDeck.remove(0);
-                        discardCard = new DiscardCard(context, database, Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()), 7, opponentPlayer, thisPlayer);
-                        discardCard.setOwnHandAdapter(ownHandAdapter);
-                        discardCard.showDialog();
                         break;
                     case Common.DISCARD_SPELL:
                         if (thisPlayer.getHand().equals("")) {
@@ -444,214 +458,12 @@ public class OwnAllyDialog extends CustomDialog {
     private void shuffleDeck() {
         Log.e("OwnAllyDialog", "before shuffleDeck:" + ownDeck.size());
         if (!thisPlayer.getDiscarded().equals("")) {
-            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer,ownDeck);
+            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
             Collections.shuffle(ownDeck);
             thisPlayer.setDiscarded("");
             Log.e("OwnAllyDialog", "after shuffleDeck:" + ownDeck.size());
         }
     }
-//    private void showButtonsOnCardId() {
-//        switch (Integer.valueOf(activeAlly.getId())) {
-//            case 0:
-//                cardSpells = 1;
-//                return_to_library.setVisibility(View.VISIBLE);
-//                gold.setVisibility(View.VISIBLE);
-//                chooseEffect = true;
-//                EffectsToDisable.add(return_to_library);
-//                EffectsToDisable.add(gold);
-//                break;
-//            case 4:
-//                cardSpells = 1;
-//                attack.setVisibility(View.VISIBLE);
-//                break;
-//            case 5:
-//                cardSpells = 1;
-//                heart.setVisibility(View.VISIBLE);
-//                gold.setVisibility(View.VISIBLE);
-//                chooseEffect = true;
-//                EffectsToDisable.add(heart);
-//                EffectsToDisable.add(gold);
-//                break;
-//            case 6:
-//                cardSpells = 1;
-//                gold.setVisibility(View.VISIBLE);
-//                break;
-//            case 9:
-//                cardSpells = 2;
-//                    cardSpells++;
-//                    drawCard.setVisibility(View.VISIBLE);
-//
-//                attack.setVisibility(View.VISIBLE);
-//                heart.setVisibility(View.VISIBLE);
-//                break;
-//            case 11:
-//                cardSpells = 2;
-//                    cardSpells++;
-//                    drawExtraCard.setVisibility(View.VISIBLE);
-//
-//                gold.setVisibility(View.VISIBLE);
-//                drawCard.setVisibility(View.VISIBLE);
-//                break;
-//            case 13:
-//                cardSpells = 1;
-//                    chooseEffect = true;
-//                    EffectsToDisable.add(heart);
-//                    EffectsToDisable.add(gold);
-//
-//                break;
-//            case 15:
-//                cardSpells = 1;
-//                gold.setVisibility(View.VISIBLE);
-//                    cardSpells++;
-//                    drawCard.setVisibility(View.VISIBLE);
-//
-//                break;
-//            default:
-//        }
-//
-//    }
-
-//    private void setOnClickButtons(Dialog dialog) {
-//        gold.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeAlly.getCoins()));
-//                if (chooseEffect) {
-//                    for (Button buttonTmp : EffectsToDisable) {
-//                        buttonTmp.setVisibility(View.GONE);
-//                    }
-//                    EffectsToDisable.clear();
-//                } else {
-//                    gold.setVisibility(View.GONE);
-//                }
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        heart.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                if (thisPlayer.getLives() < 7)
-//                    thisPlayer.setLives(thisPlayer.getLives() + Integer.parseInt(activeAlly.getHeart()));
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        attack.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
-//                if (chooseEffect) {
-//                    for (Button buttonTmp : EffectsToDisable) {
-//                        buttonTmp.setVisibility(View.GONE);
-//                    }
-//                    EffectsToDisable.clear();
-//                } else {
-//                    attack.setVisibility(View.GONE);
-//                }
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        banishClassroom.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                checkForCardEnd(dialog);
-//
-//            }
-//        });
-//        banishDiscardPile.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        drawCard.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                hand.add(ownDeck.get(0));
-//                thisPlayer.setHand(thisPlayer.getHand() + "," + ownDeck.get(0).getId());
-//                ownDeck.remove(0);
-//                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getHand());
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        drawExtraCard.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                hand.add(ownDeck.get(0));
-//                thisPlayer.setHand(thisPlayer.getHand() + "," + ownDeck.get(0).getId());
-//                ownDeck.remove(0);
-//                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getHand());
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        drawCardDiscardOne.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                hand.add(ownDeck.get(0));
-//                thisPlayer.setHand(thisPlayer.getHand() + "," + ownDeck.get(0).getId());
-//                ownDeck.remove(0);
-//                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getHand());
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        drawTwoCardDiscardOne.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                hand.add(ownDeck.get(0));
-//                thisPlayer.setHand(thisPlayer.getHand() + "," + ownDeck.get(0).getId());
-//                ownDeck.remove(0);
-//                hand.add(ownDeck.get(0));
-//                thisPlayer.setHand(thisPlayer.getHand() + "," + ownDeck.get(0).getId());
-//                ownDeck.remove(0);
-//                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getHand());
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        opponentHexToDiscardPile.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discard").setValue(opponentPlayer.getDiscarded() + "," + hexes.get(0).getId());
-//                hexes.remove(0);
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//        opponentHexToHand.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cardSpells--;
-//                dialog.setCancelable(false);
-//                database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/hand").setValue(opponentPlayer.getHand() + "," + hexes.get(0).getId());
-//                hexes.remove(0);
-//
-//                checkForCardEnd(dialog);
-//            }
-//        });
-//    }
 
     void thisPlayerDiscardCard(Card card) {
         if (thisPlayer.getDiscarded() == "")

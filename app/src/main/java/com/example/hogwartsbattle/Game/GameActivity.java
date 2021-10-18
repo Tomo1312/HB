@@ -640,7 +640,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         int i;
         StringBuilder stringHandBuilder = new StringBuilder(stringHand);
 
-        deckNeedShuffle();
+        deckNeedShuffle(5);
         for (i = 0; i < 5; i++) {
             if (ownDeck.get(0).getCardType().equals("hex")) {
                 if (hexesString.toString().equals(""))
@@ -669,20 +669,29 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 } else {
                     Toast.makeText(GameActivity.this, "You lucky wizard, you don't have any ally currently active!", Toast.LENGTH_LONG).show();
                 }
+            } else if (cardTmp.getId().equals("84")) {
+                Toast.makeText(GameActivity.this, "You need to banish top card of your deck because of Jelly-brain jinx!", Toast.LENGTH_LONG).show();
+                deckNeedShuffle(1);
+                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0));
+                ownDeck.remove(0);
+                hand.remove(cardTmp);
+            } else if (cardTmp.getId().equals("87")) {
+                Toast.makeText(GameActivity.this, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
+                deckNeedShuffle(1);
+                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
+                hand.remove(cardTmp);
+                StringBuilder newTwoHexes = new StringBuilder();
+                newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
+                hexDeck.remove(0);
+                hexDeck.remove(0);
+                if (thisPlayer.getDiscarded().equals(""))
+                    thisPlayer.setDiscarded(newTwoHexes.toString());
+                else
+                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + newTwoHexes.toString());
             }
         }
-//        SOME FAILED SHIT WITH HEX
-//        if (!hexesString.toString().equals("")) {
-//            for (Card hexTmp : Helpers.getInstance().returnCardsFromString(hexesString.toString())) {
-//                ShowCardDialog.getInstance().showCardDialog(this, hexTmp, "You have draw Hex");
-//                try {
-//                    TimeUnit.MILLISECONDS.sleep(3000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-        if (!thisPlayer.getAlly().equals("")) {
+
+        if (!thisPlayer.getAlly().equals("") && thisPlayer.getHexes().contains("89")) {
             ownAllyAdapter.updateAllies();
         }
 
@@ -691,7 +700,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         thisPlayer.setHexes(hexesString.toString());
         thisPlayer.setPlayedCards(hexesString.toString());
 
-        Log.e("GameActivity", "Player hexes:" + thisPlayer.getHexes());
+//        Log.e("GameActivity", "Player hexes:" + thisPlayer.getHexes());
 
         // testing purpose
         // hand.add(Common.allCardsMap.get(7));
@@ -795,8 +804,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         });
     }
 
-    public void deckNeedShuffle() {
-        if (ownDeck.size() < 5 && !thisPlayer.getDiscarded().equals("")) {
+    public void deckNeedShuffle(int sizeRequested) {
+        if (ownDeck.size() < sizeRequested && !thisPlayer.getDiscarded().equals("")) {
             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
             thisPlayer.setDiscarded("");
             database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");

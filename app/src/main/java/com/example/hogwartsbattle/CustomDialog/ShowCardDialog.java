@@ -64,14 +64,16 @@ public class ShowCardDialog {
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.show();
+        Timer timer = new Timer("Timer");
 
         TimerTask task = new TimerTask() {
             public void run() {
                 dialog.dismiss();
                 mDialog= null;
+                timer.cancel();
+
             }
         };
-        Timer timer = new Timer("Timer");
 
         long delay = 1000L;
         timer.schedule(task, delay * 2);

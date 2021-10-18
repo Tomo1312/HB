@@ -1,10 +1,12 @@
 package com.example.hogwartsbattle.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -63,7 +65,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull OwnHandAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull OwnHandAdapter.MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String cardName = "id" + ownHandCard.get(position).getId();
         int id = context.getResources().getIdentifier("drawable/" + cardName, null, context.getPackageName());
         holder.card_from_layout.setImageResource(id);
@@ -71,17 +73,48 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CardDialog cardDialog = new CardDialog(context, library, iCardAddOrDeletedFromHand,
-                        ownHandCard.get(position), thisPlayer, opponentPlayer,
-                        ownDeck, ownHandCard, hexes, database, iChooseDialog, classroom);
-                cardDialog.setOwnHandAdapter(OwnHandAdapter.this);
-                cardDialog.showDialog();
-
+                if (thisPlayer.getHexes().contains("85") && !checkForOnlyOneItemPlayed()) {
+                    Toast.makeText(context, "You can only play one item because of hex!", Toast.LENGTH_LONG).show();
+                } else if (thisPlayer.getHexes().contains("88") && !checkForTwoSpellPlayed()) {
+                    Toast.makeText(context, "You can only play 2 spells because of hex!", Toast.LENGTH_LONG).show();
+                } else if (thisPlayer.getHexes().contains("86") && ownHandCard.get(position).getType().equals("ally")) {
+                    Toast.makeText(context, "You can't play ally because of hex!", Toast.LENGTH_LONG).show();
+                } else {
+                    CardDialog cardDialog = new CardDialog(context, library, iCardAddOrDeletedFromHand,
+                            ownHandCard.get(position), thisPlayer, opponentPlayer,
+                            ownDeck, ownHandCard, hexes, database, iChooseDialog, classroom);
+                    cardDialog.setOwnHandAdapter(OwnHandAdapter.this);
+                    cardDialog.showDialog();
+                }
             }
         });
         if (!cardViewList.contains(holder.card_from_layout)) {
             cardViewList.add(holder.card_Layout_card);
         }
+    }
+
+    private boolean checkForTwoSpellPlayed() {
+        if (thisPlayer.getPlayedCards().equals(""))
+            return true;
+        int spellPlayed = 0;
+        for (Card cardTmp : Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards())) {
+            if (cardTmp.getType().equals("spell"))
+                spellPlayed++;
+        }
+        if (spellPlayed < 2) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkForOnlyOneItemPlayed() {
+        if (thisPlayer.getPlayedCards().equals(""))
+            return true;
+        for (Card cardTmp : Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards())) {
+            if (cardTmp.getType().equals("item"))
+                return false;
+        }
+        return true;
     }
 
     @Override

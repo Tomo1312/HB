@@ -41,7 +41,7 @@ public class CardBuyDialog extends CustomDialog {
         this.iChooseDialog = iChooseDialog;
         this.classroom = classroom;
         this.ownDeck = ownDeck;
-        this.library=library;
+        this.library = library;
     }
 
     public void showDialog() {
@@ -66,41 +66,10 @@ public class CardBuyDialog extends CustomDialog {
         buyCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (thisPlayer.getCoins() >= Integer.parseInt(activeCard.getCost())) {
-                    if (activeCard.getId().equals(0)) {
-                        //Card 46, says to put item on top of deck
-                        if (thisPlayer.getPlayedCards().contains("46")) {
-                            ownDeck.add(0, activeCard);
-                        } else {
-                            if (thisPlayer.getDiscarded() == "")
-                                thisPlayer.setDiscarded(activeCard.getId());
-                            else
-                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
-                        }
-                        library--;
-                        database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
-                    } else {
-                        if (thisPlayer.getPlayedCards().contains("46") && activeCard.getType().equals("item")) {
-                            ownDeck.add(0, activeCard);
-                        }else if(thisPlayer.getPlayedCards().contains("45") && activeCard.getType().equals("spell")){
-                            ownDeck.add(0, activeCard);
-                        }else if(thisPlayer.getPlayedCards().contains("34") && activeCard.getType().equals("ally")){
-                            ownDeck.add(0, activeCard);
-                        }else{
-                            if (thisPlayer.getDiscarded().equals(""))
-                                thisPlayer.setDiscarded(activeCard.getId());
-                            else
-                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
-                        }
-                        thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()));
-                        classroom.remove(activeCard);
-
-                        iChooseDialog.onUpdateAttackGoldHeart();
-                        database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(Helpers.getInstance().returnCardsFromArray(classroom));
-                    }
-                    database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue(activeCard.getId());
-
-                    dialog.dismiss();
+                if (thisPlayer.getHexes().contains("82") && thisPlayer.getCoins() >= Integer.parseInt(activeCard.getCost()) + 1) {
+                    buyCardFromClassroom(1, dialog);
+                } else if (thisPlayer.getCoins() >= Integer.parseInt(activeCard.getCost())) {
+                    buyCardFromClassroom(0, dialog);
                 } else {
                     Toast.makeText(context, "Don't have enough money!", Toast.LENGTH_LONG).show();
                 }
@@ -108,4 +77,40 @@ public class CardBuyDialog extends CustomDialog {
         });
     }
 
+    private void buyCardFromClassroom(int addToPrice, Dialog dialog) {
+        if (activeCard.getId().equals(0)) {
+            //Card 46, says to put item on top of deck
+            if (thisPlayer.getPlayedCards().contains("46")) {
+                ownDeck.add(0, activeCard);
+            } else {
+                if (thisPlayer.getDiscarded() == "")
+                    thisPlayer.setDiscarded(activeCard.getId());
+                else
+                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
+            }
+            library--;
+            database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
+        } else {
+            if (thisPlayer.getPlayedCards().contains("46") && activeCard.getType().equals("item")) {
+                ownDeck.add(0, activeCard);
+            } else if (thisPlayer.getPlayedCards().contains("45") && activeCard.getType().equals("spell")) {
+                ownDeck.add(0, activeCard);
+            } else if (thisPlayer.getPlayedCards().contains("34") && activeCard.getType().equals("ally")) {
+                ownDeck.add(0, activeCard);
+            } else {
+                if (thisPlayer.getDiscarded().equals(""))
+                    thisPlayer.setDiscarded(activeCard.getId());
+                else
+                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
+            }
+            thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()) - addToPrice);
+            classroom.remove(activeCard);
+
+            iChooseDialog.onUpdateAttackGoldHeart();
+            database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(Helpers.getInstance().returnCardsFromArray(classroom));
+        }
+        database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue(activeCard.getId());
+
+        dialog.dismiss();
+    }
 }

@@ -71,7 +71,7 @@ public class ListenerHelpers {
 
                 if (snapshot.exists()) {
                     if (!snapshot.getValue().toString().equals("0")) {
-                        activity.deckNeedShuffle();
+                        activity.deckNeedShuffle(5);
                         if (snapshot.getValue().toString().equals("1")) {
                             for (Card card : ownDeck) {
                                 if (!card.getCardType().equals("hex")) {
