@@ -456,20 +456,15 @@ public class OwnAllyDialog extends CustomDialog {
     }
 
     private void shuffleDeck() {
-        Log.e("OwnAllyDialog", "before shuffleDeck:" + ownDeck.size());
         if (!thisPlayer.getDiscarded().equals("")) {
             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
             Collections.shuffle(ownDeck);
-            thisPlayer.setDiscarded("");
-            Log.e("OwnAllyDialog", "after shuffleDeck:" + ownDeck.size());
+            thisPlayer.setDiscardedToEmpty();
         }
     }
 
     void thisPlayerDiscardCard(Card card) {
-        if (thisPlayer.getDiscarded() == "")
-            thisPlayer.setDiscarded(card.getId());
-        else
-            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + card.getId());
+        thisPlayer.setDiscarded(card.getId());
     }
 
     private void checkForCardEnd(Dialog dialog) {

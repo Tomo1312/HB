@@ -98,7 +98,18 @@ public class Player {
     }
 
     public void setDiscarded(String discarded) {
-        this.discarded = discarded;
+        if (this.discarded == "")
+            this.discarded = discarded;
+        else
+            this.discarded += "," + discarded;
+    }
+
+    public void setDiscardedToExactString(String returnCardsFromArray) {
+        this.discarded = returnCardsFromArray;
+    }
+
+    public void setDiscardedToEmpty() {
+        this.discarded = "";
     }
 
     public String getDeck() {
@@ -188,4 +199,5 @@ public class Player {
     public void setPlaying(boolean playing) {
         isPlaying = playing;
     }
+
 }

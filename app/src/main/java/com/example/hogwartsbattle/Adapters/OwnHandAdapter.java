@@ -161,10 +161,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
 
     public void cleanCardsInHand() {
         if (ownHandCard.size() > 0) {
-            if (thisPlayer.getDiscarded().equals(""))
-                thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(ownHandCard));
-            else
-                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + Helpers.getInstance().returnCardsFromArray(ownHandCard));
+            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(ownHandCard));
             ownHandCard.clear();
             notifyDataSetChanged();
         }

@@ -75,20 +75,13 @@ public class ListenerHelpers {
                         if (snapshot.getValue().toString().equals("1")) {
                             for (Card card : ownDeck) {
                                 if (!card.getCardType().equals("hex")) {
-                                    if (thisPlayer.getDiscarded().equals("")) {
-                                        thisPlayer.setDiscarded(card.getId());
-                                    } else {
-                                        thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + card.getId());
-                                    }
+                                    thisPlayer.setDiscarded(card.getId());
                                     ownDeck.remove(card);
                                     break;
                                 }
                             }
                         } else if (snapshot.getValue().toString().equals("2")) {
-                            if (!thisPlayer.getDiscarded().equals("")) {
-                                thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ",");
-                            }
-                            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + ownDeck.get(0).getId());
+                            thisPlayer.setDiscarded(ownDeck.get(0).getId());
                             ownDeck.remove(0);
                         }
                         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").setValue(0);
@@ -105,41 +98,6 @@ public class ListenerHelpers {
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").addValueEventListener(valueEventListenerForDiscardCard);
         return valueEventListenerForDiscardCard;
     }
-
-//    public ValueEventListener setListenerForOpponentDiscardCards() {
-//
-//        ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                opponentPlayer.setDiscarded(snapshot.getValue().toString());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        };
-//        database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").addValueEventListener(valueEventListenerForDiscardCard);
-//        return valueEventListenerForDiscardCard;
-//    }
-//
-//    public ValueEventListener setListenerForThisPlayerDiscardCards() {
-//
-//        ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (!thisPlayer.getDiscarded().equals(snapshot.getValue().toString()))
-//                    thisPlayer.setDiscarded(snapshot.getValue().toString());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        };
-//        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").addValueEventListener(valueEventListenerForDiscardCard);
-//        return valueEventListenerForDiscardCard;
-//    }
 
     public ValueEventListener setListenerForOpponentHandCards(IChooseDialog iChooseDialog) {
         ValueEventListener valueEventListenerOpponentHandCards = new ValueEventListener() {
@@ -370,7 +328,7 @@ public class ListenerHelpers {
         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                opponentPlayer.setDiscarded(snapshot.getValue().toString());
+                opponentPlayer.setDiscardedToExactString(snapshot.getValue().toString());
                 getOwnDiscardPile(activity, dialog);
             }
 
@@ -385,7 +343,7 @@ public class ListenerHelpers {
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                thisPlayer.setDiscarded(snapshot.getValue().toString());
+                thisPlayer.setDiscardedToExactString(snapshot.getValue().toString());
                 startDraw(activity, dialog);
             }
 

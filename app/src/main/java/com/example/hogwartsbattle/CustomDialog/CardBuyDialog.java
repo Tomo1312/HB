@@ -83,10 +83,7 @@ public class CardBuyDialog extends CustomDialog {
             if (thisPlayer.getPlayedCards().contains("46")) {
                 ownDeck.add(0, activeCard);
             } else {
-                if (thisPlayer.getDiscarded() == "")
-                    thisPlayer.setDiscarded(activeCard.getId());
-                else
-                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
+                thisPlayer.setDiscarded(activeCard.getId());
             }
             library--;
             database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
@@ -98,10 +95,7 @@ public class CardBuyDialog extends CustomDialog {
             } else if (thisPlayer.getPlayedCards().contains("34") && activeCard.getType().equals("ally")) {
                 ownDeck.add(0, activeCard);
             } else {
-                if (thisPlayer.getDiscarded().equals(""))
-                    thisPlayer.setDiscarded(activeCard.getId());
-                else
-                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
+                thisPlayer.setDiscarded(activeCard.getId());
             }
             thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()) - addToPrice);
             classroom.remove(activeCard);

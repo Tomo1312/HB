@@ -356,10 +356,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         finishMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (thisPlayer.getDiscarded().equals(""))
+                if (!thisPlayer.getPlayedCards().equals(""))
                     thisPlayer.setDiscarded(thisPlayer.getPlayedCards());
-                else
-                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getPlayedCards());
 
                 thisPlayer.setPlayedCards("");
 
@@ -376,17 +374,12 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                     opponent.setLives(7);
                     opponent.setDeaths(opponent.getDeaths() + 1);
 
-                    if (thisPlayer.getDiscarded().equals(""))
+                    if (!thisPlayer.getAlly().equals(""))
                         thisPlayer.setDiscarded(thisPlayer.getAlly());
-                    else
-                        thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getAlly());
-
                     if (!thisPlayer.getDiscarded().equals("")) {
                         ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-                        thisPlayer.setDiscarded("");
                     }
-
-                    thisPlayer.setDiscarded("");
+                    thisPlayer.setDiscardedToEmpty();
                     thisPlayer.setAlly("");
 
                     ownAllyAdapter = new OwnAllyAdapter(GameActivity.this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
@@ -603,16 +596,14 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         opponent.setLives(7);
         thisPlayer.setDeaths(thisPlayer.getDeaths() + 1);
 
-        if (thisPlayer.getDiscarded().equals(""))
+        if (!thisPlayer.getAlly().equals(""))
             thisPlayer.setDiscarded(thisPlayer.getAlly());
-        else
-            thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + thisPlayer.getAlly());
 
-        if (!thisPlayer.getDiscarded().equals("")) {
+        if (!thisPlayer.getDiscarded().equals(""))
             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-        }
 
-        thisPlayer.setDiscarded("");
+
+        thisPlayer.setDiscardedToEmpty();
         thisPlayer.setAlly("");
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue("");
         ownAllyAdapter = new OwnAllyAdapter(GameActivity.this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
@@ -684,10 +675,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
                 hexDeck.remove(0);
                 hexDeck.remove(0);
-                if (thisPlayer.getDiscarded().equals(""))
-                    thisPlayer.setDiscarded(newTwoHexes.toString());
-                else
-                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + newTwoHexes.toString());
+                thisPlayer.setDiscarded(newTwoHexes.toString());
             }
         }
 
@@ -807,9 +795,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     public void deckNeedShuffle(int sizeRequested) {
         if (ownDeck.size() < sizeRequested && !thisPlayer.getDiscarded().equals("")) {
             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-            thisPlayer.setDiscarded("");
+            thisPlayer.setDiscardedToEmpty();
             database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");
-            Log.e("GameActivity", "after deckNeedShuffle:" + ownDeck.size());
             discardPileShow();
         }
     }

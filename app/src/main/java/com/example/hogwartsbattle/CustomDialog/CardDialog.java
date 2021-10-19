@@ -522,7 +522,7 @@ public class CardDialog extends CustomDialog {
                     case Common.REVEAL_TOP_CARD:
                         if (ownDeck.size() < 1) {
                             ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-                            thisPlayer.setDiscarded("");
+                            thisPlayer.setDiscardedToEmpty();
                         }
                         ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), "Top Card");
                         if (Integer.parseInt(activeCard.getId()) == 7) {
@@ -536,7 +536,7 @@ public class CardDialog extends CustomDialog {
                             if (ownDeck.size() <= 0) {
                                 ownDeck = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
                                 Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscarded("");
+                                thisPlayer.setDiscardedToEmpty();
                             }
                             DrawOrDiscardCardDialog.getInstance().showChooseAllyDialog(context, thisPlayer, iCardAddOrDeletedFromHand, ownDeck.get(0));
                             ownDeck.remove(0);
@@ -604,7 +604,7 @@ public class CardDialog extends CustomDialog {
                                     //If deck don't have 2 cards we need new one
                                     if (ownDeck.size() <= 1) {
                                         ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-                                        thisPlayer.setDiscarded("");
+                                        thisPlayer.setDiscardedToEmpty();
                                     }
                                     discardCard.setOwnDeck(ownDeck);
                                 }
@@ -619,7 +619,7 @@ public class CardDialog extends CustomDialog {
                             if (ownDeck.size() == 0) {
                                 ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                 Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscarded("");
+                                thisPlayer.setDiscardedToEmpty();
                             }
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
@@ -706,10 +706,7 @@ public class CardDialog extends CustomDialog {
                         hexes.remove(0);
                         break;
                     case Common.OPPONENT_PUT_HEX_TO_DISCARD_PILE:
-                        if (opponentPlayer.getDiscarded().equals(""))
-                            opponentPlayer.setDiscarded(hexes.get(0).getId());
-                        else
-                            opponentPlayer.setDiscarded(opponentPlayer.getDiscarded() + "," + hexes.get(0).getId());
+                        opponentPlayer.setDiscarded(hexes.get(0).getId());
                         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").setValue(opponentPlayer.getDiscarded());
                         hexes.remove(0);
                         break;
@@ -720,7 +717,7 @@ public class CardDialog extends CustomDialog {
                             if (ownDeck.size() < 0) {
                                 ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                 Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscarded("");
+                                thisPlayer.setDiscardedToEmpty();
                             }
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
@@ -743,7 +740,7 @@ public class CardDialog extends CustomDialog {
                         } else {
                             if (ownDeck.size() <= 1) {
                                 ownDeck = new ArrayList<>(Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck));
-                                thisPlayer.setDiscarded("");
+                                thisPlayer.setDiscardedToEmpty();
                             }
 
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));

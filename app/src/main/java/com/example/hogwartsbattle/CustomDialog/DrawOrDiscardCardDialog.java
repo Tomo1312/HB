@@ -41,10 +41,7 @@ public class DrawOrDiscardCardDialog {
         btnDiscard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (thisPlayer.getDiscarded().equals(""))
-                    thisPlayer.setDiscarded(activeCard.getId());
-                else
-                    thisPlayer.setDiscarded(thisPlayer.getDiscarded() + "," + activeCard.getId());
+                thisPlayer.setDiscarded(activeCard.getId());
                 dialog.dismiss();
             }
         });
