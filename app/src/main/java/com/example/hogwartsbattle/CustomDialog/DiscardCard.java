@@ -114,7 +114,7 @@ public class DiscardCard extends CustomDialog {
         switch (layout) {
             case 0:
             case 10:
-            case 12:
+            case 13:
                 //0 - Discards opponent ally
                 //10 - discard opponent ally, then use that ally (not tested yet)
                 //12 - Discard own ally (Hex)
@@ -209,7 +209,7 @@ public class DiscardCard extends CustomDialog {
 
         viewCardsForDelete.setAdapter(discardCardAdapter);
 
-        if (layout != 7  && layout != 12)
+        if (layout != 7  && layout != 13)
             dialog.setCancelable(true);
         else
             dialog.setCancelable(false);

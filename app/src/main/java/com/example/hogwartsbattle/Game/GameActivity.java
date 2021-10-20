@@ -654,7 +654,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
             } else if (cardTmp.getId().equals("81")) {
                 if (!thisPlayer.getAlly().equals("")) {
-                    DiscardCard discardOwnAlly = new DiscardCard(GameActivity.this, database, thisPlayer.getAlly(), 12, null, thisPlayer);
+                    DiscardCard discardOwnAlly = new DiscardCard(GameActivity.this, database, thisPlayer.getAlly(), 13, null, thisPlayer);
                     discardOwnAlly.setIChooseDialog(iChooseDialog);
                     discardOwnAlly.showDialog();
                 } else {
@@ -679,7 +679,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             }
         }
 
-        if (!thisPlayer.getAlly().equals("") && thisPlayer.getHexes().contains("89")) {
+        if (!thisPlayer.getAlly().equals("") && !thisPlayer.getHexes().contains("89")) {
             ownAllyAdapter.updateAllies();
         }
 

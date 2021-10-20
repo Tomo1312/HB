@@ -142,6 +142,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
             @Override
             public void onClick(View v) {
                 switch (layoutInt) {
+                    // 12 - just show discard pile..
                     case 0:
                         discardOpponentAlly(cards.get(position));
                         break;
@@ -182,7 +183,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                         thisPlayer.setPlayedCards(Helpers.getInstance().returnCardsFromArray(playedCards));
                         dialog.dismiss();
                         break;
-                    case 12:
+                    case 13:
                         iChooseDialog.removeAlly(cards.get(position));
                         dialog.dismiss();
                         break;
