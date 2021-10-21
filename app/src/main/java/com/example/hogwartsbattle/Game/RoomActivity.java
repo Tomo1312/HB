@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import io.paperdb.Paper;
+
 public class RoomActivity extends AppCompatActivity {
 
     ListView listView;
@@ -226,6 +228,9 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        Paper.init(this);
+        Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
+        Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
         mediaPlayer.stopMediaPlayer();
         if (valueEventListenerStartGame != null)
             databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);

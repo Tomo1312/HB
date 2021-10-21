@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         txt_eMail = findViewById(R.id.tvEmail);
         txt_password = findViewById(R.id.tvPassword);
         txt_Username = findViewById(R.id.tvUsername);
-        eMailWand  = findViewById(R.id.tvEmailWand);
+        eMailWand = findViewById(R.id.tvEmailWand);
         passwordWand = findViewById(R.id.tvPasswordWand);
         usernameWand = findViewById(R.id.tvUsernameWand);
 
@@ -70,15 +70,15 @@ public class LoginActivity extends AppCompatActivity {
         loading = new SpotsDialog.Builder().setCancelable(false).setContext(LoginActivity.this).build();
         loading.show();
         Paper.init(this);
-        String userId = Paper.book().read(Common.KEY_LOGGED);
-        if(!TextUtils.isEmpty(userId)){
+        User user = Paper.book().read(Common.KEY_LOGGED);
+        if (!TextUtils.isEmpty(user.getUserId())) {
 
-            databse.getReference("/Users/"+userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            databse.getReference("/Users/" + user.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Common.currentUser = snapshot.getValue(User.class);
                     Intent intent = new Intent(LoginActivity.this, LobbyActivity.class);
-                    intent.putExtra(Common.KEY_USER_ID, userId);
+                    intent.putExtra(Common.KEY_USER_ID, user.getUserId());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -90,8 +90,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
             });
-        }else {
-            if(loading.isShowing())
+        } else {
+            if (loading.isShowing())
                 loading.dismiss();
         }
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
         txt_Username.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(tmpWand!=null){
+                if (tmpWand != null) {
                     tmpWand.setVisibility(View.INVISIBLE);
                 }
                 tmpWand = usernameWand;
@@ -137,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
         txt_eMail.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(tmpWand!=null){
+                if (tmpWand != null) {
                     tmpWand.setVisibility(View.INVISIBLE);
                 }
                 tmpWand = eMailWand;
@@ -148,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
         txt_password.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(tmpWand!=null){
+                if (tmpWand != null) {
                     tmpWand.setVisibility(View.INVISIBLE);
                 }
                 tmpWand = passwordWand;
@@ -164,6 +164,7 @@ public class LoginActivity extends AppCompatActivity {
         mediaPlayer = new HarryMediaPlayer(LoginActivity.this);
         mediaPlayer.startPlaying();
     }
+
     private void startEmailVerification() {
         loading.show();
         String userEmail = txt_eMail.getText().toString();
@@ -199,7 +200,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void sendUserData() {
-        Common.currentUser = new User(txt_Username.getText().toString(),txt_eMail.getText().toString());
+        Common.currentUser = new User(txt_Username.getText().toString(), txt_eMail.getText().toString());
         Common.currentUser.setUserId(mAuth.getUid());
         userRef = databse.getReference("Users");
         User user = new User(txt_Username.getText().toString(), (mAuth.getUid()), txt_eMail.getText().toString());
@@ -234,7 +235,7 @@ public class LoginActivity extends AppCompatActivity {
     private void checkEmailVerification() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         Boolean emailFlag = firebaseUser.isEmailVerified();
-        if(loading.isShowing())
+        if (loading.isShowing())
             loading.dismiss();
         if (emailFlag) {
 
@@ -257,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
             });
-            Paper.book().write(Common.KEY_LOGGED, firebaseUser.getUid());
+            Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
         } else {
             Toast.makeText(this, "Verify your e-mail", Toast.LENGTH_SHORT).show();
             mAuth.signOut();
@@ -268,7 +269,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         mediaPlayer.stopMediaPlayer();
         super.onDestroy();
-        if(loading.isShowing())
+        if (loading.isShowing())
             loading.dismiss();
     }
 }

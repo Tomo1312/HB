@@ -200,9 +200,7 @@ public class DiscardCard extends CustomDialog {
                 viewCardsForDelete.setLayoutManager(horizontalLayoutManagerOwnHand);
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
                 break;
-
         }
-
 
         viewCardsForDelete.setHasFixedSize(true);
         viewCardsForDelete.addItemDecoration(new SpacesItemDecoration(8));

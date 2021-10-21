@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Common.HarryMediaPlayer;
 import com.example.hogwartsbattle.Model.Player;
+import com.example.hogwartsbattle.Model.User;
 import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.paperdb.Paper;
 
 public class LobbyActivity extends AppCompatActivity {
 
@@ -46,18 +50,16 @@ public class LobbyActivity extends AppCompatActivity {
 
     ValueEventListener valueEventListenerRoom, valueEventListenerCreateRoom;
 
-    Timer timer;
     HarryMediaPlayer mediaPlayer;
-    ArrayList<Integer> playList;
-    int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
-    mediaPlayer = new HarryMediaPlayer(this);
-    mediaPlayer.startPlaying();
+        getPreload();
+        mediaPlayer = new HarryMediaPlayer(this);
+        mediaPlayer.startPlaying();
         databse = FirebaseDatabase.getInstance();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -67,6 +69,23 @@ public class LobbyActivity extends AppCompatActivity {
             }
         }
         setUiView();
+    }
+
+    private void getPreload() {
+        Paper.init(this);
+        boolean isPlaying = Paper.book().read(Common.KEY_IS_PLAYING, false);
+        Log.e("LobbyActivity", "user: " + isPlaying);
+        if (isPlaying) {
+            String currentRoom = Paper.book().read(Common.KEY_ROOM, "");
+            if (!currentRoom.equals("")) {
+                Log.e("LobbyActivity", "CurrentRoom: " + currentRoom);
+                Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+                intent.putExtra("roomName", currentRoom);
+                Common.currentRoomName = currentRoom;
+                finish();
+                startActivity(intent);
+            }
+        }
     }
 
     private void setUiView() {

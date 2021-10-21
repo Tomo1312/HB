@@ -35,6 +35,7 @@ import com.example.hogwartsbattle.Helpers.ListenerHelpers;
 import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
+import com.example.hogwartsbattle.Model.User;
 import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,6 +53,7 @@ import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 import dmax.dialog.SpotsDialog;
+import io.paperdb.Paper;
 
 
 public class GameActivity extends AppCompatActivity implements IChooseDialog {
@@ -300,7 +302,11 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         }
         // Need to be deleted in onDestroy!
         // All listeners for game will be here
+        startAllListeners();
 
+    }
+
+    private void startAllListeners() {
         valueEventListenerPlaying = listenerHelpers.startListenerForPlaying(GameActivity.this);
         valueEventListenerOpponentHandCards = listenerHelpers.setListenerForOpponentHandCards(iChooseDialog);
         valueEventListenerOpponentAlly = listenerHelpers.setListenerForOpponentAllys(iChooseDialog);
@@ -310,7 +316,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         valueEventListenerLibrary = listenerHelpers.setListenerForLibrary(iChooseDialog);
         valueEventListenerBoughtClassroomCard = listenerHelpers.setListenerForBoughtClassroomCard(GameActivity.this);
         valueEventListenerBanishedCard = listenerHelpers.setListenerForBanishedCard(GameActivity.this);
-
     }
 
     private void setUIView() {
@@ -827,6 +832,29 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     protected void onStop() {
         mediaPlayer.stopMediaPlayer();
         killAllListeners();
+        savePreloadData();
         super.onStop();
+    }
+
+    private void getPreloadData() {
+        Paper.init(this);
+        Common.currentUser = Paper.book().read(Common.KEY_THIS_USER);
+        opponent = Paper.book().read(Common.KEY_OPPONENT);
+        thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER);
+        Common.currentRoomName = Paper.book().read(Common.KEY_ROOM);
+        ownDeck = Paper.book().read(Common.KEY_OWN_DECK);
+        hand = Paper.book().read(Common.KEY_HAND);
+    }
+
+    private void savePreloadData() {
+        Paper.init(this);
+        //String userId = Paper.book().read(Common.KEY_LOGGED);
+        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
+        Paper.book().write(Common.KEY_OPPONENT, opponent);
+        Paper.book().write(Common.KEY_THIS_PLAYER, thisPlayer);
+        Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
+        Paper.book().write(Common.KEY_OWN_DECK, ownDeck);
+        Paper.book().write(Common.KEY_HAND, hand);
+        Paper.book().write(Common.KEY_IS_PLAYING, true);
     }
 }

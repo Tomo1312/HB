@@ -18,6 +18,13 @@ public class Common {
 
     public static final String KEY_LOGGED = "logged";
     public static final String KEY_USER_ID = "userid";
+    public static final String KEY_OPPONENT = "opponentPlayer";
+    public static final String KEY_THIS_PLAYER = "thisPlayer";
+    public static final String KEY_THIS_USER = "thisUser";
+    public static final String KEY_ROOM = "currentRoom";
+    public static final String KEY_OWN_DECK = "ownDeck";
+    public static final String KEY_HAND = "ownHand";
+    public static final String KEY_IS_PLAYING = "isPlaying";
     public static User currentUser;
     public static String currentRoomName;
     public static Map<Integer, Card> allCardsMap;
