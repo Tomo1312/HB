@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ListenerHelpers {
     FirebaseDatabase database;
@@ -71,21 +72,39 @@ public class ListenerHelpers {
 
                 if (snapshot.exists()) {
                     if (!snapshot.getValue().toString().equals("0")) {
-                        activity.deckNeedShuffle(5);
-                        if (snapshot.getValue().toString().equals("1")) {
-                            for (Card card : ownDeck) {
-                                if (!card.getCardType().equals("hex")) {
-                                    thisPlayer.setDiscarded(card.getId());
-                                    ownDeck.remove(card);
-                                    break;
+                        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                thisPlayer.setDiscardedToExactString(snapshot.getValue().toString());
+                                if (ownDeck.size() < 5 && !thisPlayer.getDiscarded().equals("")) {
+                                    ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                    Collections.shuffle(ownDeck);
+                                    Collections.shuffle(ownDeck);
+                                    thisPlayer.setDiscardedToEmpty();
+                                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");
+                                    activity.discardPileShow();
                                 }
+                                if (snapshot.getValue().toString().equals("1")) {
+                                    for (Card card : ownDeck) {
+                                        if (!card.getCardType().equals("hex")) {
+                                            thisPlayer.setDiscardedString(card.getId());
+                                            ownDeck.remove(card);
+                                            break;
+                                        }
+                                    }
+                                } else if (snapshot.getValue().toString().equals("2")) {
+                                    thisPlayer.setDiscardedString(ownDeck.get(0).getId());
+                                    ownDeck.remove(0);
+                                }
+                                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").setValue(0);
+                                database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
                             }
-                        } else if (snapshot.getValue().toString().equals("2")) {
-                            thisPlayer.setDiscarded(ownDeck.get(0).getId());
-                            ownDeck.remove(0);
-                        }
-                        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").setValue(0);
-                        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
                 }
             }
@@ -364,6 +383,7 @@ public class ListenerHelpers {
                 opponentPlayer.setHand("");
 
                 if (thisPlayer.getLives() < 1) {
+                    thisPlayer.setDeaths(thisPlayer.getDeaths() + 1);
                     activity.prepareForNewRound();
                 }
                 if (dialog.isShowing())

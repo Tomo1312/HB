@@ -105,14 +105,6 @@ public class Helpers {
         return handString.toString();
     }
 
-    // When player need to draw more then 1 card, so new deck will be discard pile + current deck
-    // That have size < 5
-    public ArrayList<Card>  getDeckFromDiscardPileAndDeck(Player thisPlayer, ArrayList<Card> ownDeck) {
-        ownDeck.addAll(returnCardsFromString(thisPlayer.getDiscarded()));
-        Collections.shuffle(ownDeck);
-        return ownDeck;
-    }
-
     public void startAfterPlayerDied(FirebaseDatabase database, Player thisPlayer, ArrayList<Card> ownDeck) {
 
     }

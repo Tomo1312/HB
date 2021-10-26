@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +69,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     ArrayList<Card> hexDeck = new ArrayList<>();
     ArrayList<Card> ownDeck = new ArrayList<>();
     ArrayList<Card> hand = new ArrayList<>();
-    ArrayList<Card> banishedDeck = new ArrayList<>();
     ArrayList<Card> books = new ArrayList<>();
     Map<Integer, Card> allCardsMap = new HashMap<>();
     HarryMediaPlayer mediaPlayer;
@@ -88,6 +88,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     OwnAllyAdapter ownAllyAdapter;
     OwnHandAdapter ownHandAdapter;
     OpponentHandAdapter opponentHandAdapter;
+    ClassroomAdapter classroomAdapter;
+
     ListenerHelpers listenerHelpers;
     Button finishMove;
 
@@ -109,21 +111,54 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        database = FirebaseDatabase.getInstance();
         mediaPlayer = new HarryMediaPlayer(this);
         mediaPlayer.startPlaying();
         loading = new SpotsDialog.Builder().setCancelable(false).setContext(GameActivity.this).build();
         loading.show();
-
-        getPlayers();
-        opponent_house_image = findViewById(R.id.opponent_house_image);
-        own_house_image = findViewById(R.id.own_house_image);
         setUiForPlayerImage();
-
         iChooseDialog = this;
-        buildDecks();
+
+        if (getPreloadData()) {
+            listenerHelpers = new ListenerHelpers(database, thisPlayer, opponent);
+            setUIView();
+            startAllListeners();
+            int id = getResources().getIdentifier("drawable/" + opponent.getHouse(), null, getPackageName());
+            opponent_house_image.setImageResource(id);
+
+            int house = getResources().getIdentifier("drawable/" + thisPlayer.getHouse(), null, getPackageName());
+            int house1 = getResources().getIdentifier("drawable/" + thisPlayer.getHouse() + "1", null, getPackageName());
+            own_house_image.setImageResource(house);
+
+            own_life_start.setImageResource(house1);
+            own_life_1.setImageResource(house1);
+            own_life_2.setImageResource(house1);
+            own_life_3.setImageResource(house1);
+            own_life_4.setImageResource(house1);
+            own_life_5.setImageResource(house1);
+            own_life_6.setImageResource(house1);
+
+            if (!thisPlayer.getAlly().equals("")) {
+                ArrayList<Card> allyTmp = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getAlly()));
+                for (Card ally : allyTmp) {
+                    iChooseDialog.onOwnAllyChange(ally);
+                }
+            }
+            if (loading.isShowing()) {
+                loading.dismiss();
+            }
+        } else {
+            //start new game
+            getPlayers();
+            buildDecks();
+        }
+
     }
 
     private void setUiForPlayerImage() {
+        opponent_house_image = findViewById(R.id.opponent_house_image);
+        own_house_image = findViewById(R.id.own_house_image);
+
         opponent_life_start = findViewById(R.id.opponent_life_start);
         opponent_life_1 = findViewById(R.id.opponent_life_1);
         opponent_life_2 = findViewById(R.id.opponent_life_2);
@@ -187,21 +222,19 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         Collections.shuffle(generalDeck);
         Collections.shuffle(generalDeck);
         Collections.shuffle(ownDeck);
+        Collections.shuffle(hexDeck);
 
         if (loading.isShowing()) {
             loading.dismiss();
             ChooseHouseDialog.getInstance().showChooseHouseDialog(this, iChooseDialog);
         }
-
     }
-
 
     @Override
     public void onChooseHouse(DialogInterface dialog, int id) {
         dialog.dismiss();
         thisPlayer.setHouse(Common.Houses.get(id));
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/house").setValue(Common.Houses.get(id));
-
 
         int house = getResources().getIdentifier("drawable/" + thisPlayer.getHouse(), null, getPackageName());
         int house1 = getResources().getIdentifier("drawable/" + thisPlayer.getHouse() + "1", null, getPackageName());
@@ -342,7 +375,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         recyclerOwnAllys.addItemDecoration(new SpacesItemDecoration(8));
         ownAllyAdapter = new OwnAllyAdapter(this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
         recyclerOwnAllys.setAdapter(ownAllyAdapter);
-
+        classroomAdapter = new ClassroomAdapter(GameActivity.this, classRoom, database, thisPlayer, iChooseDialog);
         LinearLayoutManager horizontalLayoutManagerOwnHand = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
         LinearLayoutManager horizontalLayoutManagerOpponentHand = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
         ownHand.setLayoutManager(horizontalLayoutManagerOwnHand);
@@ -362,7 +395,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             @Override
             public void onClick(View v) {
                 if (!thisPlayer.getPlayedCards().equals(""))
-                    thisPlayer.setDiscarded(thisPlayer.getPlayedCards());
+                    thisPlayer.setDiscardedString(thisPlayer.getPlayedCards());
 
                 thisPlayer.setPlayedCards("");
 
@@ -373,25 +406,28 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 // Player got death!
                 // Let's start again!
                 if (opponent.getLives() < 1) {
+
+                    if (!thisPlayer.getAlly().equals(""))
+                        thisPlayer.setDiscardedString(thisPlayer.getAlly());
+                    if (!thisPlayer.getDiscarded().equals("")) {
+                        ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                        Collections.shuffle(ownDeck);
+                    }
+                    thisPlayer.setDiscardedToEmpty();
+                    thisPlayer.setAlly("");
+
+                    opponent.setDiscardedToEmpty();
+                    opponent.setAlly("");
+
+                    ownAllyAdapter = new OwnAllyAdapter(GameActivity.this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
+                    recyclerOwnAllys.setAdapter(ownAllyAdapter);
+
                     Toast.makeText(GameActivity.this, "You have stunned " + opponent.getPlayerName(), Toast.LENGTH_LONG).show();
                     database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/lives").setValue(opponent.getLives());
                     thisPlayer.setLives(7);
                     opponent.setLives(7);
                     opponent.setDeaths(opponent.getDeaths() + 1);
-
-                    if (!thisPlayer.getAlly().equals(""))
-                        thisPlayer.setDiscarded(thisPlayer.getAlly());
-                    if (!thisPlayer.getDiscarded().equals("")) {
-                        ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-                    }
-                    thisPlayer.setDiscardedToEmpty();
-                    thisPlayer.setAlly("");
-
-                    ownAllyAdapter = new OwnAllyAdapter(GameActivity.this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
-                    recyclerOwnAllys.setAdapter(ownAllyAdapter);
-
                     setDeathImage();
-
                 } else {
                     database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/lives").setValue(opponent.getLives());
                 }
@@ -599,63 +635,86 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         Toast.makeText(GameActivity.this, opponent.getPlayerName() + " stunned you!", Toast.LENGTH_LONG).show();
         thisPlayer.setLives(7);
         opponent.setLives(7);
-        thisPlayer.setDeaths(thisPlayer.getDeaths() + 1);
 
         if (!thisPlayer.getAlly().equals(""))
-            thisPlayer.setDiscarded(thisPlayer.getAlly());
+            thisPlayer.setDiscardedString(thisPlayer.getAlly());
 
-        if (!thisPlayer.getDiscarded().equals(""))
-            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
-
+        if (!thisPlayer.getDiscarded().equals("")) {
+            ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+            Collections.shuffle(ownDeck);
+        }
 
         thisPlayer.setDiscardedToEmpty();
         thisPlayer.setAlly("");
+
+        opponent.setDiscardedToEmpty();
+        opponent.setAlly("");
+        OpponentAllyAdapter opponentAllyAdapter = new OpponentAllyAdapter(this, new ArrayList<>());
+        recyclerOpponentAlly.setAdapter(opponentAllyAdapter);
+
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue("");
+
         ownAllyAdapter = new OwnAllyAdapter(GameActivity.this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
         recyclerOwnAllys.setAdapter(ownAllyAdapter);
 
     }
 
     public void playTurn() {
-        loading.show();
         finishMove.setEnabled(true);
-        thisPlayer.setPlaying(true);
+        if (!thisPlayer.isPlaying()) {
+            loading.show();
+            thisPlayer.setPlaying(true);
+            listenerHelpers.startGettingInfoForTurn(GameActivity.this, loading);
+        } else {
+            continueAfterKilledApp();
+        }
+    }
 
-        listenerHelpers.startGettingInfoForTurn(GameActivity.this, loading);
+    private void continueAfterKilledApp() {
+        updatePlayerImage();
+        if (!thisPlayer.getAlly().equals("") && !thisPlayer.getHexes().contains("89")) {
+            ownAllyAdapter.updateAllies();
+        }
+
+        ownHandAdapter = new OwnHandAdapter(this, hand, thisPlayer, opponent, ownDeck, hexDeck,
+                database, iChooseDialog, classRoom);
+        ownHandAdapter.setLibrary(library);
+
+
+        // so we can draw card from ally!
+        if (!ownAllyAdapter.checkIfHandAdapterIsSet())
+            ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
+        ownHand.setAdapter(ownHandAdapter);
     }
 
     public void drawCards(String stringHand) {
         updatePlayerImage();
         // It will come 1,2,3 -> which may be hexes
         // Hexes that are active are going to player.getHexes, but also need to be added to playedCards
-        StringBuilder hexesString = new StringBuilder(stringHand);
+        StringBuilder hexesString = new StringBuilder();
+        hexesString.append(stringHand);
         if (!stringHand.equals("")) {
             hand.addAll(Helpers.getInstance().returnCardsFromString(stringHand));
-            stringHand += ",";
         }
-        int i;
-        StringBuilder stringHandBuilder = new StringBuilder(stringHand);
 
         deckNeedShuffle(5);
-        for (i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             if (ownDeck.get(0).getCardType().equals("hex")) {
                 if (hexesString.toString().equals(""))
                     hexesString.append(ownHand.getId());
                 else
                     hexesString.append(",").append(ownHand.getId());
             }
-            stringHandBuilder.append(ownDeck.get(0).getId());
-            if (!(i == 4))
-                stringHandBuilder.append(",");
             hand.add(ownDeck.get(0));
-
             ownDeck.remove(0);
         }
 
-
-        for (Card cardTmp : hand) {
+        Log.e("GameActivity", "Neke tu ne valja sa hexesString: " + hexesString.toString());
+        Iterator handIterator = hand.iterator();
+        while (handIterator.hasNext()) {
+            Card cardTmp = (Card) handIterator.next();
             if (cardTmp.getId().equals("80")) {
-                hand.remove(cardTmp);
+                handIterator.remove();
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
             } else if (cardTmp.getId().equals("81")) {
                 if (!thisPlayer.getAlly().equals("")) {
@@ -670,28 +729,30 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 deckNeedShuffle(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0));
                 ownDeck.remove(0);
-                hand.remove(cardTmp);
+                handIterator.remove();
             } else if (cardTmp.getId().equals("87")) {
                 Toast.makeText(GameActivity.this, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
                 deckNeedShuffle(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
-                hand.remove(cardTmp);
+                handIterator.remove();
                 StringBuilder newTwoHexes = new StringBuilder();
                 newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
+                hand.add(hexDeck.get(0));
                 hexDeck.remove(0);
+                hand.add(hexDeck.get(0));
                 hexDeck.remove(0);
-                thisPlayer.setDiscarded(newTwoHexes.toString());
+                //**???thisPlayer.setDiscardedString(newTwoHexes.toString());
             }
         }
-
+        String stringHandBuilder = Helpers.getInstance().returnCardsFromArray(hand);
         if (!thisPlayer.getAlly().equals("") && !thisPlayer.getHexes().contains("89")) {
             ownAllyAdapter.updateAllies();
         }
 
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(stringHandBuilder.toString());
-        thisPlayer.setHand(stringHandBuilder.toString());
+        thisPlayer.setHand(stringHandBuilder);
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(stringHandBuilder);
         thisPlayer.setHexes(hexesString.toString());
-        thisPlayer.setPlayedCards(hexesString.toString());
+        thisPlayer.setPlayedCards("");
 
 //        Log.e("GameActivity", "Player hexes:" + thisPlayer.getHexes());
 
@@ -710,10 +771,11 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
     @Override
     public void onShowClassroom(ArrayList<Card> classRoomTmp) {
-        classRoom = classRoomTmp;
-        ClassroomAdapter imageAdapter = new ClassroomAdapter(this, classRoom, database, thisPlayer, iChooseDialog);
-        imageAdapter.setOwnDeck(ownDeck);
-        recyclerViewClassroom.setAdapter(imageAdapter);
+        classRoom.clear();
+        classRoom.addAll(classRoomTmp);
+        classroomAdapter.updateClassroom(classRoomTmp);
+        classroomAdapter.setOwnDeck(ownDeck);
+        recyclerViewClassroom.setAdapter(classroomAdapter);
     }
 
     @Override
@@ -769,7 +831,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     }
 
     private void getPlayers() {
-        database = FirebaseDatabase.getInstance();
         database.getReference("rooms/" + Common.currentRoomName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -799,7 +860,9 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
     public void deckNeedShuffle(int sizeRequested) {
         if (ownDeck.size() < sizeRequested && !thisPlayer.getDiscarded().equals("")) {
-            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+            ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+            Collections.shuffle(ownDeck);
+            Collections.shuffle(ownDeck);
             thisPlayer.setDiscardedToEmpty();
             database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");
             discardPileShow();
@@ -836,14 +899,21 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         super.onStop();
     }
 
-    private void getPreloadData() {
+    private boolean getPreloadData() {
         Paper.init(this);
-        Common.currentUser = Paper.book().read(Common.KEY_THIS_USER);
-        opponent = Paper.book().read(Common.KEY_OPPONENT);
-        thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER);
-        Common.currentRoomName = Paper.book().read(Common.KEY_ROOM);
-        ownDeck = Paper.book().read(Common.KEY_OWN_DECK);
-        hand = Paper.book().read(Common.KEY_HAND);
+        thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER, new Player());
+        if (thisPlayer.getPlayerName() != null) {
+            Common.currentUser = Paper.book().read(Common.KEY_THIS_USER);
+            opponent = Paper.book().read(Common.KEY_OPPONENT);
+            Common.currentRoomName = Paper.book().read(Common.KEY_ROOM);
+            generalDeck = Paper.book().read(Common.KEY_GENERAL_DECK);
+            Common.allCardsMap = Paper.book().read(Common.KEY_GENERAL_DECK_MAP);
+            hexDeck = Paper.book().read(Common.KEY_HEX_DECK);
+            ownDeck = Paper.book().read(Common.KEY_OWN_DECK);
+            hand = Paper.book().read(Common.KEY_HAND);
+            return true;
+        }
+        return false;
     }
 
     private void savePreloadData() {
@@ -853,6 +923,9 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         Paper.book().write(Common.KEY_OPPONENT, opponent);
         Paper.book().write(Common.KEY_THIS_PLAYER, thisPlayer);
         Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
+        Paper.book().write(Common.KEY_GENERAL_DECK, generalDeck);
+        Paper.book().write(Common.KEY_GENERAL_DECK_MAP, Common.allCardsMap);
+        Paper.book().write(Common.KEY_HEX_DECK, hexDeck);
         Paper.book().write(Common.KEY_OWN_DECK, ownDeck);
         Paper.book().write(Common.KEY_HAND, hand);
         Paper.book().write(Common.KEY_IS_PLAYING, true);

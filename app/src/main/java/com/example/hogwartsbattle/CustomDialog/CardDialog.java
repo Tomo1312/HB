@@ -2,6 +2,7 @@ package com.example.hogwartsbattle.CustomDialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -107,6 +108,7 @@ public class CardDialog extends CustomDialog {
                 EffectsToDisable.add(createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell));
                 break;
             case 4:
+            case 8:
                 cardSpells = 1;
                 createButton(Common.ATTACK, dialog, R.drawable.button_border_normall_spell);
                 break;
@@ -122,11 +124,6 @@ public class CardDialog extends CustomDialog {
                 break;
             case 7:
                 cardSpells = 1;
-                createButton(Common.REVEAL_TOP_CARD, dialog, R.drawable.button_border_normall_spell);
-                break;
-            case 8:
-                cardSpells = 1;
-                //FAKE
                 createButton(Common.REVEAL_TOP_CARD, dialog, R.drawable.button_border_normall_spell);
                 break;
             case 9:
@@ -247,7 +244,7 @@ public class CardDialog extends CustomDialog {
                 break;
             case 32:
                 cardSpells = 2;
-                createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
+                createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.ATTACK_PER_ALLY, dialog, R.drawable.button_border_normall_spell);
                 break;
             case 33:
@@ -492,36 +489,40 @@ public class CardDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeCard.getCoins()));
                         break;
                     case Common.HEART:
-                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("91") && thisPlayer.getAttacks() == 0)) {
-                            if (thisPlayer.getHexes().contains("91")) {
-                                thisPlayer.setHeart(1);
-                            } else {
-                                thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeCard.getHeart()));
-                            }
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("91")) {
+                            Toast.makeText(context, "You have active Sectusempra!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setHeart(1);
+                        } else {
+                            thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeCard.getHeart()));
                         }
+
                         break;
                     case Common.ATTACK:
-                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() == 0)) {
-                            if (thisPlayer.getHexes().contains("90")) {
-                                thisPlayer.setAttacks(1);
-                            } else {
-                                thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeCard.getAttack()));
-                                if (Integer.parseInt(activeCard.getId()) == 28) {
-                                    ArrayList<Card> opponentDiscarded = Helpers.getInstance().returnCardsFromString(opponentPlayer.getDiscarded());
-                                    for (Card cardTmp : opponentDiscarded) {
-                                        if (cardTmp.getCardType().equals("Hex")) {
-                                            thisPlayer.setAttacks(thisPlayer.getAttacks() + 1);
-                                        }
+                        Log.e("CardDialog", "This players" + thisPlayer.getHexes());
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("90")) {
+                            Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setAttacks(1);
+                        } else {
+                            thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeCard.getAttack()));
+                            if (Integer.parseInt(activeCard.getId()) == 28) {
+                                ArrayList<Card> opponentDiscarded = Helpers.getInstance().returnCardsFromString(opponentPlayer.getDiscarded());
+                                for (Card cardTmp : opponentDiscarded) {
+                                    if (cardTmp.getCardType().equals("Hex")) {
+                                        thisPlayer.setAttacks(thisPlayer.getAttacks() + 1);
                                     }
                                 }
                             }
-                        } else {
-                            Toast.makeText(context, "You have active Hexes!", Toast.LENGTH_LONG).show();
                         }
+
                         break;
                     case Common.REVEAL_TOP_CARD:
                         if (ownDeck.size() < 1) {
-                            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+                            ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                            Collections.shuffle(ownDeck);
                             thisPlayer.setDiscardedToEmpty();
                         }
                         ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), "Top Card");
@@ -533,8 +534,8 @@ public class CardDialog extends CustomDialog {
                                 thisPlayer.setCoins(thisPlayer.getCoins() + 2);
                             }
                         } else if (Integer.parseInt(activeCard.getId()) == 23) {
-                            if (ownDeck.size() <= 0) {
-                                ownDeck = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
+                            if (ownDeck.size() < 1) {
+                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                 Collections.shuffle(ownDeck);
                                 thisPlayer.setDiscardedToEmpty();
                             }
@@ -603,7 +604,8 @@ public class CardDialog extends CustomDialog {
                                     discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
                                     //If deck don't have 2 cards we need new one
                                     if (ownDeck.size() <= 1) {
-                                        ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+                                        ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                        Collections.shuffle(ownDeck);
                                         thisPlayer.setDiscardedToEmpty();
                                     }
                                     discardCard.setOwnDeck(ownDeck);
@@ -617,7 +619,7 @@ public class CardDialog extends CustomDialog {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
                             if (ownDeck.size() == 0) {
-                                ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                 Collections.shuffle(ownDeck);
                                 thisPlayer.setDiscardedToEmpty();
                             }
@@ -642,7 +644,7 @@ public class CardDialog extends CustomDialog {
                     case Common.BANISH_FROM_HAND:
                         ArrayList<Card> handTmp = new ArrayList<>();
 
-                        if (handTmp.size() < 1) {
+                        if (hand.size() < 1) {
                             Toast.makeText(context, "Hand empty!", Toast.LENGTH_LONG).show();
                         } else {
                             for (Card cardTmp : hand) {
@@ -706,7 +708,7 @@ public class CardDialog extends CustomDialog {
                         hexes.remove(0);
                         break;
                     case Common.OPPONENT_PUT_HEX_TO_DISCARD_PILE:
-                        opponentPlayer.setDiscarded(hexes.get(0).getId());
+                        opponentPlayer.setDiscardedString(hexes.get(0).getId());
                         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").setValue(opponentPlayer.getDiscarded());
                         hexes.remove(0);
                         break;
@@ -714,8 +716,8 @@ public class CardDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() < 0) {
-                                ownDeck = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                            if (ownDeck.size() < 1) {
+                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                 Collections.shuffle(ownDeck);
                                 thisPlayer.setDiscardedToEmpty();
                             }
@@ -739,7 +741,8 @@ public class CardDialog extends CustomDialog {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
                             if (ownDeck.size() <= 1) {
-                                ownDeck = new ArrayList<>(Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck));
+                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                Collections.shuffle(ownDeck);
                                 thisPlayer.setDiscardedToEmpty();
                             }
 
@@ -764,16 +767,37 @@ public class CardDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() + allysGold.length);
                         break;
                     case Common.ATTACK_PER_ALLY:
-                        String[] allysAttack = thisPlayer.getAlly().split(",");
-                        thisPlayer.setAttacks(thisPlayer.getAttacks() + allysAttack.length);
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("90")) {
+                            Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setAttacks(1);
+                        } else {
+                            String[] allysAttack = thisPlayer.getAlly().split(",");
+                            thisPlayer.setAttacks(thisPlayer.getAttacks() + allysAttack.length);
+                        }
                         break;
                     case Common.ATTACK_PER_OPPONENT_ALLY:
-                        String[] opponentsAllysAttack = opponentPlayer.getAlly().split(",");
-                        thisPlayer.setAttacks(thisPlayer.getAttacks() + opponentsAllysAttack.length);
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("90")) {
+                            Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setAttacks(1);
+                        } else {
+                            String[] opponentsAllysAttack = opponentPlayer.getAlly().split(",");
+                            thisPlayer.setAttacks(thisPlayer.getAttacks() + opponentsAllysAttack.length);
+                        }
                         break;
                     case Common.HEART_PER_ALLY:
-                        String[] allysHeart = thisPlayer.getAlly().split(",");
-                        thisPlayer.setHeart(thisPlayer.getHeart() + allysHeart.length);
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("91")) {
+                            Toast.makeText(context, "You have active Sectusempra!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setHeart(1);
+                        } else {
+                            String[] allysHeart = thisPlayer.getAlly().split(",");
+                            thisPlayer.setHeart(thisPlayer.getHeart() + allysHeart.length);
+                        }
                         break;
                     case Common.PUT_CARD_FROM_YOUR_TO_OPPONENT_DISCARD:
                         if (thisPlayer.getDiscarded().equals(""))

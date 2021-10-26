@@ -97,11 +97,15 @@ public class Player {
         return discarded;
     }
 
-    public void setDiscarded(String discarded) {
-        if (this.discarded == "")
-            this.discarded = discarded;
+    public void setDiscardedString(String newDiscarded) {
+        if (this.discarded.equals(""))
+            this.discarded = newDiscarded;
         else
-            this.discarded += "," + discarded;
+            this.discarded += "," + newDiscarded;
+    }
+
+    public void setDiscarded(String discarded) {
+        this.discarded = discarded;
     }
 
     public void setDiscardedToExactString(String returnCardsFromArray) {

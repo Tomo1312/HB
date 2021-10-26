@@ -128,7 +128,6 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         notifyDataSetChanged();
         thisPlayer.setHand(Helpers.getInstance().returnCardsFromArray(ownHandCard));
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getHand());
-
     }
 
     @Override
@@ -161,11 +160,10 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
 
     public void cleanCardsInHand() {
         if (ownHandCard.size() > 0) {
-            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(ownHandCard));
+            thisPlayer.setDiscardedString(Helpers.getInstance().returnCardsFromArray(ownHandCard));
             ownHandCard.clear();
             notifyDataSetChanged();
         }
-
     }
 
     public void setLibrary(int library) {

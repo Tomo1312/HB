@@ -25,6 +25,9 @@ public class Common {
     public static final String KEY_OWN_DECK = "ownDeck";
     public static final String KEY_HAND = "ownHand";
     public static final String KEY_IS_PLAYING = "isPlaying";
+    public static final String KEY_GENERAL_DECK = "generalDeck";
+    public static final String KEY_HEX_DECK = "hexDeck";
+    public static final String KEY_GENERAL_DECK_MAP = "generalDeckMap";
     public static User currentUser;
     public static String currentRoomName;
     public static Map<Integer, Card> allCardsMap;

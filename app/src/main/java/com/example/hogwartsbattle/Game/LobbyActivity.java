@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Common.HarryMediaPlayer;
+import com.example.hogwartsbattle.Helpers.ListenerHelpers;
 import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.Model.User;
 import com.example.hogwartsbattle.R;
@@ -57,10 +58,10 @@ public class LobbyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
+        databse = FirebaseDatabase.getInstance();
         getPreload();
         mediaPlayer = new HarryMediaPlayer(this);
         mediaPlayer.startPlaying();
-        databse = FirebaseDatabase.getInstance();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             roomName = extras.getString("roomName");
@@ -78,12 +79,27 @@ public class LobbyActivity extends AppCompatActivity {
         if (isPlaying) {
             String currentRoom = Paper.book().read(Common.KEY_ROOM, "");
             if (!currentRoom.equals("")) {
+
                 Log.e("LobbyActivity", "CurrentRoom: " + currentRoom);
-                Intent intent = new Intent(getApplicationContext(), GameActivity.class);
-                intent.putExtra("roomName", currentRoom);
-                Common.currentRoomName = currentRoom;
-                finish();
-                startActivity(intent);
+
+                databse.getReference("rooms/" + currentRoom).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            Log.e("LobbyActivity", "CurrentRoom: " + currentRoom);
+                            Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+                            intent.putExtra("roomName", currentRoom);
+                            Common.currentRoomName = currentRoom;
+                            finish();
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         }
     }

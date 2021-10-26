@@ -225,7 +225,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
             }
             ownDeck.remove(0);
         }
-        thisPlayer.setDiscarded(discardedCard.getId());
+        thisPlayer.setDiscardedString(discardedCard.getId());
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getDiscarded());
         dialog.dismiss();
     }
@@ -238,9 +238,9 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         else
             thisPlayer.setDiscardedToEmpty();
 
-        opponentPlayer.setDiscarded(card.getId());
+        opponentPlayer.setDiscardedString(card.getId());
         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").setValue(opponentPlayer.getDiscarded());
-
+        dialog.dismiss();
     }
 
     private void discardFromHand(Card discardedCard) {
@@ -249,7 +249,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         else if (ownHandAdapter != null)
             ownHandAdapter.onDiscardCard(discardedCard);
 
-        thisPlayer.setDiscarded(discardedCard.getId());
+        thisPlayer.setDiscardedString(discardedCard.getId());
 
         if (discardedCard.getId().equals("71")) {
             if (thisPlayer.getHouse().contains(discardedCard.getHouse()) || checkIfAllyIsSameHouse(discardedCard))
@@ -304,7 +304,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         if (extraGolds > 0) {
             thisPlayer.setCoins(thisPlayer.getCoins() + extraGolds);
         }
-        thisPlayer.setDiscarded(newDiscardDeck.toString());
+        thisPlayer.setDiscardedString(newDiscardDeck.toString());
         database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(banishedCard.getId());
         dialog.dismiss();
     }
@@ -342,7 +342,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         ArrayList<Card> discarded = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
         discarded.remove(activeCard);
         if (discarded.size() > 0)
-            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(discarded));
+            thisPlayer.setDiscardedString(Helpers.getInstance().returnCardsFromArray(discarded));
         else
             thisPlayer.setDiscardedToEmpty();
         dialog.dismiss();
@@ -369,7 +369,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
     private void discardOpponentAlly(Card activeCard) {
 
-        opponentPlayer.setDiscarded(activeCard.getId());
+        opponentPlayer.setDiscardedString(activeCard.getId());
 
         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/idAllyToDiscard").setValue(activeCard.getId());
         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").setValue(opponentPlayer.getDiscarded());

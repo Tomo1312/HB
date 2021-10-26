@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Common.HarryMediaPlayer;
+import com.example.hogwartsbattle.Model.Player;
 import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,6 +60,7 @@ public class RoomActivity extends AppCompatActivity {
         databse = FirebaseDatabase.getInstance();
         mediaPlayer = new HarryMediaPlayer(this);
         mediaPlayer.startPlaying();
+        Paper.init(this);
         setUiView();
         getPreload();
         saveRoomName();
@@ -180,6 +182,8 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue().equals("true")) {
+
+                    Paper.book().write(Common.KEY_THIS_PLAYER, new Player());
                     Intent intent = new Intent(RoomActivity.this, GameActivity.class);
                     intent.putExtra("roomName", roomName);
                     startActivity(intent);
@@ -228,7 +232,6 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        Paper.init(this);
         Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
         Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
         mediaPlayer.stopMediaPlayer();

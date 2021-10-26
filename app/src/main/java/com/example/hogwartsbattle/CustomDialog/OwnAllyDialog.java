@@ -58,6 +58,9 @@ public class OwnAllyDialog extends CustomDialog {
 
     ImageView cardImage;
 
+    public void setClassroom(ArrayList<Card> classroom) {
+        this.classroom = classroom;
+    }
 
     public void showDialog() {
         Dialog dialog = new Dialog(context);
@@ -112,9 +115,12 @@ public class OwnAllyDialog extends CustomDialog {
                     }
                 }
                 break;
-            case 40:
+            case 40://NE DELA
+                Log.e("OwnAllyDialog", "case 40 ");
                 for (Card card : classroom) {
+                    Log.e("OwnAllyDialog", "Classroom u ownAllyDialog:" + card.getId());
                     if (card.getType().equals("ally")) {
+                        Log.e("OwnAllyDialog", "imamo ally-a:" + card.getId());
                         cardSpells = 2;
                         createButton(Common.ATTACK, dialog);
                         createButton(Common.HEART, dialog);
@@ -124,14 +130,10 @@ public class OwnAllyDialog extends CustomDialog {
                 break;
             case 41:
                 if (!thisPlayer.getHexes().equals("")) {
-                    for (Card card : Helpers.getInstance().returnCardsFromString(thisPlayer.getHexes())) {
-                        if (card.getType().equals("ally")) {
-                            int addAttack = Integer.parseInt(activeAlly.getAttack()) + 1;
-                            int addHeart = Integer.parseInt(activeAlly.getHeart()) + 1;
-                            activeAlly.setAttack(String.valueOf(addAttack));
-                            activeAlly.setHeart(String.valueOf(addHeart));
-                        }
-                    }
+                    int addValue = Helpers.getInstance().returnCardsFromString(thisPlayer.getHexes()).size();
+                    activeAlly.setAttack(String.valueOf(addValue));
+                    activeAlly.setHeart(String.valueOf(addValue));
+
                     cardSpells = 2;
                     createButton(Common.ATTACK, dialog);
                     createButton(Common.HEART, dialog);
@@ -288,17 +290,25 @@ public class OwnAllyDialog extends CustomDialog {
                         thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeAlly.getCoins()));
                         break;
                     case Common.HEART:
-                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("91") && thisPlayer.getAttacks() == 0)) {
-                            if (thisPlayer.getHexes().contains("91")) {
-                                thisPlayer.setHeart(1);
-                            } else {
-                                thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
-                            }
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("91")) {
+                            Toast.makeText(context, "You have active Sectusempra!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setHeart(1);
+                        } else {
+                            thisPlayer.setHeart(thisPlayer.getHeart() + Integer.parseInt(activeAlly.getHeart()));
                         }
                         break;
                     case Common.ATTACK:
-                        if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() > 1))
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("90")) {
+                            Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setAttacks(1);
+                        } else {
                             thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
+                        }
+
                         break;
                     case Common.REVEAL_TOP_CARD:
                         if (ownDeck.size() < 1) {
@@ -389,7 +399,7 @@ public class OwnAllyDialog extends CustomDialog {
                                     Toast.makeText(context, "You don't have any spell in hand!", Toast.LENGTH_LONG).show();
                                 } else {
                                     if (ownDeck.size() < 1)
-                                        ownDeck = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
+                                        ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                     discardCard = new DiscardCard(context, database, Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()), 9, opponentPlayer, thisPlayer);
                                     discardCard.setOwnHandAdapter(ownHandAdapter);
                                     discardCard.setAttacks(1);
@@ -432,6 +442,16 @@ public class OwnAllyDialog extends CustomDialog {
                         discardCard = new DiscardCard(context, database, playedHexes, 11, opponentPlayer, thisPlayer);
                         discardCard.showDialog();
                         break;
+                    case Common.ATTACK_PER_OPPONENT_ALLY:
+                        if (thisPlayer.getHexes().contains("80")) {
+                            Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                        } else if (thisPlayer.getHexes().contains("90")) {
+                            Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
+                            thisPlayer.setAttacks(1);
+                        } else {
+                            thisPlayer.setAttacks(thisPlayer.getAttacks() + opponentPlayer.getAlly().split(",").length);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -457,14 +477,14 @@ public class OwnAllyDialog extends CustomDialog {
 
     private void shuffleDeck() {
         if (!thisPlayer.getDiscarded().equals("")) {
-            ownDeck = Helpers.getInstance().getDeckFromDiscardPileAndDeck(thisPlayer, ownDeck);
+            ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
             Collections.shuffle(ownDeck);
             thisPlayer.setDiscardedToEmpty();
         }
     }
 
     void thisPlayerDiscardCard(Card card) {
-        thisPlayer.setDiscarded(card.getId());
+        thisPlayer.setDiscardedString(card.getId());
     }
 
     private void checkForCardEnd(Dialog dialog) {

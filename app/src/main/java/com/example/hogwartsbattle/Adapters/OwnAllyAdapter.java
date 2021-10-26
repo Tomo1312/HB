@@ -99,7 +99,7 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         ownAllyCard.remove(removedAlly);
         notifyDataSetChanged();
         thisPlayer.setAlly(Helpers.getInstance().returnCardsFromArray(ownAllyCard));
-        thisPlayer.setDiscarded(removedAlly.getId());
+        thisPlayer.setDiscardedString(removedAlly.getId());
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue(thisPlayer.getAlly());
     }
 

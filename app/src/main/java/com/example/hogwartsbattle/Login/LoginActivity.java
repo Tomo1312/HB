@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         loading = new SpotsDialog.Builder().setCancelable(false).setContext(LoginActivity.this).build();
         loading.show();
         Paper.init(this);
-        User user = Paper.book().read(Common.KEY_LOGGED);
+        User user = Paper.book().read(Common.KEY_LOGGED, new User());
         if (!TextUtils.isEmpty(user.getUserId())) {
 
             databse.getReference("/Users/" + user.getUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -226,6 +226,8 @@ public class LoginActivity extends AppCompatActivity {
                     checkEmailVerification();
                 } else {
                     Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+                    if(loading.isShowing())
+                        loading.dismiss();
                 }
             }
         });
@@ -247,6 +249,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     User userProfile = snapshot.getValue(User.class);
                     Common.currentUser = userProfile;
+                    Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
                     Intent intent = new Intent(LoginActivity.this, LobbyActivity.class);
                     intent.putExtra(Common.KEY_USER_ID, firebaseUser.getUid());
                     startActivity(intent);
@@ -258,7 +261,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
             });
-            Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
         } else {
             Toast.makeText(this, "Verify your e-mail", Toast.LENGTH_SHORT).show();
             mAuth.signOut();

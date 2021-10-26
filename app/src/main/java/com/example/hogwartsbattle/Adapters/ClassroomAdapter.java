@@ -75,6 +75,12 @@ public class ClassroomAdapter extends RecyclerView.Adapter<ClassroomAdapter.MyVi
         this.ownDeck = ownDeck;
     }
 
+    public void updateClassroom(ArrayList<Card> classRoomTmp) {
+        classroom.clear();
+        classroom.addAll(classRoomTmp);
+        notifyDataSetChanged();
+    }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 

@@ -140,7 +140,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitXY"
-                android:src="@drawable/downmap"/>
+                android:src="@drawable/downmap" />
 
             <LinearLayout
                 android:id="@+id/relative_layout_health"
@@ -216,32 +216,31 @@
         android:layout_toEndOf="@id/map"
         android:layout_toRightOf="@id/map"
         android:gravity="bottom"
-
         android:orientation="vertical">
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/opponent_allys"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:rotation="180" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/opponent_allys"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:rotation="180" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/classroom"
             android:layout_width="wrap_content"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:minHeight="100dp"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginBottom="10dp"
+            android:minHeight="100dp" />
 
         <LinearLayout
             android:layout_width="60dp"
-            android:minHeight="80dp"
             android:layout_height="wrap_content"
             android:layout_above="@+id/books"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
             android:background="@drawable/score_board"
+            android:minHeight="80dp"
             android:orientation="vertical"
             android:padding="3dp">
 
