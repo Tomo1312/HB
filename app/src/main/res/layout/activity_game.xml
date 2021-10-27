@@ -221,8 +221,9 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/opponent_allys"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="100dp"
+            android:layout_gravity="center"
             android:rotation="180" />
 
         <androidx.recyclerview.widget.RecyclerView

@@ -5,7 +5,7 @@ public class User {
     private String userName;
     private String userId;
     private String userEmail;
-    private boolean host;
+    private boolean host, firstTime;
 
     public User() {
     }
@@ -51,5 +51,13 @@ public class User {
 
     public void setHost(boolean host) {
         this.host = host;
+    }
+
+    public boolean isFirstTime() {
+        return firstTime;
+    }
+
+    public void setFirstTime(boolean firstTime) {
+        this.firstTime = firstTime;
     }
 }

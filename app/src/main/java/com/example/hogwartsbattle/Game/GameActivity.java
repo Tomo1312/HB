@@ -112,8 +112,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         setContentView(R.layout.activity_game);
 
         database = FirebaseDatabase.getInstance();
-        mediaPlayer = new HarryMediaPlayer(this);
-        mediaPlayer.startPlaying();
+//        mediaPlayer = new HarryMediaPlayer(this);
+//        mediaPlayer.startPlaying();
         loading = new SpotsDialog.Builder().setCancelable(false).setContext(GameActivity.this).build();
         loading.show();
         setUiForPlayerImage();
@@ -893,7 +893,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
     @Override
     protected void onStop() {
-        mediaPlayer.stopMediaPlayer();
+//        mediaPlayer.stopMediaPlayer();
         killAllListeners();
         savePreloadData();
         super.onStop();

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.R;
 
@@ -41,6 +42,12 @@ public class OpponentAllyAdapter extends RecyclerView.Adapter<OpponentAllyAdapte
         String cardName = "ally" + opponentAllys.get(position).getId();
         int id = context.getResources().getIdentifier("drawable/" + cardName, null, context.getPackageName());
         holder.card_from_layout.setImageResource(id);
+        holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShowCardDialog.getInstance().showCardDialog(context, opponentAllys.get(position), null);
+            }
+        });
         if (!cardViewList.contains(holder.card_from_layout)) {
             cardViewList.add(holder.card_Layout_card);
         }

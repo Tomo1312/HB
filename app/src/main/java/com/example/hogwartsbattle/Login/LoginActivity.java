@@ -202,6 +202,7 @@ public class LoginActivity extends AppCompatActivity {
     private void sendUserData() {
         Common.currentUser = new User(txt_Username.getText().toString(), txt_eMail.getText().toString());
         Common.currentUser.setUserId(mAuth.getUid());
+        Common.currentUser.setFirstTime(true);
         userRef = databse.getReference("Users");
         User user = new User(txt_Username.getText().toString(), (mAuth.getUid()), txt_eMail.getText().toString());
         userRef.child(mAuth.getUid()).setValue(user);

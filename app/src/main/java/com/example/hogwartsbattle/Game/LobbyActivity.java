@@ -3,10 +3,13 @@ package com.example.hogwartsbattle.Game;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -68,6 +71,23 @@ public class LobbyActivity extends AppCompatActivity {
             if (roomName != null) {
                 databse.getReference("rooms/" + roomName).removeValue();
             }
+        }
+        if(Common.currentUser.isFirstTime()){
+            new AlertDialog.Builder(this)
+                    .setTitle("Tutorial")
+                    .setMessage("This game don't have in game tutorial, so if you don't know how to play this game go watch on youtube :D")
+                    .setPositiveButton("Watch video", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            databse.getReference("Users/" + Common.currentUser.getUserId() + "/firstTime").setValue(false);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=IIh5I_vdcYQ"));
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setPackage("com.google.android.youtube");
+                            startActivity(intent);
+                        }
+                    })
+                    .setCancelable(false)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
         setUiView();
     }

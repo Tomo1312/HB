@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.R;
 
@@ -48,7 +49,7 @@ public class OpponentHandAdapter extends RecyclerView.Adapter<OpponentHandAdapte
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                ShowCardDialog.getInstance().showCardDialog(context, opponentHandCard.get(position), null);
             }
         });
         if (!cardViewList.contains(holder.card_from_layout)) {

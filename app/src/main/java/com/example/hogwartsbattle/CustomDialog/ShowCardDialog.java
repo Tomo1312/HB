@@ -60,7 +60,10 @@ public class ShowCardDialog {
 
         dialog.setContentView(parent);
 
-        dialog.setCancelable(false);
+        if (title != null)
+            dialog.setCancelable(false);
+        else
+            dialog.setCancelable(true);
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.show();
@@ -69,14 +72,18 @@ public class ShowCardDialog {
         TimerTask task = new TimerTask() {
             public void run() {
                 dialog.dismiss();
-                mDialog= null;
+                mDialog = null;
                 timer.cancel();
-
             }
         };
+        long delay;
+        if(cardToShow.getCardType().equals("hex"))
+            delay= 2000L;
+        else
+            delay= 1000L;
 
-        long delay = 1000L;
-        timer.schedule(task, delay * 2);
+        if (title != null)
+            timer.schedule(task, delay * 2);
 //        try {
 //            TimeUnit.MILLISECONDS.sleep(2500 );
 //        } catch (InterruptedException e) {
