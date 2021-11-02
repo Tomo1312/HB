@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +26,7 @@ import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.Common.HarryMediaPlayer;
 import com.example.hogwartsbattle.CustomDialog.CardBuyDialog;
 import com.example.hogwartsbattle.CustomDialog.DiscardCard;
-import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
+import com.example.hogwartsbattle.CustomDialog.FinishGameDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Common.SpacesItemDecoration;
 import com.example.hogwartsbattle.CustomDialog.ChooseAllyDialog;
@@ -33,9 +34,9 @@ import com.example.hogwartsbattle.CustomDialog.ChooseHouseDialog;
 import com.example.hogwartsbattle.CustomDialog.RockPaperScissorsDialog;
 import com.example.hogwartsbattle.Helpers.ListenerHelpers;
 import com.example.hogwartsbattle.Interface.IChooseDialog;
+import com.example.hogwartsbattle.Login.LoginActivity;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
-import com.example.hogwartsbattle.Model.User;
 import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -111,6 +112,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        Paper.init(this);
         database = FirebaseDatabase.getInstance();
 //        mediaPlayer = new HarryMediaPlayer(this);
 //        mediaPlayer.startPlaying();
@@ -118,7 +120,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         loading.show();
         setUiForPlayerImage();
         iChooseDialog = this;
-
         if (getPreloadData()) {
             listenerHelpers = new ListenerHelpers(database, thisPlayer, opponent);
             setUIView();
@@ -144,6 +145,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                     iChooseDialog.onOwnAllyChange(ally);
                 }
             }
+            setDeathImage();
             if (loading.isShowing()) {
                 loading.dismiss();
             }
@@ -152,7 +154,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             getPlayers();
             buildDecks();
         }
-
     }
 
     private void setUiForPlayerImage() {
@@ -262,6 +263,26 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
     @Override
     public void onChooseReturnToLobby(DialogInterface dialog) {
+        dialog.dismiss();
+        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
+        Paper.book().write(Common.KEY_OPPONENT, null);
+        Paper.book().write(Common.KEY_THIS_PLAYER, null);
+        Paper.book().write(Common.KEY_ROOM, null);
+        Paper.book().write(Common.KEY_GENERAL_DECK, null);
+        Paper.book().write(Common.KEY_GENERAL_DECK_MAP, null);
+        Paper.book().write(Common.KEY_HEX_DECK, null);
+        Paper.book().write(Common.KEY_OWN_DECK, null);
+        Paper.book().write(Common.KEY_HAND, null);
+        Paper.book().write(Common.KEY_IS_PLAYING, null);
+
+        if(Common.currentUser.isHost()){
+            Common.currentUser.setHost(false);
+            database.getReference("rooms/" + Common.currentRoomName).removeValue();
+        }
+        Intent intent = new Intent(GameActivity.this, LobbyActivity.class);
+        intent.putExtra(Common.KEY_USER_ID, Common.currentUser.getUserId());
+        startActivity(intent);
+        finish();
 
     }
 
@@ -532,6 +553,9 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
     private void finishGame(Player winner) {
         killAllListeners();
+
+        FinishGameDialog.getInstance().showFinishGameDialog(GameActivity.this, iChooseDialog, winner.getPlayerName());
+
     }
 
     private void killAllListeners() {
@@ -701,15 +725,15 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         for (int i = 0; i < 5; i++) {
             if (ownDeck.get(0).getCardType().equals("hex")) {
                 if (hexesString.toString().equals(""))
-                    hexesString.append(ownHand.getId());
+                    hexesString.append(ownDeck.get(0).getId());
                 else
-                    hexesString.append(",").append(ownHand.getId());
+                    hexesString.append(",").append(ownDeck.get(0).getId());
             }
             hand.add(ownDeck.get(0));
             ownDeck.remove(0);
         }
 
-        Log.e("GameActivity", "Neke tu ne valja sa hexesString: " + hexesString.toString());
+        //Log.e("GameActivity", "Neke tu ne valja sa hexesString: " + hexesString.toString());
         Iterator handIterator = hand.iterator();
         while (handIterator.hasNext()) {
             Card cardTmp = (Card) handIterator.next();
@@ -727,7 +751,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             } else if (cardTmp.getId().equals("84")) {
                 Toast.makeText(GameActivity.this, "You need to banish top card of your deck because of Jelly-brain jinx!", Toast.LENGTH_LONG).show();
                 deckNeedShuffle(1);
-                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0));
+                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
                 ownDeck.remove(0);
                 handIterator.remove();
             } else if (cardTmp.getId().equals("87")) {
@@ -894,13 +918,19 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     @Override
     protected void onStop() {
 //        mediaPlayer.stopMediaPlayer();
-        killAllListeners();
-        savePreloadData();
         super.onStop();
+        savePreloadData();
+        killAllListeners();
     }
 
+    @Override
+    protected void onDestroy() {
+//        mediaPlayer.stopMediaPlayer();
+        super.onDestroy();
+        savePreloadData();
+        killAllListeners();
+    }
     private boolean getPreloadData() {
-        Paper.init(this);
         thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER, new Player());
         if (thisPlayer.getPlayerName() != null) {
             Common.currentUser = Paper.book().read(Common.KEY_THIS_USER);
@@ -917,7 +947,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     }
 
     private void savePreloadData() {
-        Paper.init(this);
         //String userId = Paper.book().read(Common.KEY_LOGGED);
         Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
         Paper.book().write(Common.KEY_OPPONENT, opponent);

@@ -117,7 +117,7 @@ public class DiscardCard extends CustomDialog {
             case 13:
                 //0 - Discards opponent ally
                 //10 - discard opponent ally, then use that ally (not tested yet)
-                //12 - Discard own ally (Hex)
+                //13 - Discard own ally (Hex)
                 dialog.setContentView(R.layout.layout_discard_card_vertical);
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(new GridLayoutManager(context, 1));
@@ -207,10 +207,10 @@ public class DiscardCard extends CustomDialog {
 
         viewCardsForDelete.setAdapter(discardCardAdapter);
 
-        if (layout != 7  && layout != 13)
-            dialog.setCancelable(true);
-        else
+        if (layout == 7 || layout == 13)
             dialog.setCancelable(false);
+        else
+            dialog.setCancelable(true);
         dialog.show();
         Window window = dialog.getWindow();
         window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

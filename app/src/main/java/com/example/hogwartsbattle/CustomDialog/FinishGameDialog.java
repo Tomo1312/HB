@@ -6,16 +6,22 @@ import android.graphics.PorterDuff;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.R;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FinishGameDialog {
     public static FinishGameDialog mDialog;
     IChooseDialog iChooseDialog;
 
-    ImageView btnCat, btnFrog, btnOwl;
+    TextView textWinner;
+    Button btnReturnToLobby;
 
     public static FinishGameDialog getInstance() {
         if (mDialog == null)
@@ -24,22 +30,21 @@ public class FinishGameDialog {
     }
 
     public void showFinishGameDialog(Context context,
-                                     IChooseDialog iChooseDialog) {
+                                     IChooseDialog iChooseDialog, String winner) {
         this.iChooseDialog = iChooseDialog;
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.choose_ally_dialog_layout);
-        btnCat = dialog.findViewById(R.id.btnCat);
-        btnFrog = dialog.findViewById(R.id.btnFrog);
-        btnOwl = dialog.findViewById(R.id.btnOwl);
+        dialog.setContentView(R.layout.layout_finish_game);
 
-        btnCat.setOnClickListener(new View.OnClickListener() {
+
+        textWinner = dialog.findViewById(R.id.text_view_winner);
+        btnReturnToLobby = dialog.findViewById(R.id.btnReturnToLobby);
+
+        textWinner.setText(winner + " has won! easy!");
+
+        btnReturnToLobby.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImageView view = (ImageView) v;
-                view.getDrawable().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
-                view.invalidate();
-                btnCat.setImageResource(R.drawable.cat);
                 iChooseDialog.onChooseReturnToLobby(dialog);
             }
         });

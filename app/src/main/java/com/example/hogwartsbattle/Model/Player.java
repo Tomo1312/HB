@@ -108,10 +108,6 @@ public class Player {
         this.discarded = discarded;
     }
 
-    public void setDiscardedToExactString(String returnCardsFromArray) {
-        this.discarded = returnCardsFromArray;
-    }
-
     public void setDiscardedToEmpty() {
         this.discarded = "";
     }

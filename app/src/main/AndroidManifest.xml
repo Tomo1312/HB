@@ -9,11 +9,13 @@
         android:hardwareAccelerated="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+
         android:theme="@style/Theme.HogwartsBattle">
         <activity android:name=".Game.GameActivity"/>
         <activity android:name=".Game.RoomActivity"/>
         <activity android:name=".Game.LobbyActivity"/>
-        <activity android:name=".Login.LoginActivity">
+        <activity android:name=".Login.LoginActivity"
+            android:clearTaskOnLaunch="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

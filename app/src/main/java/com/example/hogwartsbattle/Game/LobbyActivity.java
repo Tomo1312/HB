@@ -63,8 +63,8 @@ public class LobbyActivity extends AppCompatActivity {
 
         databse = FirebaseDatabase.getInstance();
         getPreload();
-        mediaPlayer = new HarryMediaPlayer(this);
-        mediaPlayer.startPlaying();
+//        mediaPlayer = new HarryMediaPlayer(this);
+//        mediaPlayer.startPlaying();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             roomName = extras.getString("roomName");
@@ -225,7 +225,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        mediaPlayer.stopMediaPlayer();
+//        mediaPlayer.stopMediaPlayer();
         if (valueEventListenerRoom != null)
             roomsRef.removeEventListener(valueEventListenerRoom);
         if (valueEventListenerCreateRoom != null)

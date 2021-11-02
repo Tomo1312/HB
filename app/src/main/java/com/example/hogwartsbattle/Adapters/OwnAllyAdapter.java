@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -72,11 +73,15 @@ public class OwnAllyAdapter extends RecyclerView.Adapter<OwnAllyAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!ownAllyCard.get(position).isUsed() && thisPlayer.isPlaying()) {
-                    OwnAllyDialog ownAllyDialog = new OwnAllyDialog(context, ownAllyCard.get(position),
-                            thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iChooseDialog,
-                            iDisableAllyListener, ownHandAdapter);
-                    ownAllyDialog.showDialog();
+                if (!thisPlayer.getHexes().contains("89")) {
+                    if (!ownAllyCard.get(position).isUsed() && thisPlayer.isPlaying()) {
+                        OwnAllyDialog ownAllyDialog = new OwnAllyDialog(context, ownAllyCard.get(position),
+                                thisPlayer, opponentPlayer, ownDeck, classroom, hexes, database, iChooseDialog,
+                                iDisableAllyListener, ownHandAdapter);
+                        ownAllyDialog.showDialog();
+                    }
+                }else{
+                    Toast.makeText(context, "You can't activate effect of allys this turn!", Toast.LENGTH_LONG).show();
                 }
 
             }

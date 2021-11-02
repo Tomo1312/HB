@@ -78,7 +78,7 @@ public class CardBuyDialog extends CustomDialog {
     }
 
     private void buyCardFromClassroom(int addToPrice, Dialog dialog) {
-        if (activeCard.getId().equals(0)) {
+        if (activeCard.getId().equals("0") && library > 0) {
             //Card 46, says to put item on top of deck
             if (thisPlayer.getPlayedCards().contains("46")) {
                 ownDeck.add(0, activeCard);
@@ -87,7 +87,10 @@ public class CardBuyDialog extends CustomDialog {
             }
             library--;
             database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
-        } else {
+        } else if (activeCard.getId().equals("0")) {
+            Toast.makeText(context, "There are no more cards in library!", Toast.LENGTH_LONG).show();
+        }
+        else{
             if (thisPlayer.getPlayedCards().contains("46") && activeCard.getType().equals("item")) {
                 ownDeck.add(0, activeCard);
             } else if (thisPlayer.getPlayedCards().contains("45") && activeCard.getType().equals("spell")) {
@@ -97,12 +100,12 @@ public class CardBuyDialog extends CustomDialog {
             } else {
                 thisPlayer.setDiscardedString(activeCard.getId());
             }
-            thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()) - addToPrice);
             classroom.remove(activeCard);
 
-            iChooseDialog.onUpdateAttackGoldHeart();
             database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(Helpers.getInstance().returnCardsFromArray(classroom));
         }
+        thisPlayer.setCoins(thisPlayer.getCoins() - Integer.parseInt(activeCard.getCost()) - addToPrice);
+        iChooseDialog.onUpdateAttackGoldHeart();
         database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue(activeCard.getId());
 
         dialog.dismiss();

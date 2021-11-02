@@ -58,8 +58,8 @@ public class RoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
         databse = FirebaseDatabase.getInstance();
-        mediaPlayer = new HarryMediaPlayer(this);
-        mediaPlayer.startPlaying();
+//        mediaPlayer = new HarryMediaPlayer(this);
+//        mediaPlayer.startPlaying();
         Paper.init(this);
         setUiView();
         getPreload();
@@ -234,7 +234,7 @@ public class RoomActivity extends AppCompatActivity {
     protected void onStop() {
         Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
         Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
-        mediaPlayer.stopMediaPlayer();
+//        mediaPlayer.stopMediaPlayer();
         if (valueEventListenerStartGame != null)
             databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);
         if (valueEventListenerPlayerId != null)

@@ -73,9 +73,9 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (thisPlayer.getHexes().contains("85") && !checkForOnlyOneItemPlayed()) {
+                if (thisPlayer.getHexes().contains("85") && !checkForOnlyOneItemPlayed() &&  ownHandCard.get(position).getType().equals("item")) {
                     Toast.makeText(context, "You can only play one item because of hex!", Toast.LENGTH_LONG).show();
-                } else if (thisPlayer.getHexes().contains("88") && !checkForTwoSpellPlayed()) {
+                } else if (thisPlayer.getHexes().contains("88") && !checkForTwoSpellPlayed() &&  ownHandCard.get(position).getType().equals("spell")) {
                     Toast.makeText(context, "You can only play 2 spells because of hex!", Toast.LENGTH_LONG).show();
                 } else if (thisPlayer.getHexes().contains("86") && ownHandCard.get(position).getType().equals("ally")) {
                     Toast.makeText(context, "You can't play ally because of hex!", Toast.LENGTH_LONG).show();

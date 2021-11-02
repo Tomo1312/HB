@@ -69,13 +69,12 @@ public class ListenerHelpers {
         ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                 if (snapshot.exists()) {
                     if (!snapshot.getValue().toString().equals("0")) {
                         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                thisPlayer.setDiscardedToExactString(snapshot.getValue().toString());
+                            public void onDataChange(@NonNull DataSnapshot snapshotDiscarded) {
+                                thisPlayer.setDiscarded(snapshotDiscarded.getValue().toString());
                                 if (ownDeck.size() < 5 && !thisPlayer.getDiscarded().equals("")) {
                                     ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
                                     Collections.shuffle(ownDeck);
@@ -277,6 +276,7 @@ public class ListenerHelpers {
                 if (snapshot.exists()) {
                     if (!snapshot.getValue().equals("")) {
                         iChooseDialog.removeAlly(Common.allCardsMap.get(Integer.valueOf(snapshot.getValue().toString())));
+                        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/idAllyToDiscard").setValue("");
                     }
                 }
             }
@@ -347,7 +347,7 @@ public class ListenerHelpers {
         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                opponentPlayer.setDiscardedToExactString(snapshot.getValue().toString());
+                opponentPlayer.setDiscarded(snapshot.getValue().toString());
                 getOwnDiscardPile(activity, dialog);
             }
 
@@ -362,7 +362,7 @@ public class ListenerHelpers {
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                thisPlayer.setDiscardedToExactString(snapshot.getValue().toString());
+                thisPlayer.setDiscarded(snapshot.getValue().toString());
                 startDraw(activity, dialog);
             }
 

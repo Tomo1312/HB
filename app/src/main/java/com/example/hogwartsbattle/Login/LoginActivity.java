@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        setMediaPlayer();
+//        setMediaPlayer();
     }
 
     private void setMediaPlayer() {
@@ -270,7 +270,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        mediaPlayer.stopMediaPlayer();
+//        mediaPlayer.stopMediaPlayer();
         super.onDestroy();
         if (loading.isShowing())
             loading.dismiss();

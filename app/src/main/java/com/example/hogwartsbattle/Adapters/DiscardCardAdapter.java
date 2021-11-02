@@ -234,7 +234,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         ArrayList<Card> discardPile = Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded());
         discardPile.remove(card);
         if (discardPile.size() > 0)
-            thisPlayer.setDiscardedToExactString(Helpers.getInstance().returnCardsFromArray(discardPile));
+            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(discardPile));
         else
             thisPlayer.setDiscardedToEmpty();
 
@@ -327,7 +327,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         ArrayList<Card> discardPile = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
         discardPile.remove(hexToBanish);
         if (discardPile.size() > 0)
-            thisPlayer.setDiscardedToExactString(Helpers.getInstance().returnCardsFromArray(discardPile));
+            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(discardPile));
         else
             thisPlayer.setDiscardedToEmpty();
         database.getReference("rooms/" + Common.currentRoomName + "/banished").

@@ -40,7 +40,7 @@ public class CardDialog extends CustomDialog {
 
     ArrayList<Button> EffectsToDisable;
     ArrayList<Card> classroom;
-    boolean chooseEffect, mayUseSpell = false;
+    boolean chooseEffect, mayUseSpell = false, returnToLibrary = false;
 
     ImageView cardImage;
 
@@ -188,7 +188,7 @@ public class CardDialog extends CustomDialog {
                 createButton(Common.COPY_SPELL, dialog, R.drawable.button_border_normall_spell);
                 break;
             case 20:
-                cardSpells = 2;
+                cardSpells = 1;
                 mayUseSpell = true;
                 createButton(Common.BANISH_FROM_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.BANISH_FROM_CLASSROOM, dialog, R.drawable.button_border_normall_spell);
@@ -308,12 +308,12 @@ public class CardDialog extends CustomDialog {
                 }
                 break;
             case 48:
-                cardSpells = 2;
+                cardSpells = 1;
                 mayUseSpell = true;
-                createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
+                createButton(Common.ATTACK, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.PUT_CARD_FROM_YOUR_TO_OPPONENT_DISCARD, dialog, R.drawable.button_border_normall_spell);
                 if (checkForSameHouse()) {
-                    cardSpells = 3;
+                    cardSpells = 2;
                     createButton(Common.DRAW_TWO_CARD_THEN_DISCARD_ANY, dialog, R.drawable.button_border_ravenclaw_spell);
                 }
                 break;
@@ -443,7 +443,6 @@ public class CardDialog extends CustomDialog {
                 EffectsToDisable.add(createButton(Common.BANISH_FROM_HAND, dialog, R.drawable.button_border_normall_spell));
                 EffectsToDisable.add(createButton(Common.BANISH_FROM_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell));
                 if (checkForSameHouse()) {
-                    mayUseSpell = false;
                     cardSpells = 2;
                     createButton(Common.GOLD, dialog, R.drawable.button_border_hufflepuff_spell);
                     createButton(Common.HEART, dialog, R.drawable.button_border_hufflepuff_spell);
@@ -808,6 +807,18 @@ public class CardDialog extends CustomDialog {
                         }
                         break;
                     case Common.RETURN_TO_LIBRARY:
+                        if (thisPlayer.getHexes().contains("83")) {
+                            Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (ownDeck.size() == 0) {
+                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                                Collections.shuffle(ownDeck);
+                                thisPlayer.setDiscardedToEmpty();
+                            }
+                            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+                            ownDeck.remove(0);
+                        }
+                        returnToLibrary = true;
                         library++;
                         database.getReference("rooms/" + Common.currentRoomName + "/library").setValue(library);
                         break;
@@ -836,12 +847,14 @@ public class CardDialog extends CustomDialog {
         if (cardSpells < 1 && !mayUseSpell) {
             iCardAddOrDeletedFromHand.onDiscardCard(activeCard);
             dialog.dismiss();
-            thisPlayerPlayedCard(activeCard);
+            if(!returnToLibrary)
+                thisPlayerPlayedCard(activeCard);
             iChooseDialog.onUpdateAttackGoldHeart();
         } else if (cardSpells < 1) {
             iCardAddOrDeletedFromHand.onDiscardCard(activeCard);
             dialog.setCancelable(true);
-            thisPlayerPlayedCard(activeCard);
+            if(!returnToLibrary)
+                thisPlayerPlayedCard(activeCard);
             iChooseDialog.onUpdateAttackGoldHeart();
         }
     }

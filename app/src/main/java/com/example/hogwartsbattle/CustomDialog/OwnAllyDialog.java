@@ -318,7 +318,11 @@ public class OwnAllyDialog extends CustomDialog {
                         ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), title);
                         if (Integer.parseInt(activeAlly.getId()) == 38) {
                             if (Integer.parseInt(ownDeck.get(0).getCost()) > 0) {
-                                thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
+                                if (thisPlayer.getHexes().contains("80")) {
+                                    Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
+                                } else {
+                                    thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeAlly.getAttack()));
+                                }
                                 thisPlayer.setCoins(thisPlayer.getCoins() + Integer.parseInt(activeAlly.getCoins()));
                             }
                         } else if (Integer.parseInt(activeAlly.getId()) == 67) {
