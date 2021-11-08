@@ -26,4 +26,7 @@ public interface IChooseDialog {
     void setAllyAvailable(Card ally);
 
     void onUpdateAttackGoldHeart();
+
+    void onAddCard(Card newCard);
+    void onDiscardCard(Card discardCard);
 }

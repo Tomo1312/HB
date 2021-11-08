@@ -3,6 +3,7 @@ package com.example.hogwartsbattle.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.Common.Common;
+import com.example.hogwartsbattle.CustomDialog.DiscardCard;
 import com.example.hogwartsbattle.CustomDialog.OwnAllyDialog;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
@@ -24,12 +26,13 @@ import com.example.hogwartsbattle.R;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.MyViewHolder> {
 
     Context context;
-    List<Card> cards;
+    ArrayList<Card> cards;
     List<CardView> cardViewList;
     FirebaseDatabase database;
     Dialog dialog;
@@ -178,9 +181,10 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                         dialog.dismiss();
                         break;
                     case 11:
-                        ArrayList<Card> playedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards());
-                        playedCards.remove(cards.get(position));
-                        thisPlayer.setPlayedCards(Helpers.getInstance().returnCardsFromArray(playedCards));
+                        ArrayList<Card> hexes = Helpers.getInstance().returnCardsFromString(thisPlayer.getHexes());
+                        hexes.remove(cards.get(position));
+                        iChooseDialog.onDiscardCard(cards.get(position));
+                        thisPlayer.setHexes(Helpers.getInstance().returnCardsFromArray(hexes));
                         dialog.dismiss();
                         break;
                     case 13:
@@ -199,10 +203,21 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     }
 
     private void discardCardAndGainEffects(Card discardedCard) {
-        if (iCardAddOrDeletedFromHand != null)
+        if (iCardAddOrDeletedFromHand != null) {
+            Log.e("DiscardCard", "Uslo U krivi IF jebiga" );
             iCardAddOrDeletedFromHand.onDiscardCard(discardedCard);
-        else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
-            ownHandAdapter.onDiscardCard(discardedCard);
+        } else if (extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
+            if (thisPlayer.getHexes().contains("83")) {
+                Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
+            } else {
+                if (ownDeck.size() <= 1) {
+                    ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+                    Collections.shuffle(ownDeck);
+                    thisPlayer.setDiscardedToEmpty();
+                }
+                iChooseDialog.onAddCard(ownDeck.get(0));
+                ownDeck.remove(0);
+            }
 
             if (!thisPlayer.getHexes().contains("80") || !(thisPlayer.getHexes().contains("90") && thisPlayer.getAttacks() == 0)) {
                 if (thisPlayer.getHexes().contains("90")) {
@@ -218,15 +233,11 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
                     thisPlayer.setHeart(thisPlayer.getHeart() + extraHearts);
                 }
             }
-            if (thisPlayer.getHexes().contains("83")) {
-                Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
-            } else {
-                ownHandAdapter.onAddCard(ownDeck.get(0));
-            }
-            ownDeck.remove(0);
+            iChooseDialog.onDiscardCard(discardedCard);
+            thisPlayer.setDiscardedString(discardedCard.getId());
+            database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue(thisPlayer.getDiscarded());
+
         }
-        thisPlayer.setDiscardedString(discardedCard.getId());
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(thisPlayer.getDiscarded());
         dialog.dismiss();
     }
 
@@ -285,16 +296,12 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
     }
 
     private void playerBanishCardFromDiscardPile(Card banishedCard) {
-        String[] cards = thisPlayer.getDiscarded().split(",");
-        int i = 1;
-        StringBuilder newDiscardDeck = new StringBuilder();
-        for (String cardTmp : cards) {
-            if (cardTmp.equals(banishedCard.getId()))
-                continue;
-            newDiscardDeck.append(cardTmp);
-            if (i == cards.length)
-                newDiscardDeck.append(",");
-        }
+        ArrayList<Card> discardPile = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
+        discardPile.remove(banishedCard);
+        if (discardPile.size() > 0)
+            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(discardPile));
+        else
+            thisPlayer.setDiscardedToEmpty();
 
         if (banishedCard.getCardType().equals("hex")) {
             if (extraHearts > 0)
@@ -304,7 +311,8 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         if (extraGolds > 0) {
             thisPlayer.setCoins(thisPlayer.getCoins() + extraGolds);
         }
-        thisPlayer.setDiscardedString(newDiscardDeck.toString());
+
+        iChooseDialog.onUpdateAttackGoldHeart();
         database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(banishedCard.getId());
         dialog.dismiss();
     }
@@ -350,19 +358,13 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
     private void banishFromClassroom(Card activeCard) {
         cards.remove(activeCard);
-        StringBuilder stringCards = new StringBuilder();
-        int i = 1;
-        for (Card cardTmp : cards) {
-            stringCards.append(cardTmp.getId());
-            if (i != cards.size()) {
-                stringCards.append(",");
-            }
-            i++;
-        }
+        String stringCards = Helpers.getInstance().returnCardsFromArray(cards);
+
         if (extraGolds > 0) {
             thisPlayer.setCoins(thisPlayer.getCoins() + extraGolds);
+            iChooseDialog.onUpdateAttackGoldHeart();
         }
-        database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(stringCards.toString());
+        database.getReference("rooms/" + Common.currentRoomName + "/classroom").setValue(stringCards);
         database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(activeCard.getId());
         dialog.dismiss();
     }

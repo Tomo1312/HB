@@ -124,8 +124,9 @@ public class DiscardCard extends CustomDialog {
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
                 if (iChooseDialog != null) {
                     discardCardAdapter.setIChooseDialog(iChooseDialog);
-                }else if (ownHandAdapter != null) {
+                } else if (ownHandAdapter != null) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
+                    discardCardAdapter.setOwnDeck(ownDeck);
                     discardCardAdapter.setClassroom(classroom);
                     discardCardAdapter.setHexes(hexes);
                     discardCardAdapter.setIChooseDialog(iChooseDialog);
@@ -139,6 +140,7 @@ public class DiscardCard extends CustomDialog {
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
                 if (extraGolds > 0) {
                     discardCardAdapter.setGolds(extraGolds);
+                    discardCardAdapter.setIChooseDialog(iChooseDialog);
                 }
                 break;
             case 2:
@@ -146,27 +148,26 @@ public class DiscardCard extends CustomDialog {
             case 6:
             case 7:
             case 9:
-            case 11:
                 //2- Opponent draw from discard pile Item
                 //5- Copy any spell from played cards
                 //6- Banish from hand
                 //7 - Discard from hand
                 //9 - Discard card from spell and gain effects
-                //11 - Banish Hex from played cards
                 dialog.setContentView(R.layout.layout_discard_card_horizontal);
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(horizontalLayoutManagerOwnHand);
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
-                if (iCardAddOrDeletedFromHand != null)
+                if (iCardAddOrDeletedFromHand != null) {
                     discardCardAdapter.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
-                else if (extraHearts > 0) {
-                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
-                    discardCardAdapter.setHearts(1);
-                } else if (ownHandAdapter != null && extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
-                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
+                } else if (extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
+                    discardCardAdapter.setOwnDeck(ownDeck);
                     discardCardAdapter.setAttacks(1);
                     discardCardAdapter.setHearts(1);
                     discardCardAdapter.setCards(1);
+                    discardCardAdapter.setIChooseDialog(iChooseDialog);
+                } else if (extraHearts > 0) {
+                    discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
+                    discardCardAdapter.setHearts(1);
                 } else if (ownHandAdapter != null)
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                 break;
@@ -192,7 +193,19 @@ public class DiscardCard extends CustomDialog {
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(horizontalLayoutManagerOwnHand);
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
-                discardCardAdapter.setHearts(extraHearts);
+                if (extraGolds > 0)
+                    discardCardAdapter.setGolds(extraGolds);
+                else if (extraHearts > 0)
+                    discardCardAdapter.setHearts(extraHearts);
+                discardCardAdapter.setIChooseDialog(iChooseDialog);
+                break;
+            case 11:
+                //11 - Banish Hex from played cards
+                dialog.setContentView(R.layout.layout_discard_card_horizontal);
+                viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
+                viewCardsForDelete.setLayoutManager(horizontalLayoutManagerOwnHand);
+                discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
+                discardCardAdapter.setIChooseDialog(iChooseDialog);
                 break;
             default:
                 dialog.setContentView(R.layout.layout_discard_card_horizontal);

@@ -69,6 +69,13 @@ public class RoomActivity extends AppCompatActivity {
         checkIfGameIsStarted();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.e("RoomActivity", "Koji je ovo kurca ");
+    }
+
     private void getPreload() {
         Bundle extras = getIntent().getExtras();
         roomName = extras.getString("roomName");
@@ -110,15 +117,16 @@ public class RoomActivity extends AppCompatActivity {
                     killListeners();
                     Intent intent = new Intent(RoomActivity.this, LobbyActivity.class);
                     Common.currentRoomName = "";
+                    finish();
                     startActivity(intent);
                     databse.getReference("rooms/" + roomName ).removeValue();
                 }else{
                     Intent intent = new Intent(RoomActivity.this, LobbyActivity.class);
                     Common.currentRoomName = "";
+                    finish();
                     startActivity(intent);
                     databse.getReference("rooms/" + roomName  + "/" + playerName).removeValue();
                 }
-                finish();
             }
         });
     }
@@ -155,25 +163,6 @@ public class RoomActivity extends AppCompatActivity {
 
     private void setIdToPlayers() {
         plyersRef = databse.getReference("rooms/" + roomName);
-//        valueEventListenerPlayerId = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                databse.getReference("rooms/" + roomName + "/" + playerName + "/id").setValue(1);
-//                for (DataSnapshot snapshotTmp : snapshot.getChildren()) {
-//                    if (!(snapshotTmp.getKey().equals("startGame")) && !(snapshotTmp.getKey().equals("banished")) && !(snapshotTmp.getKey().equals("classroom"))
-//                            && !(snapshotTmp.getKey().equals("playing")) && !(snapshotTmp.getKey().equals(Common.currentUser.getUserName()))) {
-//                        databse.getReference("rooms/" + roomName + "/" + snapshotTmp.getKey() + "/id").setValue(2);
-//                    }
-//                }
-//                databse.getReference("rooms/" + roomName + "/startGame").setValue("true");
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        };
-//        plyersRef.addListenerForSingleValueEvent(valueEventListenerPlayerId);
         databse.getReference("rooms/" + roomName + "/startGame").setValue("true");
     }
 
@@ -182,12 +171,12 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue().equals("true")) {
-
+                    killListeners();
                     Paper.book().write(Common.KEY_THIS_PLAYER, new Player());
                     Intent intent = new Intent(RoomActivity.this, GameActivity.class);
                     intent.putExtra("roomName", roomName);
-                    startActivity(intent);
                     finish();
+                    startActivity(intent);
                 }
             }
 
@@ -229,18 +218,17 @@ public class RoomActivity extends AppCompatActivity {
         };
         databse.getReference("rooms/" + roomName).addValueEventListener(valueEventListenerPlayersInRoom);
     }
-
-    @Override
-    protected void onStop() {
-        Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
-        Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
-//        mediaPlayer.stopMediaPlayer();
-        if (valueEventListenerStartGame != null)
-            databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);
-        if (valueEventListenerPlayerId != null)
-            databse.getReference("rooms/" + roomName).removeEventListener(valueEventListenerPlayerId);
-        if (valueEventListenerPlayersInRoom != null)
-            databse.getReference("rooms/" + roomName).removeEventListener(valueEventListenerPlayersInRoom);
-        super.onStop();
-    }
+//    @Override
+//    protected void onStop() {
+////        Paper.book().write(Common.KEY_LOGGED, Common.currentUser);
+////        Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
+////        mediaPlayer.stopMediaPlayer();
+////        if (valueEventListenerStartGame != null)
+////            databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);
+////        if (valueEventListenerPlayerId != null)
+////            databse.getReference("rooms/" + roomName).removeEventListener(valueEventListenerPlayerId);
+////        if (valueEventListenerPlayersInRoom != null)
+////            databse.getReference("rooms/" + roomName).removeEventListener(valueEventListenerPlayersInRoom);
+////        super.onStop();
+//    }
 }

@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,7 +54,7 @@ public class LobbyActivity extends AppCompatActivity {
     DatabaseReference roomsRef;
 
     ValueEventListener valueEventListenerRoom, valueEventListenerCreateRoom;
-
+    User user;
     HarryMediaPlayer mediaPlayer;
 
     @Override
@@ -61,7 +62,10 @@ public class LobbyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
+        Paper.init(this);
         databse = FirebaseDatabase.getInstance();
+        user = Paper.book().read(Common.KEY_THIS_USER, new User());
+        Common.currentUser = user;
         getPreload();
 //        mediaPlayer = new HarryMediaPlayer(this);
 //        mediaPlayer.startPlaying();
@@ -72,30 +76,36 @@ public class LobbyActivity extends AppCompatActivity {
                 databse.getReference("rooms/" + roomName).removeValue();
             }
         }
-        if(Common.currentUser.isFirstTime()){
-            new AlertDialog.Builder(this)
-                    .setTitle("Tutorial")
-                    .setMessage("This game don't have in game tutorial, so if you don't know how to play this game go watch on youtube :D")
-                    .setPositiveButton("Watch video", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            databse.getReference("Users/" + Common.currentUser.getUserId() + "/firstTime").setValue(false);
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=IIh5I_vdcYQ"));
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.setPackage("com.google.android.youtube");
-                            startActivity(intent);
-                        }
-                    })
-                    .setCancelable(false)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
+        if (!TextUtils.isEmpty(user.getUserId())) {
+            if (user.isFirstTime()) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Tutorial")
+                        .setMessage("This game don't have in game tutorial, so if you don't know how to play this game go watch on youtube :D")
+                        .setPositiveButton("Watch video", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                databse.getReference("Users/" + user.getUserId() + "/firstTime").setValue(false);
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=IIh5I_vdcYQ"));
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.setPackage("com.google.android.youtube");
+                                startActivity(intent);
+                            }
+                        })
+                        .setCancelable(false)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
         }
         setUiView();
     }
 
     private void getPreload() {
-        Paper.init(this);
         boolean isPlaying = Paper.book().read(Common.KEY_IS_PLAYING, false);
-        Log.e("LobbyActivity", "user: " + isPlaying);
+//        Player thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER, new Player());
+//
+//        if(thisPlayer.getPlayerName().equals("")){
+//            this.finishAffinity();
+//        }
+//        Log.e("LobbyActivity", "thisPlayer: " + thisPlayer.getPlayerName());
         if (isPlaying) {
             String currentRoom = Paper.book().read(Common.KEY_ROOM, "");
             if (!currentRoom.equals("")) {
@@ -126,7 +136,7 @@ public class LobbyActivity extends AppCompatActivity {
 
     private void setUiView() {
 
-        playerName = Common.currentUser.getUserName();
+        playerName = user.getUserName();
         roomName = playerName + "'s room";
 //        checkIfItsInRoom();
 

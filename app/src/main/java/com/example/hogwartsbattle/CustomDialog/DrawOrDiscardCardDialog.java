@@ -27,13 +27,13 @@ public class DrawOrDiscardCardDialog {
         return mDialog;
     }
 
-    public void showChooseAllyDialog(Context context, Player thisPlayer, ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand, Card activeCard) {
+    public void showDialog(Context context, Player thisPlayer, ICardAddOrDeletedFromHand iCardAddOrDeletedFromHand, Card activeCard) {
         this.iCardAddOrDeletedFromHand = iCardAddOrDeletedFromHand;
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_card_draw_or_discard);
-        btnDiscard = dialog.findViewById(R.id.btnCat);
-        btnDraw = dialog.findViewById(R.id.btnFrog);
+        btnDiscard = dialog.findViewById(R.id.discard_card);
+        btnDraw = dialog.findViewById(R.id.draw_card);
         cardImage = dialog.findViewById(R.id.card_image);
         int id = context.getResources().getIdentifier("drawable/id" + activeCard.getId(), null, context.getPackageName());
         cardImage.setImageResource(id);

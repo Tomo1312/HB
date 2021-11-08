@@ -104,8 +104,4 @@ public class Helpers {
         }
         return handString.toString();
     }
-
-    public void startAfterPlayerDied(FirebaseDatabase database, Player thisPlayer, ArrayList<Card> ownDeck) {
-
-    }
 }

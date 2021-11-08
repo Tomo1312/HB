@@ -162,7 +162,7 @@ public class CardDialog extends CustomDialog {
                 break;
             case 15:
             case 22:
-                cardSpells = 2;
+                cardSpells = 1;
                 mayUseSpell = true;
                 createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
@@ -204,7 +204,7 @@ public class CardDialog extends CustomDialog {
                 createButton(Common.REVEAL_TOP_CARD, dialog, R.drawable.button_border_normall_spell);
                 break;
             case 24:
-                cardSpells = 2;
+                cardSpells = 1;
                 mayUseSpell = true;
                 createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
                 chooseEffect = true;
@@ -313,7 +313,6 @@ public class CardDialog extends CustomDialog {
                 createButton(Common.ATTACK, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.PUT_CARD_FROM_YOUR_TO_OPPONENT_DISCARD, dialog, R.drawable.button_border_normall_spell);
                 if (checkForSameHouse()) {
-                    cardSpells = 2;
                     createButton(Common.DRAW_TWO_CARD_THEN_DISCARD_ANY, dialog, R.drawable.button_border_ravenclaw_spell);
                 }
                 break;
@@ -326,7 +325,7 @@ public class CardDialog extends CustomDialog {
                 }
                 break;
             case 54:
-                cardSpells = 3;
+                cardSpells = 1;
                 mayUseSpell = true;
                 createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.HEART, dialog, R.drawable.button_border_normall_spell);
@@ -370,12 +369,11 @@ public class CardDialog extends CustomDialog {
                 }
                 break;
             case 63:
-                cardSpells = 2;
+                cardSpells = 1;
                 mayUseSpell = true;
                 createButton(Common.GOLD, dialog, R.drawable.button_border_normall_spell);
                 createButton(Common.BANISH_FROM_CLASSROOM, dialog, R.drawable.button_border_normall_spell);
                 if (checkForSameHouse()) {
-                    cardSpells = 3;
                     createButton(Common.OPPONENT_DISCARD_NON_HEX_CARD, dialog, R.drawable.button_border_slytherin_spell);
                 }
                 break;
@@ -437,13 +435,12 @@ public class CardDialog extends CustomDialog {
                 }
                 break;
             case 74:
-                cardSpells = 0;
+                cardSpells = 1;
                 chooseEffect = true;
                 mayUseSpell = true;
                 EffectsToDisable.add(createButton(Common.BANISH_FROM_HAND, dialog, R.drawable.button_border_normall_spell));
                 EffectsToDisable.add(createButton(Common.BANISH_FROM_DISCARD_PILE, dialog, R.drawable.button_border_normall_spell));
                 if (checkForSameHouse()) {
-                    cardSpells = 2;
                     createButton(Common.GOLD, dialog, R.drawable.button_border_hufflepuff_spell);
                     createButton(Common.HEART, dialog, R.drawable.button_border_hufflepuff_spell);
                 }
@@ -499,7 +496,6 @@ public class CardDialog extends CustomDialog {
 
                         break;
                     case Common.ATTACK:
-                        Log.e("CardDialog", "This players" + thisPlayer.getHexes());
                         if (thisPlayer.getHexes().contains("80")) {
                             Toast.makeText(context, "You have active Trip jinx!", Toast.LENGTH_LONG).show();
                         } else if (thisPlayer.getHexes().contains("90")) {
@@ -533,12 +529,7 @@ public class CardDialog extends CustomDialog {
                                 thisPlayer.setCoins(thisPlayer.getCoins() + 2);
                             }
                         } else if (Integer.parseInt(activeCard.getId()) == 23) {
-                            if (ownDeck.size() < 1) {
-                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscardedToEmpty();
-                            }
-                            DrawOrDiscardCardDialog.getInstance().showChooseAllyDialog(context, thisPlayer, iCardAddOrDeletedFromHand, ownDeck.get(0));
+                            DrawOrDiscardCardDialog.getInstance().showDialog(context, thisPlayer, iCardAddOrDeletedFromHand, ownDeck.get(0));
                             ownDeck.remove(0);
                         }
                         break;
@@ -558,8 +549,10 @@ public class CardDialog extends CustomDialog {
                         break;
                     case Common.BANISH_FROM_CLASSROOM:
                         discardCard = new DiscardCard(context, database, classroom, 1, opponentPlayer, thisPlayer);
-                        if (Integer.parseInt(activeCard.getId()) == 20)
+                        if (Integer.parseInt(activeCard.getId()) == 20) {
                             discardCard.setGolds(1);
+                            discardCard.setIChooseDialog(iChooseDialog);
+                        }
                         discardCard.showDialog();
                         break;
                     case Common.DRAW_ITEM_FROM_DISCARD_PILE:
@@ -637,6 +630,7 @@ public class CardDialog extends CustomDialog {
                                 discardCard.setGolds(1);
                             else
                                 discardCard.setHearts(0);
+                            discardCard.setIChooseDialog(iChooseDialog);
                             discardCard.showDialog();
                         }
                         break;
@@ -725,7 +719,7 @@ public class CardDialog extends CustomDialog {
                             ArrayList<Card> cardToDiscardTmp = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
                             ArrayList<Card> cardToDiscard = new ArrayList<>();
                             for (Card cardTmp : cardToDiscardTmp) {
-                                if (!cardTmp.getId().equals(activeCard.getId())) {
+                                if (!cardTmp.getId().equals(activeCard.getId()) && !cardTmp.getCardType().equals("hex")) {
                                     cardToDiscard.add(cardTmp);
                                 }
                             }
@@ -744,7 +738,6 @@ public class CardDialog extends CustomDialog {
                                 Collections.shuffle(ownDeck);
                                 thisPlayer.setDiscardedToEmpty();
                             }
-
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
@@ -752,7 +745,7 @@ public class CardDialog extends CustomDialog {
                             ArrayList<Card> cardToDiscardTmp2 = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
                             ArrayList<Card> cardToDiscard2 = new ArrayList<>();
                             for (Card cardTmp : cardToDiscardTmp2) {
-                                if (!cardTmp.getId().equals(activeCard.getId())) {
+                                if (!cardTmp.getId().equals(activeCard.getId()) && !cardTmp.getCardType().equals("hex")) {
                                     cardToDiscard2.add(cardTmp);
                                 }
                             }
@@ -772,8 +765,12 @@ public class CardDialog extends CustomDialog {
                             Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
                             thisPlayer.setAttacks(1);
                         } else {
-                            String[] allysAttack = thisPlayer.getAlly().split(",");
-                            thisPlayer.setAttacks(thisPlayer.getAttacks() + allysAttack.length);
+                            if (thisPlayer.getAlly().equals("")) {
+                                Toast.makeText(context, "You don't have any ally", Toast.LENGTH_LONG).show();
+                            } else {
+                                String[] allysAttack = thisPlayer.getAlly().split(",");
+                                thisPlayer.setAttacks(thisPlayer.getAttacks() + allysAttack.length);
+                            }
                         }
                         break;
                     case Common.ATTACK_PER_OPPONENT_ALLY:
@@ -783,8 +780,12 @@ public class CardDialog extends CustomDialog {
                             Toast.makeText(context, "You have active Confudus!", Toast.LENGTH_LONG).show();
                             thisPlayer.setAttacks(1);
                         } else {
-                            String[] opponentsAllysAttack = opponentPlayer.getAlly().split(",");
-                            thisPlayer.setAttacks(thisPlayer.getAttacks() + opponentsAllysAttack.length);
+                            if (opponentPlayer.getAlly().equals("")) {
+                                Toast.makeText(context, "Opponent don't have any ally", Toast.LENGTH_LONG).show();
+                            } else {
+                                String[] opponentsAllysAttack = opponentPlayer.getAlly().split(",");
+                                thisPlayer.setAttacks(thisPlayer.getAttacks() + opponentsAllysAttack.length);
+                            }
                         }
                         break;
                     case Common.HEART_PER_ALLY:
@@ -794,8 +795,12 @@ public class CardDialog extends CustomDialog {
                             Toast.makeText(context, "You have active Sectusempra!", Toast.LENGTH_LONG).show();
                             thisPlayer.setHeart(1);
                         } else {
-                            String[] allysHeart = thisPlayer.getAlly().split(",");
-                            thisPlayer.setHeart(thisPlayer.getHeart() + allysHeart.length);
+                            if (thisPlayer.getAlly().equals("")) {
+                                Toast.makeText(context, "You don't have any ally", Toast.LENGTH_LONG).show();
+                            } else {
+                                String[] allysHeart = thisPlayer.getAlly().split(",");
+                                thisPlayer.setHeart(thisPlayer.getHeart() + allysHeart.length);
+                            }
                         }
                         break;
                     case Common.PUT_CARD_FROM_YOUR_TO_OPPONENT_DISCARD:
@@ -844,16 +849,16 @@ public class CardDialog extends CustomDialog {
     }
 
     private void checkForCardEnd(Dialog dialog) {
-        if (cardSpells < 1 && !mayUseSpell) {
+        if (cardSpells == 0 && !mayUseSpell) {
             iCardAddOrDeletedFromHand.onDiscardCard(activeCard);
             dialog.dismiss();
-            if(!returnToLibrary)
+            if (!returnToLibrary)
                 thisPlayerPlayedCard(activeCard);
             iChooseDialog.onUpdateAttackGoldHeart();
-        } else if (cardSpells < 1) {
+        } else if (cardSpells == 0) {
             iCardAddOrDeletedFromHand.onDiscardCard(activeCard);
             dialog.setCancelable(true);
-            if(!returnToLibrary)
+            if (!returnToLibrary)
                 thisPlayerPlayedCard(activeCard);
             iChooseDialog.onUpdateAttackGoldHeart();
         }

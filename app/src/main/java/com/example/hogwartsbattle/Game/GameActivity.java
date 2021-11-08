@@ -155,6 +155,11 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             buildDecks();
         }
     }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//    }
 
     private void setUiForPlayerImage() {
         opponent_house_image = findViewById(R.id.opponent_house_image);
@@ -264,25 +269,26 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     @Override
     public void onChooseReturnToLobby(DialogInterface dialog) {
         dialog.dismiss();
-        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
-        Paper.book().write(Common.KEY_OPPONENT, null);
-        Paper.book().write(Common.KEY_THIS_PLAYER, null);
-        Paper.book().write(Common.KEY_ROOM, null);
-        Paper.book().write(Common.KEY_GENERAL_DECK, null);
-        Paper.book().write(Common.KEY_GENERAL_DECK_MAP, null);
-        Paper.book().write(Common.KEY_HEX_DECK, null);
-        Paper.book().write(Common.KEY_OWN_DECK, null);
-        Paper.book().write(Common.KEY_HAND, null);
-        Paper.book().write(Common.KEY_IS_PLAYING, null);
 
-        if(Common.currentUser.isHost()){
+        Paper.book().delete(Common.KEY_OPPONENT);
+        Paper.book().delete(Common.KEY_THIS_PLAYER);
+        Paper.book().delete(Common.KEY_ROOM);
+        Paper.book().delete(Common.KEY_GENERAL_DECK);
+        Paper.book().delete(Common.KEY_GENERAL_DECK_MAP);
+        Paper.book().delete(Common.KEY_HEX_DECK);
+        Paper.book().delete(Common.KEY_OWN_DECK);
+        Paper.book().delete(Common.KEY_HAND);
+        Paper.book().delete(Common.KEY_IS_PLAYING);
+
+        if (Common.currentUser.isHost()) {
             Common.currentUser.setHost(false);
             database.getReference("rooms/" + Common.currentRoomName).removeValue();
         }
+        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
         Intent intent = new Intent(GameActivity.this, LobbyActivity.class);
         intent.putExtra(Common.KEY_USER_ID, Common.currentUser.getUserId());
-        startActivity(intent);
         finish();
+        startActivity(intent);
 
     }
 
@@ -336,6 +342,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                     RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
                 }
             }
+
 
             if (loading.isShowing()) {
                 loading.dismiss();
@@ -436,6 +443,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                     }
                     thisPlayer.setDiscardedToEmpty();
                     thisPlayer.setAlly("");
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/ally").setValue("");
 
                     opponent.setDiscardedToEmpty();
                     opponent.setAlly("");
@@ -477,7 +485,18 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
             }
         });
-        finishMove.setEnabled(false);
+        if (thisPlayer.isPlaying()) {
+            finishMove.setEnabled(true);
+            ownHandAdapter = new OwnHandAdapter(this, hand, thisPlayer, opponent, ownDeck, hexDeck,
+                    database, iChooseDialog, classRoom);
+            ownHandAdapter.setLibrary(library);
+
+            ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
+            ownHand.setAdapter(ownHandAdapter);
+
+        } else {
+            finishMove.setEnabled(false);
+        }
         libraryImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -680,7 +699,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
         ownAllyAdapter = new OwnAllyAdapter(GameActivity.this, thisPlayer, opponent, ownDeck, hexDeck, classRoom, database, iChooseDialog);
         recyclerOwnAllys.setAdapter(ownAllyAdapter);
-
     }
 
     public void playTurn() {
@@ -706,8 +724,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
 
         // so we can draw card from ally!
-        if (!ownAllyAdapter.checkIfHandAdapterIsSet())
-            ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
+
+        ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
         ownHand.setAdapter(ownHandAdapter);
     }
 
@@ -722,6 +740,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         }
 
         deckNeedShuffle(5);
+
+        Log.e("GameActivity", "Own deck: "+ Helpers.getInstance().returnCardsFromArray(ownDeck));
         for (int i = 0; i < 5; i++) {
             if (ownDeck.get(0).getCardType().equals("hex")) {
                 if (hexesString.toString().equals(""))
@@ -781,20 +801,20 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 //        Log.e("GameActivity", "Player hexes:" + thisPlayer.getHexes());
 
         // testing purpose
-        // hand.add(Common.allCardsMap.get(7));
+//
+
 
         ownHandAdapter = new OwnHandAdapter(this, hand, thisPlayer, opponent, ownDeck, hexDeck,
                 database, iChooseDialog, classRoom);
         ownHandAdapter.setLibrary(library);
 
-        // so we can draw card from ally!
-        if (!ownAllyAdapter.checkIfHandAdapterIsSet())
-            ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
+        ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
         ownHand.setAdapter(ownHandAdapter);
     }
 
     @Override
     public void onShowClassroom(ArrayList<Card> classRoomTmp) {
+        Log.e("GameActivity", "GeneralDeck:" + generalDeck.size());
         classRoom.clear();
         classRoom.addAll(classRoomTmp);
         classroomAdapter.updateClassroom(classRoomTmp);
@@ -813,6 +833,17 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     public void onOpponentAllysShow(ArrayList<Card> allys) {
         OpponentAllyAdapter opponentAllyAdapter = new OpponentAllyAdapter(this, allys);
         recyclerOpponentAlly.setAdapter(opponentAllyAdapter);
+    }
+
+    @Override
+    public void onAddCard(Card newCard) {
+        ownHandAdapter.onAddCard(newCard);
+    }
+
+    @Override
+    public void onDiscardCard(Card discardCard) {
+        ownHandAdapter.onDiscardCard(discardCard);
+
     }
 
     @Override
@@ -915,23 +946,27 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         }
     }
 
-    @Override
-    protected void onStop() {
-//        mediaPlayer.stopMediaPlayer();
-        super.onStop();
-        savePreloadData();
-        killAllListeners();
-    }
 
     @Override
-    protected void onDestroy() {
-//        mediaPlayer.stopMediaPlayer();
-        super.onDestroy();
+    protected void onPause() {
+        Log.e("GameActivity", "ON PAUSE!");
         savePreloadData();
         killAllListeners();
+        finish();
+        System.exit(0);
+        super.onPause();
     }
+//
+//    @Override
+//    protected void onDestroy() {
+//        savePreloadData();
+//        killAllListeners();
+//        super.onDestroy();
+//    }
+
     private boolean getPreloadData() {
         thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER, new Player());
+
         if (thisPlayer.getPlayerName() != null) {
             Common.currentUser = Paper.book().read(Common.KEY_THIS_USER);
             opponent = Paper.book().read(Common.KEY_OPPONENT);

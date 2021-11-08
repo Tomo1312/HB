@@ -115,12 +115,9 @@ public class OwnAllyDialog extends CustomDialog {
                     }
                 }
                 break;
-            case 40://NE DELA
-                Log.e("OwnAllyDialog", "case 40 ");
+            case 40:
                 for (Card card : classroom) {
-                    Log.e("OwnAllyDialog", "Classroom u ownAllyDialog:" + card.getId());
                     if (card.getType().equals("ally")) {
-                        Log.e("OwnAllyDialog", "imamo ally-a:" + card.getId());
                         cardSpells = 2;
                         createButton(Common.ATTACK, dialog);
                         createButton(Common.HEART, dialog);
@@ -393,24 +390,22 @@ public class OwnAllyDialog extends CustomDialog {
                         if (thisPlayer.getHand().equals("")) {
                             Toast.makeText(context, "You don't have any card in hand!", Toast.LENGTH_LONG).show();
                         } else {
+                            ArrayList<Card> spellCardsInHand = new ArrayList<>();
                             for (Card cardTmp : Helpers.getInstance().returnCardsFromString(thisPlayer.getHand())) {
-                                ArrayList<Card> spellCardsInHand = new ArrayList<>();
                                 if (cardTmp.getType().equals("spell")) {
                                     spellCardsInHand.add(cardTmp);
                                 }
-
-                                if (spellCardsInHand.isEmpty()) {
-                                    Toast.makeText(context, "You don't have any spell in hand!", Toast.LENGTH_LONG).show();
-                                } else {
-                                    if (ownDeck.size() < 1)
-                                        ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                    discardCard = new DiscardCard(context, database, Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()), 9, opponentPlayer, thisPlayer);
-                                    discardCard.setOwnHandAdapter(ownHandAdapter);
-                                    discardCard.setAttacks(1);
-                                    discardCard.setHearts(1);
-                                    discardCard.setCards(1);
-                                    discardCard.showDialog();
-                                }
+                            }
+                            if (spellCardsInHand.isEmpty()) {
+                                Toast.makeText(context, "You don't have any spell in hand!", Toast.LENGTH_LONG).show();
+                            } else {
+                                discardCard = new DiscardCard(context, database, spellCardsInHand, 9, opponentPlayer, thisPlayer);
+                                discardCard.setIChooseDialog(iChooseDialog);
+                                discardCard.setAttacks(1);
+                                discardCard.setHearts(1);
+                                discardCard.setCards(1);
+                                discardCard.setOwnDeck(ownDeck);
+                                discardCard.showDialog();
                             }
                         }
                         break;
@@ -436,14 +431,15 @@ public class OwnAllyDialog extends CustomDialog {
                         discardCard.showDialog();
                         break;
                     case Common.BANISH_PLAYED_HEX:
-                        discardedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getPlayedCards());
+                        discardedCards = Helpers.getInstance().returnCardsFromString(thisPlayer.getHexes());
                         ArrayList<Card> playedHexes = new ArrayList<>();
                         for (Card cardTmp : discardedCards) {
-                            if (cardTmp.getCardType().equals("hex")) {
+                            if (cardTmp.getCardType().equals("hex") && !cardTmp.getId().equals("80") && !cardTmp.getId().equals("84") && !cardTmp.getId().equals("87")) {
                                 playedHexes.add(cardTmp);
                             }
                         }
                         discardCard = new DiscardCard(context, database, playedHexes, 11, opponentPlayer, thisPlayer);
+                        discardCard.setIChooseDialog(iChooseDialog);
                         discardCard.showDialog();
                         break;
                     case Common.ATTACK_PER_OPPONENT_ALLY:

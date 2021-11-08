@@ -14,8 +14,7 @@
         <activity android:name=".Game.GameActivity"/>
         <activity android:name=".Game.RoomActivity"/>
         <activity android:name=".Game.LobbyActivity"/>
-        <activity android:name=".Login.LoginActivity"
-            android:clearTaskOnLaunch="true">
+        <activity android:name=".Login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
