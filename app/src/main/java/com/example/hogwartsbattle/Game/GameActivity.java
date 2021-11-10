@@ -754,11 +754,9 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         }
 
         //Log.e("GameActivity", "Neke tu ne valja sa hexesString: " + hexesString.toString());
-        Iterator handIterator = hand.iterator();
-        while (handIterator.hasNext()) {
-            Card cardTmp = (Card) handIterator.next();
+        for (Card cardTmp : hand){
             if (cardTmp.getId().equals("80")) {
-                handIterator.remove();
+                hand.remove(cardTmp);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
             } else if (cardTmp.getId().equals("81")) {
                 if (!thisPlayer.getAlly().equals("")) {
@@ -773,21 +771,53 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 deckNeedShuffle(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
                 ownDeck.remove(0);
-                handIterator.remove();
+                hand.remove(cardTmp);
             } else if (cardTmp.getId().equals("87")) {
                 Toast.makeText(GameActivity.this, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
                 deckNeedShuffle(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
-                handIterator.remove();
+                hand.remove(cardTmp);
                 StringBuilder newTwoHexes = new StringBuilder();
                 newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
-                hand.add(hexDeck.get(0));
                 hexDeck.remove(0);
-                hand.add(hexDeck.get(0));
                 hexDeck.remove(0);
-                //**???thisPlayer.setDiscardedString(newTwoHexes.toString());
+                thisPlayer.setDiscardedString(newTwoHexes.toString());
             }
         }
+//        Iterator handIterator = hand.iterator();
+//        while (handIterator.hasNext()) {
+//            Card cardTmp = (Card) handIterator.next();
+//            if (cardTmp.getId().equals("80")) {
+//                handIterator.remove();
+//                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
+//            } else if (cardTmp.getId().equals("81")) {
+//                if (!thisPlayer.getAlly().equals("")) {
+//                    DiscardCard discardOwnAlly = new DiscardCard(GameActivity.this, database, thisPlayer.getAlly(), 13, null, thisPlayer);
+//                    discardOwnAlly.setIChooseDialog(iChooseDialog);
+//                    discardOwnAlly.showDialog();
+//                } else {
+//                    Toast.makeText(GameActivity.this, "You lucky wizard, you don't have any ally currently active!", Toast.LENGTH_LONG).show();
+//                }
+//            } else if (cardTmp.getId().equals("84")) {
+//                Toast.makeText(GameActivity.this, "You need to banish top card of your deck because of Jelly-brain jinx!", Toast.LENGTH_LONG).show();
+//                deckNeedShuffle(1);
+//                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
+//                ownDeck.remove(0);
+//                handIterator.remove();
+//            } else if (cardTmp.getId().equals("87")) {
+//                Toast.makeText(GameActivity.this, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
+//                deckNeedShuffle(1);
+//                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
+//                handIterator.remove();
+//                StringBuilder newTwoHexes = new StringBuilder();
+//                newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
+//                hand.add(hexDeck.get(0));
+//                hexDeck.remove(0);
+//                hand.add(hexDeck.get(0));
+//                hexDeck.remove(0);
+//                //**???thisPlayer.setDiscardedString(newTwoHexes.toString());
+//            }
+//        }
         String stringHandBuilder = Helpers.getInstance().returnCardsFromArray(hand);
         if (!thisPlayer.getAlly().equals("") && !thisPlayer.getHexes().contains("89")) {
             ownAllyAdapter.updateAllies();

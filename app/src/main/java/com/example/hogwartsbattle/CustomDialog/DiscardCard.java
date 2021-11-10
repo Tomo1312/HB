@@ -122,13 +122,13 @@ public class DiscardCard extends CustomDialog {
                 viewCardsForDelete = dialog.findViewById(R.id.recycler_view_cards_for_delete);
                 viewCardsForDelete.setLayoutManager(new GridLayoutManager(context, 1));
                 discardCardAdapter = new DiscardCardAdapter(context, allCardsToDisplay, layout, database, dialog, opponentPlayer, thisPlayer);
-                if (iChooseDialog != null) {
-                    discardCardAdapter.setIChooseDialog(iChooseDialog);
-                } else if (ownHandAdapter != null) {
+                if (ownHandAdapter != null) {
                     discardCardAdapter.setOwnHandAdapter(ownHandAdapter);
                     discardCardAdapter.setOwnDeck(ownDeck);
                     discardCardAdapter.setClassroom(classroom);
                     discardCardAdapter.setHexes(hexes);
+                    discardCardAdapter.setIChooseDialog(iChooseDialog);
+                } else if (iChooseDialog != null) {
                     discardCardAdapter.setIChooseDialog(iChooseDialog);
                 }
                 break;
