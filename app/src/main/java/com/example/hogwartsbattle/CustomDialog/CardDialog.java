@@ -628,8 +628,6 @@ public class CardDialog extends CustomDialog {
                                 discardCard.setHearts(2);
                             else if (Integer.parseInt(activeCard.getId()) == 20)
                                 discardCard.setGolds(1);
-                            else
-                                discardCard.setHearts(0);
                             discardCard.setIChooseDialog(iChooseDialog);
                             discardCard.showDialog();
                         }

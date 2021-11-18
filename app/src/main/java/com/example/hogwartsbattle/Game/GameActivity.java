@@ -107,6 +107,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     ImageView libraryImageView;
     int library = 8;
 
+    boolean finished = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -233,120 +235,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         if (loading.isShowing()) {
             loading.dismiss();
             ChooseHouseDialog.getInstance().showChooseHouseDialog(this, iChooseDialog);
-        }
-    }
-
-    @Override
-    public void onChooseHouse(DialogInterface dialog, int id) {
-        dialog.dismiss();
-        thisPlayer.setHouse(Common.Houses.get(id));
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/house").setValue(Common.Houses.get(id));
-
-        int house = getResources().getIdentifier("drawable/" + thisPlayer.getHouse(), null, getPackageName());
-        int house1 = getResources().getIdentifier("drawable/" + thisPlayer.getHouse() + "1", null, getPackageName());
-        own_house_image.setImageResource(house);
-
-        own_life_start.setImageResource(house1);
-        own_life_1.setImageResource(house1);
-        own_life_2.setImageResource(house1);
-        own_life_3.setImageResource(house1);
-        own_life_4.setImageResource(house1);
-        own_life_5.setImageResource(house1);
-        own_life_6.setImageResource(house1);
-
-        ChooseAllyDialog.getInstance().showChooseAllyDialog(this, iChooseDialog);
-    }
-
-    @Override
-    public void onChooseAlly(DialogInterface dialog, int id) {
-        dialog.dismiss();
-        Card starterAlly = Common.allCardsMap.get(id);
-        ownDeck.add(starterAlly);
-        Collections.shuffle(ownDeck);
-        RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
-    }
-
-    @Override
-    public void onChooseReturnToLobby(DialogInterface dialog) {
-        dialog.dismiss();
-
-        Paper.book().delete(Common.KEY_OPPONENT);
-        Paper.book().delete(Common.KEY_THIS_PLAYER);
-        Paper.book().delete(Common.KEY_ROOM);
-        Paper.book().delete(Common.KEY_GENERAL_DECK);
-        Paper.book().delete(Common.KEY_GENERAL_DECK_MAP);
-        Paper.book().delete(Common.KEY_HEX_DECK);
-        Paper.book().delete(Common.KEY_OWN_DECK);
-        Paper.book().delete(Common.KEY_HAND);
-        Paper.book().delete(Common.KEY_IS_PLAYING);
-
-        if (Common.currentUser.isHost()) {
-            Common.currentUser.setHost(false);
-            database.getReference("rooms/" + Common.currentRoomName).removeValue();
-        }
-        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
-        Intent intent = new Intent(GameActivity.this, LobbyActivity.class);
-        intent.putExtra(Common.KEY_USER_ID, Common.currentUser.getUserId());
-        finish();
-        startActivity(intent);
-
-    }
-
-    @Override
-    public void onPaperRockScissorsChoose(DialogInterface dialog, String hand) {
-        if (!loading.isShowing())
-            loading.show();
-        dialog.dismiss();
-        thisPlayer.setFirstPlayHand(hand);
-        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue(hand);
-        checkForWinner();
-
-    }
-
-    private void checkForWinner() {
-        if (opponent.getFirstPlayHand() != "" && thisPlayer.getFirstPlayHand() != "") {
-            if (opponent.getFirstPlayHand().equals("rock")) {
-                if (thisPlayer.getFirstPlayHand().equals("rock")) {
-                    Toast.makeText(GameActivity.this, "Pokazali ste isto!", Toast.LENGTH_LONG).show();
-                    thisPlayer.setFirstPlayHand("");
-                    opponent.setFirstPlayHand("");
-                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue("");
-                    RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
-                } else if (thisPlayer.getFirstPlayHand().equals("paper")) {
-                    startGame(thisPlayer.getPlayerName());
-                } else if (thisPlayer.getFirstPlayHand().equals("scissors")) {
-                    startGame(opponent.getPlayerName());
-                }
-            } else if (opponent.getFirstPlayHand().equals("paper")) {
-                if (thisPlayer.getFirstPlayHand().equals("rock")) {
-                    startGame(opponent.getPlayerName());
-                } else if (thisPlayer.getFirstPlayHand().equals("paper")) {
-                    Toast.makeText(GameActivity.this, "Pokazali ste isto!", Toast.LENGTH_LONG).show();
-                    thisPlayer.setFirstPlayHand("");
-                    opponent.setFirstPlayHand("");
-                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue("");
-                    RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
-                } else if (thisPlayer.getFirstPlayHand().equals("scissors")) {
-                    startGame(thisPlayer.getPlayerName());
-                }
-            } else if (opponent.getFirstPlayHand().equals("scissors")) {
-                if (thisPlayer.getFirstPlayHand().equals("rock")) {
-                    startGame(thisPlayer.getPlayerName());
-                } else if (thisPlayer.getFirstPlayHand().equals("paper")) {
-                    startGame(opponent.getPlayerName());
-                } else if (thisPlayer.getFirstPlayHand().equals("scissors")) {
-                    Toast.makeText(GameActivity.this, "Pokazali ste isto!", Toast.LENGTH_LONG).show();
-                    thisPlayer.setFirstPlayHand("");
-                    opponent.setFirstPlayHand("");
-                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue("");
-                    RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
-                }
-            }
-
-
-            if (loading.isShowing()) {
-                loading.dismiss();
-            }
         }
     }
 
@@ -549,6 +437,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 own_death_1.setVisibility(View.VISIBLE);
                 break;
             case 2:
+                own_death_1.setVisibility(View.VISIBLE);
                 own_death_2.setVisibility(View.VISIBLE);
                 break;
             case 3:
@@ -561,6 +450,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 opponent_death_1.setVisibility(View.VISIBLE);
                 break;
             case 2:
+                opponent_death_1.setVisibility(View.VISIBLE);
                 opponent_death_2.setVisibility(View.VISIBLE);
                 break;
             case 3:
@@ -573,29 +463,15 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
     private void finishGame(Player winner) {
         killAllListeners();
 
+        if(thisPlayer.getPlayerName().equals(winner.getPlayerName())){
+            Common.currentUser.updateWins();
+            database.getReference("Users/" + Common.currentUser.getUserId()+ "/wins").setValue(Common.currentUser.getWins());
+        }else{
+            Common.currentUser.updateLoses();
+            database.getReference("Users/" + Common.currentUser.getUserId()+ "/loses").setValue(Common.currentUser.getLoses());
+        }
         FinishGameDialog.getInstance().showFinishGameDialog(GameActivity.this, iChooseDialog, winner.getPlayerName());
 
-    }
-
-    private void killAllListeners() {
-        if (valueEventListenerPlaying != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/playing").removeEventListener(valueEventListenerPlaying);
-        if (valueEventListenerOpponentHandCards != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/hand").removeEventListener(valueEventListenerOpponentHandCards);
-        if (valueEventListenerOpponentAlly != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentAlly);
-        if (valueEventListenerOwnAlly != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/idAllyToDiscard").addValueEventListener(valueEventListenerOwnAlly);
-        if (valueEventListenerClassroom != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/classroom").addValueEventListener(valueEventListenerClassroom);
-        if (valueEventListenerForDiscardCardSpell != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").addValueEventListener(valueEventListenerForDiscardCardSpell);
-        if (valueEventListenerLibrary != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/library").addValueEventListener(valueEventListenerLibrary);
-        if (valueEventListenerBoughtClassroomCard != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").addValueEventListener(valueEventListenerBoughtClassroomCard);
-        if (valueEventListenerBanishedCard != null)
-            database.getReference("rooms/" + Common.currentRoomName + "/banished").addValueEventListener(valueEventListenerBanishedCard);
     }
 
 
@@ -741,7 +617,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
         deckNeedShuffle(5);
 
-        Log.e("GameActivity", "Own deck: "+ Helpers.getInstance().returnCardsFromArray(ownDeck));
+        Log.e("GameActivity", "Own deck: " + Helpers.getInstance().returnCardsFromArray(ownDeck));
         for (int i = 0; i < 5; i++) {
             if (ownDeck.get(0).getCardType().equals("hex")) {
                 if (hexesString.toString().equals(""))
@@ -754,12 +630,12 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         }
 
         //Log.e("GameActivity", "Neke tu ne valja sa hexesString: " + hexesString.toString());
-        for (Card cardTmp : hand){
+        for (Card cardTmp : hand) {
             if (cardTmp.getId().equals("80")) {
-                hand.remove(cardTmp);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
             } else if (cardTmp.getId().equals("81")) {
                 if (!thisPlayer.getAlly().equals("")) {
+                    Toast.makeText(GameActivity.this, "You must discard ally because of Levicorpus!", Toast.LENGTH_LONG).show();
                     DiscardCard discardOwnAlly = new DiscardCard(GameActivity.this, database, thisPlayer.getAlly(), 13, null, thisPlayer);
                     discardOwnAlly.setIChooseDialog(iChooseDialog);
                     discardOwnAlly.showDialog();
@@ -771,18 +647,24 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 deckNeedShuffle(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
                 ownDeck.remove(0);
-                hand.remove(cardTmp);
             } else if (cardTmp.getId().equals("87")) {
                 Toast.makeText(GameActivity.this, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
                 deckNeedShuffle(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
-                hand.remove(cardTmp);
                 StringBuilder newTwoHexes = new StringBuilder();
                 newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
                 hexDeck.remove(0);
                 hexDeck.remove(0);
                 thisPlayer.setDiscardedString(newTwoHexes.toString());
             }
+        }
+        for (Card cardTmp : Helpers.getInstance().returnCardsFromString(hexesString.toString())) {
+            Log.e("GAMEACTIVITY", "For loop");
+            if (cardTmp.getId().equals("80") || cardTmp.getId().equals("84") || cardTmp.getId().equals("87")) {
+                hand.remove(cardTmp);
+                Log.e("GAMEACTIVITY", "Hand Remove!");
+            }
+
         }
 //        Iterator handIterator = hand.iterator();
 //        while (handIterator.hasNext()) {
@@ -818,20 +700,19 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 //                //**???thisPlayer.setDiscardedString(newTwoHexes.toString());
 //            }
 //        }
+
         String stringHandBuilder = Helpers.getInstance().returnCardsFromArray(hand);
         if (!thisPlayer.getAlly().equals("") && !thisPlayer.getHexes().contains("89")) {
             ownAllyAdapter.updateAllies();
         }
 
+        hand.add(Common.allCardsMap.get(30));
+        hand.add(Common.allCardsMap.get(35));
+        hand.add(Common.allCardsMap.get(36));
         thisPlayer.setHand(stringHandBuilder);
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(stringHandBuilder);
         thisPlayer.setHexes(hexesString.toString());
         thisPlayer.setPlayedCards("");
-
-//        Log.e("GameActivity", "Player hexes:" + thisPlayer.getHexes());
-
-        // testing purpose
-//
 
 
         ownHandAdapter = new OwnHandAdapter(this, hand, thisPlayer, opponent, ownDeck, hexDeck,
@@ -840,6 +721,111 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
         ownAllyAdapter.setOwnHandAdapter(ownHandAdapter);
         ownHand.setAdapter(ownHandAdapter);
+    }
+
+    @Override
+    public void onChooseHouse(DialogInterface dialog, int id) {
+        dialog.dismiss();
+        thisPlayer.setHouse(Common.Houses.get(id));
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/house").setValue(Common.Houses.get(id));
+
+        int house = getResources().getIdentifier("drawable/" + thisPlayer.getHouse(), null, getPackageName());
+        int house1 = getResources().getIdentifier("drawable/" + thisPlayer.getHouse() + "1", null, getPackageName());
+        own_house_image.setImageResource(house);
+
+        own_life_start.setImageResource(house1);
+        own_life_1.setImageResource(house1);
+        own_life_2.setImageResource(house1);
+        own_life_3.setImageResource(house1);
+        own_life_4.setImageResource(house1);
+        own_life_5.setImageResource(house1);
+        own_life_6.setImageResource(house1);
+
+        ChooseAllyDialog.getInstance().showChooseAllyDialog(this, iChooseDialog);
+    }
+
+    @Override
+    public void onChooseAlly(DialogInterface dialog, int id) {
+        dialog.dismiss();
+        Card starterAlly = Common.allCardsMap.get(id);
+        ownDeck.add(starterAlly);
+        Collections.shuffle(ownDeck);
+        RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
+    }
+
+    @Override
+    public void onChooseReturnToLobby(DialogInterface dialog) {
+        dialog.dismiss();
+
+        finished = true;
+        if (Common.currentUser.isHost()) {
+            Common.currentUser.setHost(false);
+            database.getReference("rooms/" + Common.currentRoomName).removeValue();
+        }
+        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
+        Intent intent = new Intent(GameActivity.this, LobbyActivity.class);
+        intent.putExtra(Common.KEY_USER_ID, Common.currentUser.getUserId());
+        finish();
+        startActivity(intent);
+
+    }
+
+    @Override
+    public void onPaperRockScissorsChoose(DialogInterface dialog, String hand) {
+        if (!loading.isShowing())
+            loading.show();
+        dialog.dismiss();
+        thisPlayer.setFirstPlayHand(hand);
+        database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue(hand);
+        checkForWinner();
+
+    }
+
+    private void checkForWinner() {
+        if (opponent.getFirstPlayHand() != "" && thisPlayer.getFirstPlayHand() != "") {
+            if (opponent.getFirstPlayHand().equals("rock")) {
+                if (thisPlayer.getFirstPlayHand().equals("rock")) {
+                    Toast.makeText(GameActivity.this, "Pokazali ste isto!", Toast.LENGTH_LONG).show();
+                    thisPlayer.setFirstPlayHand("");
+                    opponent.setFirstPlayHand("");
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue("");
+                    RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
+                } else if (thisPlayer.getFirstPlayHand().equals("paper")) {
+                    startGame(thisPlayer.getPlayerName());
+                } else if (thisPlayer.getFirstPlayHand().equals("scissors")) {
+                    startGame(opponent.getPlayerName());
+                }
+            } else if (opponent.getFirstPlayHand().equals("paper")) {
+                if (thisPlayer.getFirstPlayHand().equals("rock")) {
+                    startGame(opponent.getPlayerName());
+                } else if (thisPlayer.getFirstPlayHand().equals("paper")) {
+                    Toast.makeText(GameActivity.this, "Pokazali ste isto!", Toast.LENGTH_LONG).show();
+                    thisPlayer.setFirstPlayHand("");
+                    opponent.setFirstPlayHand("");
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue("");
+                    RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
+                } else if (thisPlayer.getFirstPlayHand().equals("scissors")) {
+                    startGame(thisPlayer.getPlayerName());
+                }
+            } else if (opponent.getFirstPlayHand().equals("scissors")) {
+                if (thisPlayer.getFirstPlayHand().equals("rock")) {
+                    startGame(thisPlayer.getPlayerName());
+                } else if (thisPlayer.getFirstPlayHand().equals("paper")) {
+                    startGame(opponent.getPlayerName());
+                } else if (thisPlayer.getFirstPlayHand().equals("scissors")) {
+                    Toast.makeText(GameActivity.this, "Pokazali ste isto!", Toast.LENGTH_LONG).show();
+                    thisPlayer.setFirstPlayHand("");
+                    opponent.setFirstPlayHand("");
+                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/firstPlayHand").setValue("");
+                    RockPaperScissorsDialog.getInstance().showRockPaperScissorsDialog(this, iChooseDialog);
+                }
+            }
+
+
+            if (loading.isShowing()) {
+                loading.dismiss();
+            }
+        }
     }
 
     @Override
@@ -986,13 +972,6 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         System.exit(0);
         super.onPause();
     }
-//
-//    @Override
-//    protected void onDestroy() {
-//        savePreloadData();
-//        killAllListeners();
-//        super.onDestroy();
-//    }
 
     private boolean getPreloadData() {
         thisPlayer = Paper.book().read(Common.KEY_THIS_PLAYER, new Player());
@@ -1013,15 +992,48 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
 
     private void savePreloadData() {
         //String userId = Paper.book().read(Common.KEY_LOGGED);
-        Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
-        Paper.book().write(Common.KEY_OPPONENT, opponent);
-        Paper.book().write(Common.KEY_THIS_PLAYER, thisPlayer);
-        Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
-        Paper.book().write(Common.KEY_GENERAL_DECK, generalDeck);
-        Paper.book().write(Common.KEY_GENERAL_DECK_MAP, Common.allCardsMap);
-        Paper.book().write(Common.KEY_HEX_DECK, hexDeck);
-        Paper.book().write(Common.KEY_OWN_DECK, ownDeck);
-        Paper.book().write(Common.KEY_HAND, hand);
-        Paper.book().write(Common.KEY_IS_PLAYING, true);
+        if (finished) {
+            Paper.book().delete(Common.KEY_OPPONENT);
+            Paper.book().delete(Common.KEY_THIS_PLAYER);
+            Paper.book().delete(Common.KEY_ROOM);
+            Paper.book().delete(Common.KEY_GENERAL_DECK);
+            Paper.book().delete(Common.KEY_GENERAL_DECK_MAP);
+            Paper.book().delete(Common.KEY_HEX_DECK);
+            Paper.book().delete(Common.KEY_OWN_DECK);
+            Paper.book().delete(Common.KEY_HAND);
+            Paper.book().delete(Common.KEY_IS_PLAYING);
+        } else {
+            Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
+            Paper.book().write(Common.KEY_OPPONENT, opponent);
+            Paper.book().write(Common.KEY_THIS_PLAYER, thisPlayer);
+            Paper.book().write(Common.KEY_ROOM, Common.currentRoomName);
+            Paper.book().write(Common.KEY_GENERAL_DECK, generalDeck);
+            Paper.book().write(Common.KEY_GENERAL_DECK_MAP, Common.allCardsMap);
+            Paper.book().write(Common.KEY_HEX_DECK, hexDeck);
+            Paper.book().write(Common.KEY_OWN_DECK, ownDeck);
+            Paper.book().write(Common.KEY_HAND, hand);
+            Paper.book().write(Common.KEY_IS_PLAYING, true);
+        }
+    }
+
+    private void killAllListeners() {
+        if (valueEventListenerPlaying != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/playing").removeEventListener(valueEventListenerPlaying);
+        if (valueEventListenerOpponentHandCards != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/hand").removeEventListener(valueEventListenerOpponentHandCards);
+        if (valueEventListenerOpponentAlly != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/" + opponent.getPlayerName() + "/ally").addValueEventListener(valueEventListenerOpponentAlly);
+        if (valueEventListenerOwnAlly != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/idAllyToDiscard").addValueEventListener(valueEventListenerOwnAlly);
+        if (valueEventListenerClassroom != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/classroom").addValueEventListener(valueEventListenerClassroom);
+        if (valueEventListenerForDiscardCardSpell != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discardCardSpell").addValueEventListener(valueEventListenerForDiscardCardSpell);
+        if (valueEventListenerLibrary != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/library").addValueEventListener(valueEventListenerLibrary);
+        if (valueEventListenerBoughtClassroomCard != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").addValueEventListener(valueEventListenerBoughtClassroomCard);
+        if (valueEventListenerBanishedCard != null)
+            database.getReference("rooms/" + Common.currentRoomName + "/banished").addValueEventListener(valueEventListenerBanishedCard);
     }
 }

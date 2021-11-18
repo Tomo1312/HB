@@ -92,7 +92,11 @@ public class OwnAllyDialog extends CustomDialog {
             case 1:
                 cardSpells = 1;
                 chooseEffect = true;
-                EffectsToDisable.add(createButton(Common.SAVE_GOLD, dialog));
+                if (thisPlayer.getCoins() > 0) {
+                    EffectsToDisable.add(createButton(Common.SAVE_GOLD, dialog));
+                } else {
+                    Toast.makeText(context, "You don't have enough money fool!", Toast.LENGTH_LONG);
+                }
                 EffectsToDisable.add(createButton(Common.COLLECT_ALL_GOLD, dialog));
                 break;
             case 3:
@@ -338,12 +342,8 @@ public class OwnAllyDialog extends CustomDialog {
                         }
                         break;
                     case Common.SAVE_GOLD:
-                        if (thisPlayer.getCoins() > 0) {
-                            thisPlayer.setCoins(thisPlayer.getCoins() - 1);
-                            activeAlly.setSavedGold();
-                        } else {
-                            Toast.makeText(context, "You don't have enough money fool!", Toast.LENGTH_LONG);
-                        }
+                        thisPlayer.setCoins(thisPlayer.getCoins() - 1);
+                        activeAlly.setSavedGold();
                         break;
                     case Common.COLLECT_ALL_GOLD:
                         if (activeAlly.getSavedGold() > 0) {

@@ -305,7 +305,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
         if (banishedCard.getCardType().equals("hex")) {
             if (extraHearts > 0)
-                thisPlayer.setLives(thisPlayer.getLives() + extraHearts);
+                thisPlayer.setHeart(thisPlayer.getHeart() + extraHearts);
         }
 
         if (extraGolds > 0) {

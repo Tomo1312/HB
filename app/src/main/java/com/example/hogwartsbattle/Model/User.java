@@ -7,6 +7,8 @@ public class User {
     private String userEmail;
     private boolean host, firstTime;
 
+    private int wins, loses;
+
     public User() {
     }
 
@@ -59,5 +61,28 @@ public class User {
 
     public void setFirstTime(boolean firstTime) {
         this.firstTime = firstTime;
+    }
+
+    public void updateWins(){
+        this.wins = wins+1;
+    }
+
+    public int getWins() {
+        return wins;
+    }
+
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
+
+    public void updateLoses(){
+        this.loses = loses+1;
+    }
+    public int getLoses() {
+        return loses;
+    }
+
+    public void setLoses(int loses) {
+        this.loses = loses;
     }
 }

@@ -220,7 +220,7 @@ public class DiscardCard extends CustomDialog {
 
         viewCardsForDelete.setAdapter(discardCardAdapter);
 
-        if (layout == 7 || layout == 13)
+        if (layout == 7 || layout == 13 ||layout == 0)
             dialog.setCancelable(false);
         else
             dialog.setCancelable(true);
