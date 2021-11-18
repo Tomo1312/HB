@@ -706,9 +706,9 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             ownAllyAdapter.updateAllies();
         }
 
-        hand.add(Common.allCardsMap.get(30));
-        hand.add(Common.allCardsMap.get(35));
-        hand.add(Common.allCardsMap.get(36));
+//        hand.add(Common.allCardsMap.get(30));
+//        hand.add(Common.allCardsMap.get(35));
+//        hand.add(Common.allCardsMap.get(36));
         thisPlayer.setHand(stringHandBuilder);
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(stringHandBuilder);
         thisPlayer.setHexes(hexesString.toString());
