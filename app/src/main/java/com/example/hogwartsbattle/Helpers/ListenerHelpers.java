@@ -3,11 +3,11 @@ package com.example.hogwartsbattle.Helpers;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
+import androidx.annotation.RequiresApi;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.ShowCardDialog;
@@ -15,14 +15,12 @@ import com.example.hogwartsbattle.Game.GameActivity;
 import com.example.hogwartsbattle.Interface.IChooseDialog;
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.Model.Player;
-import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class ListenerHelpers {
     FirebaseDatabase database;
@@ -64,7 +62,7 @@ public class ListenerHelpers {
         return valueEventListenerClassroom;
     }
 
-    public ValueEventListener setListenerForDiscardCard(ArrayList<Card> ownDeck, GameActivity activity) {
+    public ValueEventListener setListenerForDiscardCard(ArrayList<Card> ownDeck, IChooseDialog iChooseDialog) {
 
         ValueEventListener valueEventListenerForDiscardCard = new ValueEventListener() {
             @Override
@@ -75,14 +73,7 @@ public class ListenerHelpers {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshotDiscarded) {
                                 thisPlayer.setDiscarded(snapshotDiscarded.getValue().toString());
-                                if (ownDeck.size() < 5 && !thisPlayer.getDiscarded().equals("")) {
-                                    ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                    Collections.shuffle(ownDeck);
-                                    Collections.shuffle(ownDeck);
-                                    thisPlayer.setDiscardedToEmpty();
-                                    database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");
-                                    activity.discardPileShow();
-                                }
+                                iChooseDialog.onShuffleOwnDeck(5);
                                 if (snapshot.getValue().toString().equals("1")) {
                                     for (Card card : ownDeck) {
                                         if (!card.getCardType().equals("hex")) {
@@ -217,6 +208,7 @@ public class ListenerHelpers {
 
     public ValueEventListener setListenerForBanishedCard(Context context) {
         ValueEventListener valueEventListenerBanishedCard = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -224,9 +216,9 @@ public class ListenerHelpers {
                         Card cardToShow = Common.allCardsMap.get(Integer.parseInt(snapshot.getValue().toString()));
                         String title;
                         if (thisPlayer.isPlaying())
-                            title = thisPlayer.getPlayerName() + " have banished:";
+                            title = thisPlayer.getPlayerName() + " has banished";
                         else
-                            title = opponentPlayer.getPlayerName() + " have banished:";
+                            title = opponentPlayer.getPlayerName() + " has banished";
                         ShowCardDialog.getInstance().showCardDialog(context, cardToShow, title);
                         database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue("");
                     }
@@ -244,6 +236,7 @@ public class ListenerHelpers {
 
     public ValueEventListener setListenerForBoughtClassroomCard(Context context) {
         ValueEventListener valueEventListenerBanishedCard = new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -251,9 +244,9 @@ public class ListenerHelpers {
                         Card cardToShow = Common.allCardsMap.get(Integer.parseInt(snapshot.getValue().toString()));
                         String title;
                         if (thisPlayer.isPlaying())
-                            title = thisPlayer.getPlayerName() + " have bought:";
+                            title = thisPlayer.getPlayerName() + " has bought";
                         else
-                            title = opponentPlayer.getPlayerName() + " have bought:";
+                            title = opponentPlayer.getPlayerName() + " has bought";
                         ShowCardDialog.getInstance().showCardDialog(context, cardToShow, title);
                         database.getReference("rooms/" + Common.currentRoomName + "/classroomBought").setValue("");
                     }

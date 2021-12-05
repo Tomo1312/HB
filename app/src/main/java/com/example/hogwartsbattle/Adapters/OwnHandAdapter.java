@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hogwartsbattle.Common.Common;
 import com.example.hogwartsbattle.CustomDialog.CardDialog;
+import com.example.hogwartsbattle.CustomDialog.DiscardCard;
+import com.example.hogwartsbattle.Game.GameActivity;
 import com.example.hogwartsbattle.Helpers.Helpers;
 import com.example.hogwartsbattle.Interface.ICardAddOrDeletedFromHand;
 import com.example.hogwartsbattle.Interface.IChooseDialog;
@@ -73,9 +75,9 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         holder.card_from_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (thisPlayer.getHexes().contains("85") && !checkForOnlyOneItemPlayed() &&  ownHandCard.get(position).getType().equals("item")) {
+                if (thisPlayer.getHexes().contains("85") && !checkForOnlyOneItemPlayed() && ownHandCard.get(position).getType().equals("item")) {
                     Toast.makeText(context, "You can only play one item because of hex!", Toast.LENGTH_LONG).show();
-                } else if (thisPlayer.getHexes().contains("88") && !checkForTwoSpellPlayed() &&  ownHandCard.get(position).getType().equals("spell")) {
+                } else if (thisPlayer.getHexes().contains("88") && !checkForTwoSpellPlayed() && ownHandCard.get(position).getType().equals("spell")) {
                     Toast.makeText(context, "You can only play 2 spells because of hex!", Toast.LENGTH_LONG).show();
                 } else if (thisPlayer.getHexes().contains("86") && ownHandCard.get(position).getType().equals("ally")) {
                     Toast.makeText(context, "You can't play ally because of hex!", Toast.LENGTH_LONG).show();
@@ -152,7 +154,36 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
     @Override
     public void onAddCard(Card card) {
         ownHandCard.add(card);
-        notifyDataSetChanged();
+        if (card.getCardType().equals("hex")) {
+            if (card.getId().equals("80")) {
+                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(card.getId());
+            } else if (card.getId().equals("81")) {
+                if (!thisPlayer.getAlly().equals("")) {
+                    Toast.makeText(context, "You must discard ally because of Levicorpus!", Toast.LENGTH_LONG).show();
+                    DiscardCard discardOwnAlly = new DiscardCard(context, database, thisPlayer.getAlly(), 13, null, thisPlayer);
+                    discardOwnAlly.setIChooseDialog(iChooseDialog);
+                    discardOwnAlly.showDialog();
+                } else {
+                    Toast.makeText(context, "You lucky wizard, you don't have any ally currently active!", Toast.LENGTH_LONG).show();
+                }
+            } else if (card.getId().equals("84")) {
+                Toast.makeText(context, "You need to banish top card of your deck because of Jelly-brain jinx!", Toast.LENGTH_LONG).show();
+                iChooseDialog.onShuffleOwnDeck(1);
+                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
+                ownDeck.remove(0);
+            } else if (card.getId().equals("87")) {
+                Toast.makeText(context, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
+                iChooseDialog.onShuffleOwnDeck(1);
+                database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(card.getId());
+                StringBuilder newTwoHexes = new StringBuilder();
+                newTwoHexes.append(hexes.get(0).getId()).append(",").append(hexes.get(1).getId());
+                hexes.remove(0);
+                hexes.remove(0);
+                thisPlayer.setDiscardedString(newTwoHexes.toString());
+            }
+
+            thisPlayer.setHexes(thisPlayer.getHexes() + "," + card.getId());
+        }
         String handString = Helpers.getInstance().returnCardsFromArray(ownHandCard);
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(handString);
         thisPlayer.setHand(handString);

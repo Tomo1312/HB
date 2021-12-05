@@ -5,6 +5,11 @@ public class User {
     private String userName;
     private String userId;
     private String userEmail;
+    private String status;
+    private String inviteAnswer;
+    private String invited;
+
+
     private boolean host, firstTime;
 
     private int wins, loses;
@@ -16,11 +21,23 @@ public class User {
         this.userName = userName;
         this.userId = userId;
         this.userEmail = userEmail;
+        this.status = "online";
+        this.wins = 0;
+        this.loses = 0;
+        this.inviteAnswer = "none";
+        this.invited = "none";
+        this.firstTime = true;
     }
 
     public User(String userName, String userEmail) {
         this.userName = userName;
         this.userEmail = userEmail;
+        this.status = "online";
+        this.wins = 0;
+        this.loses = 0;
+        this.inviteAnswer = "none";
+        this.invited = "none";
+        this.firstTime = true;
     }
 
     public String getUserName() {
@@ -63,8 +80,8 @@ public class User {
         this.firstTime = firstTime;
     }
 
-    public void updateWins(){
-        this.wins = wins+1;
+    public void updateWins() {
+        this.wins = wins + 1;
     }
 
     public int getWins() {
@@ -75,14 +92,39 @@ public class User {
         this.wins = wins;
     }
 
-    public void updateLoses(){
-        this.loses = loses+1;
+    public void updateLoses() {
+        this.loses = loses + 1;
     }
+
     public int getLoses() {
         return loses;
     }
 
     public void setLoses(int loses) {
         this.loses = loses;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getInviteAnswer() {
+        return inviteAnswer;
+    }
+
+    public void setInviteAnswer(String inviteAnswer) {
+        this.inviteAnswer = inviteAnswer;
+    }
+
+    public String getInvited() {
+        return invited;
+    }
+
+    public void setInvited(String invited) {
+        this.invited = invited;
     }
 }

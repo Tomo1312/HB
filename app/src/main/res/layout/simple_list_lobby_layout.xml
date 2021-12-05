@@ -24,7 +24,7 @@
     android:fontFamily="@font/lumos"
     android:textAlignment="center"
     android:textColor="@color/black"
-    android:background="#8FFFFFFF"
+    android:background="#DFFFFFFF"
     android:layout_marginTop="20dp"
     android:textSize="26dp"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"

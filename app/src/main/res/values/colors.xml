@@ -14,6 +14,10 @@
     <color name="red">#f65161</color>
     <color name="ultra_red">#A60010</color>
     <color name="blue">#abe3f3</color>
+    <color name="accept">#4CAF50</color>
+    <color name="decline">#A60010</color>
     <color name="button">#8b8b8b</color>
+    <color name="text">#4A4A4A</color>
     <color name="rock_paper_scissors">#f5f4f0</color>
+    <color name="background">#dcbf93</color>
 </resources>

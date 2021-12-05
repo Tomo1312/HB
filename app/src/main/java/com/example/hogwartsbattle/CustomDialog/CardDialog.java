@@ -77,7 +77,6 @@ public class CardDialog extends CustomDialog {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_card_active);
 
-
         setUiView(dialog);
 
         showButtonsOnCardId(dialog);
@@ -504,9 +503,11 @@ public class CardDialog extends CustomDialog {
                         } else {
                             thisPlayer.setAttacks(thisPlayer.getAttacks() + Integer.parseInt(activeCard.getAttack()));
                             if (Integer.parseInt(activeCard.getId()) == 28) {
+                                Log.e("CardDIalog", "ActiveCard id 28");
                                 ArrayList<Card> opponentDiscarded = Helpers.getInstance().returnCardsFromString(opponentPlayer.getDiscarded());
+                                Log.e("CardDIalog", "opponentPlayer.getDiscarded():" + opponentPlayer.getDiscarded());
                                 for (Card cardTmp : opponentDiscarded) {
-                                    if (cardTmp.getCardType().equals("Hex")) {
+                                    if (cardTmp.getCardType().equals("hex")) {
                                         thisPlayer.setAttacks(thisPlayer.getAttacks() + 1);
                                     }
                                 }
@@ -515,11 +516,7 @@ public class CardDialog extends CustomDialog {
 
                         break;
                     case Common.REVEAL_TOP_CARD:
-                        if (ownDeck.size() < 1) {
-                            ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                            Collections.shuffle(ownDeck);
-                            thisPlayer.setDiscardedToEmpty();
-                        }
+                        iChooseDialog.onShuffleOwnDeck(1);
                         ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), "Top Card");
                         if (Integer.parseInt(activeCard.getId()) == 7) {
                             if (Integer.parseInt(ownDeck.get(0).getCost()) > 3) {
@@ -538,6 +535,7 @@ public class CardDialog extends CustomDialog {
                             discardCard = new DiscardCard(context, database, opponentPlayer.getAlly(), 0, opponentPlayer, thisPlayer);
                             if (activeCard.getId().equals("62")) {
                                 discardCard.setOwnHandAdapter(ownHandAdapter);
+                                discardCard.setOwnDeck(ownDeck);
                                 discardCard.setClassroom(classroom);
                                 discardCard.setHexes(hexes);
                                 discardCard.setIChooseDialog(iChooseDialog);
@@ -595,11 +593,7 @@ public class CardDialog extends CustomDialog {
                                     discardCard.setCards(2);
                                     discardCard.setICardAddOrDeletedFromHand(iCardAddOrDeletedFromHand);
                                     //If deck don't have 2 cards we need new one
-                                    if (ownDeck.size() <= 1) {
-                                        ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                        Collections.shuffle(ownDeck);
-                                        thisPlayer.setDiscardedToEmpty();
-                                    }
+                                    iChooseDialog.onShuffleOwnDeck(2);
                                     discardCard.setOwnDeck(ownDeck);
                                 }
                                 discardCard.showDialog();
@@ -610,11 +604,7 @@ public class CardDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() == 0) {
-                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscardedToEmpty();
-                            }
+                            iChooseDialog.onShuffleOwnDeck(1);
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                         }
@@ -691,6 +681,7 @@ public class CardDialog extends CustomDialog {
                         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discardCardSpell").setValue(2);
                         break;
                     case Common.OPPONENT_PUT_HEX_TO_HAND:
+                        //iChooseDialog.onCreateNewHexDeck();
                         if (opponentPlayer.getHand().equals(""))
                             opponentPlayer.setHand(hexes.get(0).getId());
                         else
@@ -699,6 +690,7 @@ public class CardDialog extends CustomDialog {
                         hexes.remove(0);
                         break;
                     case Common.OPPONENT_PUT_HEX_TO_DISCARD_PILE:
+                        //iChooseDialog.onCreateNewHexDeck();
                         opponentPlayer.setDiscardedString(hexes.get(0).getId());
                         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discarded").setValue(opponentPlayer.getDiscarded());
                         hexes.remove(0);
@@ -707,11 +699,7 @@ public class CardDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() < 1) {
-                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscardedToEmpty();
-                            }
+                            iChooseDialog.onShuffleOwnDeck(1);
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                             ArrayList<Card> cardToDiscardTmp = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()));
@@ -731,11 +719,7 @@ public class CardDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() <= 1) {
-                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscardedToEmpty();
-                            }
+                            iChooseDialog.onShuffleOwnDeck(2);
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
@@ -813,11 +797,7 @@ public class CardDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() == 0) {
-                                ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                                Collections.shuffle(ownDeck);
-                                thisPlayer.setDiscardedToEmpty();
-                            }
+                            iChooseDialog.onShuffleOwnDeck(1);
                             iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                         }

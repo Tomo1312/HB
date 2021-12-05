@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HogwartsBattle</string>
+    <string name="app_version">0.234</string>
 </resources>

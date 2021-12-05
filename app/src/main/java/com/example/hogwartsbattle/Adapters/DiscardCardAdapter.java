@@ -204,17 +204,12 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
 
     private void discardCardAndGainEffects(Card discardedCard) {
         if (iCardAddOrDeletedFromHand != null) {
-            Log.e("DiscardCard", "Uslo U krivi IF jebiga" );
             iCardAddOrDeletedFromHand.onDiscardCard(discardedCard);
         } else if (extraAttacks > 0 && extraHearts > 0 && extraCards > 0) {
             if (thisPlayer.getHexes().contains("83")) {
                 Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
             } else {
-                if (ownDeck.size() <= 1) {
-                    ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-                    Collections.shuffle(ownDeck);
-                    thisPlayer.setDiscardedToEmpty();
-                }
+                iChooseDialog.onShuffleOwnDeck(2);
                 iChooseDialog.onAddCard(ownDeck.get(0));
                 ownDeck.remove(0);
             }

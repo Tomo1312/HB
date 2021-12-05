@@ -121,6 +121,7 @@ public class RoomActivity extends AppCompatActivity {
                     startActivity(intent);
                     databse.getReference("rooms/" + roomName ).removeValue();
                 }else{
+                    savePreloadData();
                     Intent intent = new Intent(RoomActivity.this, LobbyActivity.class);
                     Common.currentRoomName = "";
                     finish();
@@ -130,7 +131,17 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
     }
-
+    private void savePreloadData() {
+        //String userId = Paper.book().read(Common.KEY_LOGGED);
+            Paper.book().delete(Common.KEY_OPPONENT);
+            Paper.book().delete(Common.KEY_THIS_PLAYER);
+            Paper.book().delete(Common.KEY_ROOM);
+            Paper.book().delete(Common.KEY_GENERAL_DECK);
+            Paper.book().delete(Common.KEY_GENERAL_DECK_MAP);
+            Paper.book().delete(Common.KEY_HEX_DECK);
+            Paper.book().delete(Common.KEY_OWN_DECK);
+            Paper.book().delete(Common.KEY_HAND);
+            Paper.book().delete(Common.KEY_IS_PLAYING);}
     private void killListeners() {
         if (valueEventListenerStartGame != null)
             databse.getReference("rooms/" + roomName + "/startGame").removeEventListener(valueEventListenerStartGame);
@@ -170,6 +181,7 @@ public class RoomActivity extends AppCompatActivity {
         valueEventListenerStartGame = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
                 if (snapshot.getValue().equals("true")) {
                     killListeners();
                     Paper.book().write(Common.KEY_THIS_PLAYER, new Player());
@@ -177,7 +189,7 @@ public class RoomActivity extends AppCompatActivity {
                     intent.putExtra("roomName", roomName);
                     finish();
                     startActivity(intent);
-                }
+                }}
             }
 
             @Override

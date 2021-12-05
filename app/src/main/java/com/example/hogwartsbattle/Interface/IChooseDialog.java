@@ -29,4 +29,6 @@ public interface IChooseDialog {
 
     void onAddCard(Card newCard);
     void onDiscardCard(Card discardCard);
+
+    void onShuffleOwnDeck(int sizeDeck);
 }

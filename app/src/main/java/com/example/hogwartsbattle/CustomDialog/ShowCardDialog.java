@@ -3,6 +3,8 @@ package com.example.hogwartsbattle.CustomDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -10,6 +12,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.hogwartsbattle.Model.Card;
 import com.example.hogwartsbattle.R;
@@ -27,20 +32,24 @@ public class ShowCardDialog {
         return mDialog;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void showCardDialog(Context context, Card cardToShow, String title) {
         Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout parent = new LinearLayout(context);
         parent.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         parent.setOrientation(LinearLayout.VERTICAL);
+        parent.setBackgroundResource(R.color.background);
 
         if (title != null) {
             TextView heading = new TextView(context);
             ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             heading.setLayoutParams(tvParams);
-            heading.setGravity(View.TEXT_ALIGNMENT_CENTER);
+            heading.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
             heading.setText(title);
+            Typeface face = ResourcesCompat.getFont(context, R.font.lumos);
+            heading.setTypeface(face);
             heading.setTextSize(18);
             heading.setTextColor(Color.parseColor("#000000"));
             parent.addView(heading);
@@ -59,9 +68,8 @@ public class ShowCardDialog {
         parent.addView(iv);
 
         dialog.setContentView(parent);
-
-        if (title != null)
-            dialog.setCancelable(false);
+        if (title != null && !cardToShow.getCardType().equals("hex")){
+            dialog.setCancelable(false);}
         else
             dialog.setCancelable(true);
         Window window = dialog.getWindow();
@@ -76,18 +84,11 @@ public class ShowCardDialog {
                 timer.cancel();
             }
         };
-        long delay;
-        if(cardToShow.getCardType().equals("hex"))
-            delay= 2000L;
-        else
-            delay= 1000L;
+        long delay = 2000L;
 
-        if (title != null)
-            timer.schedule(task, delay * 2);
-//        try {
-//            TimeUnit.MILLISECONDS.sleep(2500 );
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        if (title != null) {
+            if (!cardToShow.getCardType().equals("hex"))
+                timer.schedule(task, delay * 2);
+        }
     }
 }

@@ -208,7 +208,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                         generalDeck.add(cardTmp);
                     break;
                 case "hex":
-                    hexDeck.add(cardTmp);
+                    for (int i = 0; i < Integer.valueOf(cardTmp.getCount()); i++)
+                        hexDeck.add(cardTmp);
                     break;
                 case "starter":
                     if (!cardTmp.getType().equals("ally")) {
@@ -261,7 +262,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         valueEventListenerOpponentAlly = listenerHelpers.setListenerForOpponentAllys(iChooseDialog);
         valueEventListenerOwnAlly = listenerHelpers.setListenerForOwnAllys(iChooseDialog);
         valueEventListenerClassroom = listenerHelpers.setListenerForClassroom(generalDeck, iChooseDialog);
-        valueEventListenerForDiscardCardSpell = listenerHelpers.setListenerForDiscardCard(ownDeck, GameActivity.this);
+        valueEventListenerForDiscardCardSpell = listenerHelpers.setListenerForDiscardCard(ownDeck,  iChooseDialog);
         valueEventListenerLibrary = listenerHelpers.setListenerForLibrary(iChooseDialog);
         valueEventListenerBoughtClassroomCard = listenerHelpers.setListenerForBoughtClassroomCard(GameActivity.this);
         valueEventListenerBanishedCard = listenerHelpers.setListenerForBanishedCard(GameActivity.this);
@@ -615,7 +616,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             hand.addAll(Helpers.getInstance().returnCardsFromString(stringHand));
         }
 
-        deckNeedShuffle(5);
+        onShuffleOwnDeck(5);
 
         Log.e("GameActivity", "Own deck: " + Helpers.getInstance().returnCardsFromArray(ownDeck));
         for (int i = 0; i < 5; i++) {
@@ -644,12 +645,12 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
                 }
             } else if (cardTmp.getId().equals("84")) {
                 Toast.makeText(GameActivity.this, "You need to banish top card of your deck because of Jelly-brain jinx!", Toast.LENGTH_LONG).show();
-                deckNeedShuffle(1);
+                onShuffleOwnDeck(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
                 ownDeck.remove(0);
             } else if (cardTmp.getId().equals("87")) {
                 Toast.makeText(GameActivity.this, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
-                deckNeedShuffle(1);
+                onShuffleOwnDeck(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(cardTmp.getId());
                 StringBuilder newTwoHexes = new StringBuilder();
                 newTwoHexes.append(hexDeck.get(0).getId()).append(",").append(hexDeck.get(1).getId());
@@ -929,8 +930,9 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
         });
     }
 
-    public void deckNeedShuffle(int sizeRequested) {
-        if (ownDeck.size() < sizeRequested && !thisPlayer.getDiscarded().equals("")) {
+    @Override
+    public void onShuffleOwnDeck(int sizeDeck) {
+        if (ownDeck.size() < sizeDeck && !thisPlayer.getDiscarded().equals("")) {
             ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
             Collections.shuffle(ownDeck);
             Collections.shuffle(ownDeck);
@@ -938,6 +940,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/discarded").setValue("");
             discardPileShow();
         }
+
     }
 
     @Override

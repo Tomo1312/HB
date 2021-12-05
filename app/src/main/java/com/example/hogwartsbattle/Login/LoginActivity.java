@@ -77,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Common.currentUser = snapshot.getValue(User.class);
+                    Paper.book().write(Common.KEY_THIS_USER, Common.currentUser);
                     Intent intent = new Intent(LoginActivity.this, LobbyActivity.class);
                     intent.putExtra(Common.KEY_USER_ID, user.getUserId());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -202,7 +203,6 @@ public class LoginActivity extends AppCompatActivity {
     private void sendUserData() {
         Common.currentUser = new User(txt_Username.getText().toString(), txt_eMail.getText().toString());
         Common.currentUser.setUserId(mAuth.getUid());
-        Common.currentUser.setFirstTime(true);
         userRef = databse.getReference("Users");
         User user = new User(txt_Username.getText().toString(), (mAuth.getUid()), txt_eMail.getText().toString());
         userRef.child(mAuth.getUid()).setValue(user);

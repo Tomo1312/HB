@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/text_view_challenge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginVertical="30dp"
+        android:fontFamily="@font/lumos"
+        android:gravity="center_horizontal"
+        android:text="Pobjednik je :"
+        android:textAlignment="center"
+        android:textSize="32dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_view_challenge"
+        android:weightSum="2">
+
+        <ImageView
+            android:id="@+id/btnAcceptChallengeInvite"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:background="@color/accept"
+            android:src="@drawable/accept" />
+
+        <ImageView
+            android:id="@+id/btnDeclineChallengeInvite"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:background="@color/red"
+            android:src="@drawable/decline" />
+    </LinearLayout>
+
+
+</RelativeLayout>

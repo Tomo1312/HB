@@ -312,9 +312,7 @@ public class OwnAllyDialog extends CustomDialog {
 
                         break;
                     case Common.REVEAL_TOP_CARD:
-                        if (ownDeck.size() < 1) {
-                            shuffleDeck();
-                        }
+                        iChooseDialog.onShuffleOwnDeck(1);
                         String title = "Top card:";
                         ShowCardDialog.getInstance().showCardDialog(context, ownDeck.get(0), title);
                         if (Integer.parseInt(activeAlly.getId()) == 38) {
@@ -357,17 +355,13 @@ public class OwnAllyDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() < 1) {
-                                shuffleDeck();
-                            }
+                            iChooseDialog.onShuffleOwnDeck(1);
                             ownHandAdapter.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                         }
                         break;
                     case Common.DISCARD_CARD:
-                        if (ownDeck.size() < 1) {
-                            shuffleDeck();
-                        }
+                        iChooseDialog.onShuffleOwnDeck(1);
                         thisPlayerDiscardCard(ownDeck.get(0));
                         ownDeck.remove(0);
                         database.getReference("rooms/" + Common.currentRoomName + "/" + opponentPlayer.getPlayerName() + "/discardCardSpell").setValue(1);
@@ -376,9 +370,7 @@ public class OwnAllyDialog extends CustomDialog {
                         if (thisPlayer.getHexes().contains("83")) {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
-                            if (ownDeck.size() < 1) {
-                                shuffleDeck();
-                            }
+                            iChooseDialog.onShuffleOwnDeck(1);
                             ownHandAdapter.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                             discardCard = new DiscardCard(context, database, Helpers.getInstance().returnCardsFromString(thisPlayer.getHand()), 7, opponentPlayer, thisPlayer);
@@ -473,14 +465,6 @@ public class OwnAllyDialog extends CustomDialog {
         layoutAllyAttack.addView(newButton);
 
         return newButton;
-    }
-
-    private void shuffleDeck() {
-        if (!thisPlayer.getDiscarded().equals("")) {
-            ownDeck.addAll(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
-            Collections.shuffle(ownDeck);
-            thisPlayer.setDiscardedToEmpty();
-        }
     }
 
     void thisPlayerDiscardCard(Card card) {
