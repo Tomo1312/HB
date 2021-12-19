@@ -30,6 +30,7 @@ import com.example.hogwartsbattle.CustomDialog.AnswerToOpponentInvite;
 import com.example.hogwartsbattle.Helpers.ListenerHelpers;
 import com.example.hogwartsbattle.Interface.LobbyActivityListener;
 import com.example.hogwartsbattle.Model.Player;
+import com.example.hogwartsbattle.Model.Room;
 import com.example.hogwartsbattle.Model.User;
 import com.example.hogwartsbattle.R;
 import com.google.firebase.database.DataSnapshot;
@@ -52,7 +53,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
     ListView listViewRooms, listViewPlayersOnline;
     Button btnCreateRoom;
 
-    List<String> roomsList, playersOnline, playersOnlineId;
+    List<String> roomsList, playersOnline;
+//    , playersOnlineId;
 
     String playerName;
     String roomName;
@@ -68,6 +70,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
     User user;
     HarryMediaPlayer mediaPlayer;
     Timer inviteTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,7 +185,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
 //        checkIfItsInRoom();
 
         listViewRooms = findViewById(R.id.listViewRooms);
-        listViewPlayersOnline = findViewById(R.id.listViewPlayersOnline);
+//        listViewPlayersOnline = findViewById(R.id.listViewPlayersOnline);
         btnCreateRoom = findViewById(R.id.btnCreateRoom);
         tvPlayerName = findViewById(R.id.playerName);
         tvPlayerWins = findViewById(R.id.playerWins);
@@ -192,7 +195,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
         tvPlayerLoses.setText(user.getLoses() + " Loss");
         roomsList = new ArrayList<>();
         playersOnline = new ArrayList<>();
-        playersOnlineId = new ArrayList<>();
+//        playersOnlineId = new ArrayList<>();
         roomsRef = database.getReference("rooms");
         usersOnlineRef = database.getReference("Users");
         usersInvitedRef = database.getReference("Users/" + user.getUserId() + "/invited");
@@ -203,12 +206,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
                 btnCreateRoom.setText("Room created!");
                 btnCreateRoom.setEnabled(false);
                 roomRef = database.getReference("rooms/" + roomName + "/" + playerName);
-                database.getReference("rooms/" + roomName + "/startGame").setValue("false");
-                database.getReference("rooms/" + roomName + "/classroom").setValue("");
-                database.getReference("rooms/" + roomName + "/classroomBought").setValue("");
-                database.getReference("rooms/" + roomName + "/banished").setValue("");
-                database.getReference("rooms/" + roomName + "/library").setValue("8");
-                database.getReference("rooms/" + roomName + "/playing").setValue("");
+                Room room = new Room();
+                database.getReference("rooms/").child(roomName).setValue(room);
                 Player player = new Player(playerName);
                 addRoomEventListener();
                 database.getReference("rooms/" + roomName + "/").child(playerName).setValue(player);
@@ -226,75 +225,75 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
             }
         });
 
-        listViewPlayersOnline.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                inviteDialog.show();
-                database.getReference("Users/" + playersOnlineId.get(position) + "/invited").setValue(Common.currentUser.getUserId());
-                valueEventListenerInviteAnswer = new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            if (snapshot.getValue().equals("accepted")) {
-                                Toast.makeText(LobbyActivity.this, "Player accepted!", Toast.LENGTH_LONG).show();
-                                inviteDialog.dismiss();
-                                stopAllListeners();
-                                inviteTimer.cancel();
-                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").removeEventListener(valueEventListenerInviteAnswer);
-                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").setValue("none");
-
-                                roomRef = database.getReference("rooms/" + roomName + "/" + playerName);
-                                database.getReference("rooms/" + roomName + "/startGame").setValue("false");
-                                database.getReference("rooms/" + roomName + "/classroom").setValue("");
-                                database.getReference("rooms/" + roomName + "/classroomBought").setValue("");
-                                database.getReference("rooms/" + roomName + "/banished").setValue("");
-                                database.getReference("rooms/" + roomName + "/library").setValue("8");
-                                database.getReference("rooms/" + roomName + "/playing").setValue("");
-                                Player player = new Player(playerName);
-                                database.getReference("rooms/" + roomName + "/").child(playerName).setValue(player);
-
-                                Intent intent = new Intent(LobbyActivity.this, RoomActivity.class);
-                                intent.putExtra("roomName", roomName);
-                                Common.currentRoomName = roomName;
-                                Log.e("LOBBYACTIVTIY", "RoomName= " + roomName);
-                                finish();
-                                startActivity(intent);
-                            } else if (snapshot.getValue().equals("declined")) {
-                                Toast.makeText(LobbyActivity.this, "Player declined!", Toast.LENGTH_LONG).show();
-                                inviteDialog.dismiss();
-                                inviteTimer.cancel();
-                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").removeEventListener(valueEventListenerInviteAnswer);
-                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").setValue("none");
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                };
-                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").addValueEventListener(valueEventListenerInviteAnswer);
-                TimerTask task = new TimerTask() {
-                    public void run() {
-                        inviteDialog.dismiss();
-                        database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").removeEventListener(valueEventListenerInviteAnswer);
-                        database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").setValue("none");
-                        inviteTimer.cancel();
-                    }
-                };
-                inviteTimer = new Timer("Timer for invite player");
-                inviteTimer.schedule(task, 1000 * 12);
-
-            }
-        });
+//        listViewPlayersOnline.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                inviteDialog.show();
+//                database.getReference("Users/" + playersOnlineId.get(position) + "/invited").setValue(Common.currentUser.getUserId());
+//                valueEventListenerInviteAnswer = new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if (snapshot.exists()) {
+//                            if (snapshot.getValue().equals("accepted")) {
+//                                Toast.makeText(LobbyActivity.this, "Player accepted!", Toast.LENGTH_LONG).show();
+//                                inviteDialog.dismiss();
+//                                stopAllListeners();
+//                                inviteTimer.cancel();
+//                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").removeEventListener(valueEventListenerInviteAnswer);
+//                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").setValue("none");
+//
+//                                roomRef = database.getReference("rooms/" + roomName + "/" + playerName);
+//                                database.getReference("rooms/" + roomName + "/startGame").setValue("false");
+//                                database.getReference("rooms/" + roomName + "/classroom").setValue("");
+//                                database.getReference("rooms/" + roomName + "/classroomBought").setValue("");
+//                                database.getReference("rooms/" + roomName + "/banished").setValue("");
+//                                database.getReference("rooms/" + roomName + "/library").setValue("8");
+//                                database.getReference("rooms/" + roomName + "/playing").setValue("");
+//                                Player player = new Player(playerName);
+//                                database.getReference("rooms/" + roomName + "/").child(playerName).setValue(player);
+//
+//                                Intent intent = new Intent(LobbyActivity.this, RoomActivity.class);
+//                                intent.putExtra("roomName", roomName);
+//                                Common.currentRoomName = roomName;
+//                                Log.e("LOBBYACTIVTIY", "RoomName= " + roomName);
+//                                finish();
+//                                startActivity(intent);
+//                            } else if (snapshot.getValue().equals("declined")) {
+//                                Toast.makeText(LobbyActivity.this, "Player declined!", Toast.LENGTH_LONG).show();
+//                                inviteDialog.dismiss();
+//                                inviteTimer.cancel();
+//                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").removeEventListener(valueEventListenerInviteAnswer);
+//                                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").setValue("none");
+//                            }
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                };
+//                database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").addValueEventListener(valueEventListenerInviteAnswer);
+//                TimerTask task = new TimerTask() {
+//                    public void run() {
+//                        inviteDialog.dismiss();
+//                        database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").removeEventListener(valueEventListenerInviteAnswer);
+//                        database.getReference("Users/" + Common.currentUser.getUserId() + "/inviteAnswer").setValue("none");
+//                        inviteTimer.cancel();
+//                    }
+//                };
+//                inviteTimer = new Timer("Timer for invite player");
+//                inviteTimer.schedule(task, 1000 * 12);
+//
+//            }
+//        });
         setAllListeners();
     }
 
     private void setAllListeners() {
         addRoomsEventListener();
-        addPlayersOnlineListener();
+//        addPlayersOnlineListener();
         addListenerForInvited();
     }
 
@@ -333,36 +332,36 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
         });
     }
 
-    private void addPlayersOnlineListener() {
-        valueEventListenerPlayersOnline = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                playersOnline.clear();
-                playersOnlineId.clear();
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(LobbyActivity.this,
-                        R.layout.simple_list_lobby_layout, playersOnline);
-                listViewPlayersOnline.setAdapter(adapter);
-                Iterable<DataSnapshot> users = snapshot.getChildren();
-                for (DataSnapshot snapshotTmp : users) {
-                    if (snapshotTmp.child("status").getValue().equals("online") && !snapshotTmp.child("userId").getValue().equals(Common.currentUser.getUserId())) {
-                        playersOnlineId.add(snapshotTmp.getKey());
-                        playersOnline.add(snapshotTmp.child("userName").getValue().toString());
-                        adapter = new ArrayAdapter<>(LobbyActivity.this,
-                                R.layout.simple_list_lobby_layout, playersOnline);
-                        listViewPlayersOnline.setAdapter(adapter);
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        };
-
-        usersOnlineRef.addValueEventListener(valueEventListenerPlayersOnline);
-    }
+//    private void addPlayersOnlineListener() {
+//        valueEventListenerPlayersOnline = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                playersOnline.clear();
+////                playersOnlineId.clear();
+//
+//                ArrayAdapter<String> adapter = new ArrayAdapter<>(LobbyActivity.this,
+//                        R.layout.simple_list_lobby_layout, playersOnline);
+//                listViewPlayersOnline.setAdapter(adapter);
+//                Iterable<DataSnapshot> users = snapshot.getChildren();
+//                for (DataSnapshot snapshotTmp : users) {
+//                    if (snapshotTmp.child("status").getValue().equals("online") && !snapshotTmp.child("userId").getValue().equals(Common.currentUser.getUserId())) {
+////                        playersOnlineId.add(snapshotTmp.getKey());
+//                        playersOnline.add(snapshotTmp.child("userName").getValue().toString());
+//                        adapter = new ArrayAdapter<>(LobbyActivity.this,
+//                                R.layout.simple_list_lobby_layout, playersOnline);
+//                        listViewPlayersOnline.setAdapter(adapter);
+//
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//            }
+//        };
+//
+//        usersOnlineRef.addValueEventListener(valueEventListenerPlayersOnline);
+//    }
 
     private void addRoomEventListener() {
         valueEventListenerCreateRoom = new ValueEventListener() {
@@ -399,13 +398,15 @@ public class LobbyActivity extends AppCompatActivity implements LobbyActivityLis
                 Iterable<DataSnapshot> rooms = snapshot.getChildren();
                 for (DataSnapshot snapshotTmp : rooms) {
                     if (!(snapshotTmp.getKey().equals("holder"))) {
-                        if (snapshotTmp.child("startGame").getValue().equals("false")) {
+//                        if (snapshotTmp.child("startGame").getValue().equals("false")) {
+                        if (snapshotTmp.child("locked").getValue().equals("false")) {
                             roomsList.add(snapshotTmp.getKey());
 
                             adapter = new ArrayAdapter<>(LobbyActivity.this,
                                     R.layout.simple_list_lobby_layout, roomsList);
                             listViewRooms.setAdapter(adapter);
                         }
+//                        }
 
                     }
                 }

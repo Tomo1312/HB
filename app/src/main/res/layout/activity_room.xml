@@ -15,6 +15,24 @@
         android:src="@drawable/wand" />
 
     <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:id="@+id/room_lock"
+        android:src="@drawable/lock_open"
+        android:visibility="invisible"/>
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/invite_opponent"
+        android:src="@drawable/invite_player"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"/>
+
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"

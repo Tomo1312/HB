@@ -660,10 +660,8 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             }
         }
         for (Card cardTmp : Helpers.getInstance().returnCardsFromString(hexesString.toString())) {
-            Log.e("GAMEACTIVITY", "For loop");
             if (cardTmp.getId().equals("80") || cardTmp.getId().equals("84") || cardTmp.getId().equals("87")) {
                 hand.remove(cardTmp);
-                Log.e("GAMEACTIVITY", "Hand Remove!");
             }
 
         }
@@ -908,7 +906,7 @@ public class GameActivity extends AppCompatActivity implements IChooseDialog {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot snapshotTmp : snapshot.getChildren()) {
                     if (!(snapshotTmp.getKey().equals("startGame")) && !(snapshotTmp.getKey().equals("banished")) && !(snapshotTmp.getKey().equals("classroom"))
-                            && !(snapshotTmp.getKey().equals("playing")) && !(snapshotTmp.getKey().equals("classroomBought"))
+                            && !(snapshotTmp.getKey().equals("playing")) && !(snapshotTmp.getKey().equals("classroomBought"))&& !(snapshotTmp.getKey().equals("locked"))
                             && !(snapshotTmp.getKey().equals("library"))) {
                         Player playerTmp = snapshotTmp.getValue(Player.class);
                         if (playerTmp.getPlayerName().equals(Common.currentUser.getUserName())) {

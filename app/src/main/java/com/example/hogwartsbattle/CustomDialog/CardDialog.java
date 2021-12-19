@@ -605,7 +605,7 @@ public class CardDialog extends CustomDialog {
                             Toast.makeText(context, "You can't draw extra cards because of hex!", Toast.LENGTH_LONG).show();
                         } else {
                             iChooseDialog.onShuffleOwnDeck(1);
-                            iCardAddOrDeletedFromHand.onAddCard(ownDeck.get(0));
+                            iChooseDialog.onAddCard(ownDeck.get(0));
                             ownDeck.remove(0);
                         }
                         break;

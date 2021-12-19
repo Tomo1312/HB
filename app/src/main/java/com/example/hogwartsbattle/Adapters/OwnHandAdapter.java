@@ -157,6 +157,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         if (card.getCardType().equals("hex")) {
             if (card.getId().equals("80")) {
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(card.getId());
+                ownHandCard.remove(card);
             } else if (card.getId().equals("81")) {
                 if (!thisPlayer.getAlly().equals("")) {
                     Toast.makeText(context, "You must discard ally because of Levicorpus!", Toast.LENGTH_LONG).show();
@@ -171,6 +172,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
                 iChooseDialog.onShuffleOwnDeck(1);
                 database.getReference("rooms/" + Common.currentRoomName + "/banished").setValue(ownDeck.get(0).getId());
                 ownDeck.remove(0);
+                ownHandCard.remove(card);
             } else if (card.getId().equals("87")) {
                 Toast.makeText(context, "You got 2 hexes in discard pile and banished Geminio!", Toast.LENGTH_LONG).show();
                 iChooseDialog.onShuffleOwnDeck(1);
@@ -180,6 +182,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
                 hexes.remove(0);
                 hexes.remove(0);
                 thisPlayer.setDiscardedString(newTwoHexes.toString());
+                ownHandCard.remove(card);
             }
 
             thisPlayer.setHexes(thisPlayer.getHexes() + "," + card.getId());
@@ -187,6 +190,7 @@ public class OwnHandAdapter extends RecyclerView.Adapter<OwnHandAdapter.MyViewHo
         String handString = Helpers.getInstance().returnCardsFromArray(ownHandCard);
         database.getReference("rooms/" + Common.currentRoomName + "/" + thisPlayer.getPlayerName() + "/hand").setValue(handString);
         thisPlayer.setHand(handString);
+        notifyDataSetChanged();
     }
 
     public void cleanCardsInHand() {

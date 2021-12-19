@@ -345,7 +345,7 @@ public class DiscardCardAdapter extends RecyclerView.Adapter<DiscardCardAdapter.
         ArrayList<Card> discarded = new ArrayList<>(Helpers.getInstance().returnCardsFromString(thisPlayer.getDiscarded()));
         discarded.remove(activeCard);
         if (discarded.size() > 0)
-            thisPlayer.setDiscardedString(Helpers.getInstance().returnCardsFromArray(discarded));
+            thisPlayer.setDiscarded(Helpers.getInstance().returnCardsFromArray(discarded));
         else
             thisPlayer.setDiscardedToEmpty();
         dialog.dismiss();
